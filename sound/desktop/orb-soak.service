@@ -1,0 +1,7 @@
+# One-shot health sample, driven by orb-soak.timer (user). See orb_soak_log.sh.
+[Unit]
+Description=nOdes full-server soak-test health sampler
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash %h/projects/nOdes/sound/desktop/orb_soak_log.sh

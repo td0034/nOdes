@@ -1,0 +1,10 @@
+# Sample full-server health every minute for soak / pre-show stability testing.
+[Unit]
+Description=Sample full-server health every minute (soak test)
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=60s
+
+[Install]
+WantedBy=timers.target

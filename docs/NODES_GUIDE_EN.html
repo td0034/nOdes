@@ -1,0 +1,329 @@
+<meta charset="utf-8">
+<html lang="en">
+<title>nOdes — Field Guide</title>
+<link rel="stylesheet" href="guide.css">
+<style>
+  .warnbox { border-left: 2.4pt solid #c0392b; padding-left: 4mm; }
+  p.warn { font-size: 9pt; color: #7a2a20; margin: 0 0 1.6mm; line-height: 1.45; }
+  .hint.warn { color: #a33; }
+</style>
+<div class="page cover">
+  <svg class="art" width="300" height="200" viewBox="0 0 300 200">
+    
+    <path class="ln fillw" d="M40 118 L150 152 L260 118 L260 150 L150 184 L40 150 Z"/>
+    <path class="ln fillg" d="M40 118 L150 84 L260 118 L150 152 Z"/>
+    <g class="lnT">
+      <ellipse cx="103" cy="112" rx="17" ry="8.5"/><ellipse cx="150" cy="126" rx="17" ry="8.5"/>
+      <ellipse cx="197" cy="112" rx="17" ry="8.5"/><ellipse cx="103" cy="127" rx="17" ry="8.5"/>
+      <ellipse cx="150" cy="141" rx="17" ry="8.5"/><ellipse cx="197" cy="127" rx="17" ry="8.5"/>
+    </g>
+    <g class="ln fillw">
+      <circle cx="103" cy="104" r="13"/><circle cx="150" cy="118" r="13"/>
+      <circle cx="197" cy="104" r="13"/>
+    </g>
+    <path class="ln fillw" d="M40 118 L40 46 L150 12 L150 84 Z"/>
+    <path class="ln fillg" d="M56 108 L56 56 L136 31 L136 83 Z"/>
+    <g class="lnT" opacity=".6">
+      <circle cx="80" cy="80" r="6"/><circle cx="106" cy="66" r="6"/><circle cx="120" cy="88" r="6"/>
+      <path d="M80 80 L106 66 M106 66 L120 88 M80 80 L120 88"/>
+    </g>
+  </svg>
+  <h1>nOdes</h1>
+  <p class="sub">Eggbox field kit — setup, data &amp; TouchDesigner</p>
+  <div class="nowords">
+    <figure><svg width="100%" viewBox="0 0 80 60">
+      <rect class="ln fillw" x="12" y="14" width="56" height="34" rx="4"/>
+      <path class="ln" d="M22 26h26M22 34h18"/>
+      <circle class="act" cx="58" cy="40" r="9"/><path class="act" d="M54 40l3 3 6-7"/>
+    </svg><figcaption>No tools required</figcaption></figure>
+    <figure><svg width="100%" viewBox="0 0 80 60">
+      <circle class="ln fillw" cx="40" cy="30" r="19"/><path class="ln" d="M40 19v12l8 5"/>
+    </svg><figcaption>~3 minutes to first data</figcaption></figure>
+    <figure><svg width="100%" viewBox="0 0 80 60">
+      <path class="ln fillw" d="M26 42a8 8 0 0 1 .6-16 12 12 0 0 1 22.6-2A9 9 0 0 1 52 42Z"/>
+      <path style="stroke:#c0392b;stroke-width:2.6;fill:none;stroke-linecap:round" d="M18 48L60 16"/>
+    </svg><figcaption>Works with no internet</figcaption></figure>
+  </div>
+  <p class="meta">Start on page 3 — you do not need the box yet</p>
+  <p class="meta" style="margin-top:3mm;color:#c0392b">⚠ Read the safety note on page 2 before charging</p>
+  <div class="foot"><span>nOdes</span><span>Cover</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Before you start</span><h2>What is in the box</h2></div>
+    <p class="lede">Check everything is present. The eggbox case holds the whole system — a small computer, a screen, and six wireless charging wells.</p>
+  </div>
+  <div class="parts">
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><path class="ln fillw" d="M20 48 L60 60 L100 48 L100 62 L60 74 L20 62 Z"/><path class="ln fillg" d="M20 48 L60 36 L100 48 L60 60 Z"/><path class="ln fillw" d="M20 48 L20 16 L60 4 L60 36 Z"/></svg><div class="qty">×1</div><div class="nm">Eggbox case<br>(computer + screen in the lid)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><g class="ln fillw"><circle cx="42" cy="40" r="15"/><circle cx="78" cy="40" r="15"/></g><g class="lnT"><circle cx="42" cy="40" r="7"/><circle cx="78" cy="40" r="7"/></g></svg><div class="qty">×6</div><div class="nm">Orbs<br>(70&nbsp;mm, serial printed on each)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><rect class="ln fillw" x="14" y="24" width="30" height="32" rx="5"/><path class="lnT" d="M22 34h14M22 42h9"/><path class="ln" d="M44 40h20"/><rect class="act" x="64" y="31" width="34" height="18" rx="9"/><path class="lnT" d="M72 40h18"/><text class="tinyg" x="58" y="68" style="font-size:11px">flat / oval</text></svg><div class="qty">×1</div><div class="nm">USB-C power supply<br>(runs the computer)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><rect class="ln fillw" x="14" y="24" width="30" height="32" rx="5"/><path class="lnT" d="M22 34h14M22 42h9"/><path class="ln" d="M44 40h26"/><circle class="act" cx="83" cy="40" r="13"/><circle class="fillk" cx="83" cy="40" r="4"/><text class="tinyg" x="62" y="68" style="font-size:11px">round</text></svg><div class="qty">×1</div><div class="nm">Charger power supply<br>(runs the six wells)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><path class="ln" d="M26 40c14-16 54 16 68 0"/><rect class="ln fillg" x="18" y="33" width="12" height="14" rx="4"/><rect class="ln fillg" x="90" y="33" width="12" height="14" rx="4"/></svg><div class="qty">×1</div><div class="nm">USB-C cable<br>(your laptop → eggbox)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><path class="ln fillw" d="M32 54V26a4 4 0 0 1 4-4h48a4 4 0 0 1 4 4v28"/><path class="ln" d="M22 54h76l-6 8H28z"/><path class="lnT" d="M44 34h32M44 42h20"/></svg><div class="qty">×1</div><div class="nm">Your laptop<br>(not supplied)</div></div>
+  </div>
+  <div class="blk warnbox">
+    <h2 style="font-size:11.5pt;margin:0 0 1.5mm;color:#a33">⚠ Safety — charging gets hot</h2>
+    <p class="warn"><strong>Orbs become quite hot while charging.</strong> This is normal for wireless charging, but it means charging must be <strong>attended</strong>.</p>
+    <p class="warn">Never leave the charger supply running unattended — not overnight, and not while the room is empty. Switch the charger supply off when you leave.</p>
+    <p class="warn">Keep the lid open while charging so heat can escape, and do not cover the case with fabric or paper.</p>
+    <p class="warn">A warm orb is fine. An orb too hot to hold comfortably is not — take it off the charger and let it cool.</p>
+  </div>
+  <div class="blk">
+    <h2 style="font-size:11.5pt;margin:0 0 1mm">Two ways to connect. Prefer the cable.</h2>
+    <table>
+      <tr><th style="width:26mm">Route</th><th style="width:28mm">Address</th><th>When to use it</th></tr>
+      <tr><td><strong>USB-C cable</strong></td><td><code>10.55.0.1</code></td><td><strong>Preferred.</strong> Faster, more reliable, and it does not use up one of the station's scarce Wi-Fi seats.</td></tr>
+      <tr><td><strong>Wi-Fi hotspot</strong></td><td><code>10.0.0.8</code></td><td>Only when a cable is impractical. The radio holds about <strong>eight</strong> devices in total and the orbs need those seats — every laptop that joins may cost you an orb.</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Page 2 · Parts &amp; safety</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Start here</span><h2>Build without the box</h2></div>
+    <p class="lede">Six imaginary orbs run on your own laptop and publish exactly what the real station publishes. Build your patch now; when the eggbox arrives you change one address and it works.</p>
+  </div>
+  <div class="step"><div class="num">1</div><div class="art"><svg width="200" height="92" viewBox="0 0 200 92">
+        <rect class="ln fillw" x="10" y="10" width="180" height="72" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <text class="tinyg" x="22" y="50">$ python3 --version</text><text class="tinyg" x="22" y="67">Python 3.12.3</text></svg></div><div class="txt"><p class="big">Check you have <strong>Python 3</strong>.</p><p class="hint">Version 3.8 or newer. Nothing else to install.<br>macOS — <code>xcode-select --install</code><br>Windows — install from <code>python.org</code></p></div></div>
+  <div class="step"><div class="num">2</div><div class="art"><svg width="200" height="92" viewBox="0 0 200 92">
+        <rect class="ln fillw" x="10" y="10" width="180" height="72" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <text class="tinyg" x="22" y="50">$ cd simulator</text><text class="tiny" x="22" y="67">$ ./run.sh</text></svg></div><div class="txt"><p class="big">In a terminal, go to the <code>simulator</code> folder and run it.</p><p style="margin:2mm 0"><code style="font-size:11pt;font-weight:600">./run.sh</code></p><p class="hint">It prints the addresses and keeps running. Leave it open; <strong>Ctrl-C</strong> stops it. More orbs: <code>./run.sh 12</code>. To test docked orbs: <code>./run.sh 6 --charging 2</code>.</p><p class="hint" style="margin-top:2mm">On Windows, or if <code>./run.sh</code> will not execute, run the two parts in two terminals:<br><code>python3 fake_orb_data.py --orbs 6 --hz 25</code><br><code>python3 orb_td_bridge.py</code></p></div></div>
+  <div class="step"><div class="num">3</div><div class="art"><svg width="200" height="100" viewBox="0 0 200 100">
+        <rect class="ln fillw" x="10" y="10" width="180" height="82" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <rect class="fillg" x="56" y="15" width="128" height="10" rx="5"/>
+        <text class="tinyg" x="61" y="23" style="font-size:8px">127.0.0.1:8080</text>
+        <rect class="actf" x="22" y="42" width="56" height="9" rx="4.5"/>
+        <g class="lnT"><path d="M22 60h150M22 72h150M22 84h110"/></g>
+        <g class="act"><circle cx="160" cy="82" r="9"/><path d="M156 82l3 3 6-7"/></g></svg></div><div class="txt"><p class="big">Open a browser at <code>http://127.0.0.1:8080</code></p><p class="hint">A live table of six orbs, refreshing every two seconds. <strong>If this page works, everything else in this guide will work.</strong></p></div></div>
+
+  <div class="foot"><span>nOdes</span><span>Page 3 · Simulator</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">The real box</span><h2>Power up</h2></div>
+    <p class="lede">The two power supplies are independent. The USB-C one runs the computer; the other runs the six charging wells.</p>
+  </div>
+  <div class="step"><div class="num">1</div><div class="art"><svg width="188" height="118" viewBox="0 0 188 118"><path class="ctx" d="M28 84 L94 104 L160 84 L160 96 L94 116 L28 96 Z"/><path class="ctx" d="M28 84 L94 64 L160 84 L94 104 Z"/><path class="ctx" d="M28 84 L28 34 L94 14 L94 64 Z"/><rect class="act" x="150" y="76" width="15" height="7" rx="3.5"/><path class="act dash" d="M165 79 C182 79 182 40 168 34"/><rect class="ln fillw" x="140" y="16" width="30" height="26" rx="5"/><path class="lnT" d="M148 24h14M148 32h9"/></svg></div><div class="txt"><p class="big">Plug the <strong>USB-C power supply</strong> into the port on the side of the case, then into the wall.</p><p class="hint">The screen in the lid lights up on its own. Nothing to press.</p><div class="wait"><svg width="12" height="12" viewBox="0 0 24 24"><circle class="lnT" cx="12" cy="12" r="9"/><path class="lnT" d="M12 7v5l3 2"/></svg>Wait about <strong>60 seconds</strong> for the station to start</div></div></div>
+  <div class="step"><div class="num">2</div><div class="art"><svg width="188" height="118" viewBox="0 0 188 118"><path class="ctx" d="M28 84 L94 104 L160 84 L160 96 L94 116 L28 96 Z"/><path class="ctx" d="M28 84 L94 64 L160 84 L94 104 Z"/><path class="ctx" d="M28 84 L28 34 L94 14 L94 64 Z"/><circle class="act" cx="34" cy="88" r="5"/><path class="act dash" d="M29 88 C10 88 10 44 22 38"/><rect class="ln fillw" x="14" y="16" width="34" height="24" rx="5"/><path class="lnT" d="M22 28h18"/></svg></div><div class="txt"><p class="big">Plug the <strong>charger power supply</strong> into the round socket, then into the wall.</p><p class="hint warn" style="margin-top:2mm">⚠ Only do this while someone is present — see the safety note on page 2. Switch it off when you leave the room.</p></div></div>
+  <div class="step"><div class="num">3</div><div class="art"><svg width="188" height="118" viewBox="0 0 188 118"><path class="ctx" d="M40 82 L100 100 L160 82 L160 94 L100 112 L40 94 Z"/><path class="ctx" d="M40 82 L100 64 L160 82 L100 100 Z"/><ellipse class="ctx" cx="76" cy="78" rx="14" ry="7"/><circle class="act" cx="112" cy="30" r="16"/><path class="act dash" d="M92 66 C96 48 100 40 104 36"/><path class="ln" d="M138 20c6 5 6 15 0 20M86 20c-6 5-6 15 0 20"/></svg></div><div class="txt"><p class="big">Lift an orb out and <strong>shake it</strong> to wake it.</p><p class="hint">It joins within a couple of seconds. Repeat for as many orbs as you want live.</p><p class="hint" style="margin-top:2mm"><strong>An orb that is not charging goes to sleep after 30 seconds of stillness</strong> and disappears from the data until shaken. This is normal.</p></div></div>
+  <div class="dodont">
+    <div><div class="mark ok">✓</div><p>Leave orbs in the wells between sessions, with the charger on and someone present. While actually charging they stay awake.</p></div>
+    <div><div class="mark no">✗</div><p>Do not power the station from a laptop USB port if you can avoid it. A weak port browns the computer out and the link dies. Use the supplied wall supply.</p></div>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Page 4 · Power</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">The real box</span><h2>Connect your laptop</h2></div>
+    <p class="lede">Pick <strong>one</strong>. Route A is better in every way; use B only if a cable will not reach.</p>
+  </div>
+  <div class="step"><div class="num">4</div><div class="art"><svg width="188" height="122" viewBox="0 0 188 122"><path class="ln fillw" d="M12 62V24a4 4 0 0 1 4-4h52a4 4 0 0 1 4 4v38"/><path class="ln" d="M4 62h84l-6 9H10z"/><path class="act" d="M74 46 C104 46 108 84 130 88"/><path class="ctx" d="M104 88 L142 100 L180 88 L180 100 L142 112 L104 100 Z"/><path class="ctx" d="M104 88 L142 76 L180 88 L142 100 Z"/><path class="ctx" d="M104 88 L104 52 L142 40 L142 76 Z"/><text class="tiny" x="14" y="40">A</text></svg></div><div class="txt"><p class="big"><strong>Route A — USB-C cable.</strong> Connect laptop to eggbox. That is the whole step.</p><p class="hint">The station appears as a wired network device. Leave your network settings on automatic — your normal Wi-Fi and internet keep working. macOS and Windows need no driver.</p><p style="margin-top:2mm">The station is at <code style="font-size:11pt;font-weight:600">10.55.0.1</code></p></div></div>
+  <div class="step"><div class="num">5</div><div class="art"><svg width="188" height="122" viewBox="0 0 188 122"><path class="ln fillw" d="M12 62V24a4 4 0 0 1 4-4h52a4 4 0 0 1 4 4v38"/><path class="ln" d="M4 62h84l-6 9H10z"/><g class="act"><path d="M92 58c5-6 5-16 0-22"/><path d="M102 64c9-11 9-29 0-40"/><path d="M112 70c13-16 13-42 0-58"/></g><path class="ctx" d="M124 88 L152 98 L180 88 L180 100 L152 110 L124 100 Z"/><path class="ctx" d="M124 88 L152 78 L180 88 L152 98 Z"/><path class="ctx" d="M124 88 L124 56 L152 46 L152 78 Z"/><text class="tiny" x="14" y="40">B</text></svg></div><div class="txt"><p class="big"><strong>Route B — Wi-Fi hotspot.</strong> Join the network the station broadcasts.</p><table style="margin-top:1mm"><tr><td style="width:24mm;border:0;padding-left:0">Network</td><td style="border:0"><code>OrbAP</code></td></tr><tr><td style="border:0;padding-left:0">Password</td><td style="border:0"><code>&lt;your-passphrase&gt;</code></td></tr><tr><td style="border:0;padding-left:0">Station at</td><td style="border:0"><code>10.0.0.8</code></td></tr></table><p class="hint" style="margin-top:2mm">This network has <strong>no internet</strong> — that is normal. Your laptop may warn you; ignore it.</p></div></div>
+  <div class="step"><div class="num">6</div><div class="art"><svg width="200" height="100" viewBox="0 0 200 100">
+        <rect class="ln fillw" x="10" y="10" width="180" height="82" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <rect class="fillg" x="56" y="15" width="128" height="10" rx="5"/>
+        <text class="tinyg" x="61" y="23" style="font-size:8px">10.55.0.1:8080</text>
+        <rect class="actf" x="22" y="42" width="56" height="9" rx="4.5"/>
+        <g class="lnT"><path d="M22 60h150M22 72h150M22 84h110"/></g>
+        <g class="act"><circle cx="160" cy="82" r="9"/><path d="M156 82l3 3 6-7"/></g></svg></div><div class="txt"><p class="big">Open a browser and go to the station's page.</p><p class="big" style="margin-top:2mm"><code style="font-size:10.5pt;font-weight:600">http://10.55.0.1:8080</code> <span style="color:#99a0a8">(cable)</span><br><code style="font-size:10.5pt;font-weight:600">http://10.0.0.8:8080</code> <span style="color:#99a0a8">(Wi-Fi)</span></p><p class="hint" style="margin-top:2mm">A live table of orbs, refreshing every two seconds. <strong>If this page works, everything else will work.</strong></p></div></div>
+
+  <div class="foot"><span>nOdes</span><span>Page 5 · Connect</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Sound</span><h2>Getting sound out</h2></div>
+    <p class="lede">The orbs make their own sound, and the station also produces a full mix of the whole group. That mix comes out of a 3.5&nbsp;mm jack — but not the one you expect.</p>
+  </div>
+  <div class="step"><div class="art"><svg width="210" height="140" viewBox="0 0 210 140">
+        <!-- lid + screen, with the jack called out on the SCREEN -->
+        <path class="ln fillw" d="M30 96 L30 26 L126 4 L126 74 Z"/>
+        <path class="ln fillg" d="M44 88 L44 36 L112 20 L112 72 Z"/>
+        <path class="ctx" d="M30 96 L96 114 L162 96 L162 106 L96 124 L30 106 Z"/>
+        <path class="ctx" d="M30 96 L96 78 L162 96 L96 114 Z"/>
+        <!-- the live jack -->
+        <circle class="act" cx="128" cy="52" r="7"/>
+        <path class="act" d="M135 52 L168 52"/>
+        <circle class="actf" cx="176" cy="52" r="7"/>
+        <text class="tiny" x="132" y="34" style="fill:#1f6feb">✓</text>
+        <!-- the dead jack on the computer -->
+        <circle class="ctx" cx="150" cy="101" r="5"/>
+        <path style="stroke:#c0392b;stroke-width:2.4;fill:none;stroke-linecap:round"
+              d="M143 94 L157 108 M157 94 L143 108"/>
+      </svg></div><div class="txt"><p class="big">Plug speakers or headphones into the 3.5&nbsp;mm socket <strong>on the screen</strong>, in the lid.</p><p class="hint warn" style="margin-top:2mm">⚠ <strong>Not the socket on the small computer.</strong> That one is switched off in software and will always be silent, no matter what you plug into it. The sound travels to the screen through the internal video cable.</p><p class="hint" style="margin-top:2mm">Powered speakers work best. Set the volume on the speakers themselves — the station has no volume control of its own.</p></div></div>
+  <div class="step"><div class="art"><svg width="210" height="104" viewBox="0 0 210 104">
+        <path class="ln fillw" d="M14 60V24a4 4 0 0 1 4-4h50a4 4 0 0 1 4 4v36"/>
+        <path class="ln" d="M6 60h82l-6 9H12z"/>
+        <path class="act" d="M76 44 C104 44 108 62 128 64"/>
+        <rect class="ln fillw" x="128" y="50" width="72" height="28" rx="4"/>
+        <text class="tiny" x="138" y="68">orbstation</text>
+        <g class="lnT"><path d="M30 34h26M30 42h16"/></g>
+        <text class="tinyg" x="132" y="42" style="font-size:10px">MIDI</text>
+      </svg></div><div class="txt"><p class="big">Want to drive your own instruments instead? The same USB-C cable also carries <strong>MIDI</strong>.</p><p class="hint">Your laptop sees a MIDI device called <strong>orbstation</strong> with no setup. Select it as a MIDI input in TouchDesigner, Ableton or anything else.</p></div></div>
+  <div class="blk">
+    <h2 style="font-size:11pt;margin:0 0 1mm">What arrives on MIDI</h2>
+    <table>
+      <tr><td style="width:52mm"><strong>MIDI channel</strong></td><td>the group (cluster) — 1st group → channel 1, 2nd → channel 2, and so on. Route each to a different instrument.</td></tr>
+      <tr><td><strong>Low notes (around C3)</strong></td><td>a swelling pad — an orb being spun</td></tr>
+      <tr><td><strong>High notes (around C5)</strong></td><td>a chime — an orb being jolted or thrown</td></tr>
+    </table>
+    <p class="hint" style="margin-top:2mm">So you can take the station's own mix from the screen's jack, or ignore it entirely and build your own sound from the MIDI. Both at once is fine.</p>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Page 6 · Sound</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Important</span><h2>Charging orbs vanish from the screen</h2></div>
+    <p class="lede">This surprises everyone, so it is worth knowing before it confuses you.</p>
+  </div>
+  <div class="step"><div class="art"><svg width="200" height="130" viewBox="0 0 200 130"><rect class="ln fillw" x="10" y="10" width="120" height="78" rx="5"/><path class="ln" d="M10 28h120"/><g class="lnT"><circle cx="22" cy="19" r="3"/><circle cx="32" cy="19" r="3"/></g><text class="tinyg" x="34" y="60" style="font-size:12px">— — —</text><path class="ln" d="M46 96h48l6 10H40z"/><g class="ctx"><circle cx="158" cy="36" r="13"/><circle cx="158" cy="72" r="13"/></g><path class="lnT" d="M150 92h16M152 100h12"/><path style="stroke:#c0392b;stroke-width:2.2;fill:none;stroke-linecap:round" d="M146 24L172 84"/></svg></div><div class="txt"><p>The station's own display — the screen in the lid, and the proximity graph on it — <strong>deliberately hides any orb that is sitting on a charger</strong>. So a case full of charging orbs shows an empty screen. Nothing is broken.</p><p style="margin-top:2mm"><strong>But they are still in the data.</strong> Charging orbs come through to TouchDesigner as normal, flagged so you can choose what to do with them.</p></div></div>
+  <div class="blk">
+    <table>
+      <tr><th style="width:56mm">Where</th><th>A charging orb…</th></tr>
+      <tr><td>Screen in the lid</td><td><strong style="color:#c0392b">is hidden entirely</strong></td></tr>
+      <tr><td>Your TouchDesigner patch</td><td><strong style="color:#1c7a3e">arrives as normal, with <code>charging</code> = 1</strong></td></tr>
+      <tr><td>The <code>/</code> status page</td><td>is listed, marked <em>charging</em></td></tr>
+    </table>
+    <p class="lede" style="margin-top:3mm">So: to see orbs on the screen in the lid, take them out of the wells. To decide in your patch, filter on <code>charging</code>.</p>
+    <p class="hint">You can test this without the box: <code>./run.sh 6 --charging 2</code> marks two simulated orbs as docked.</p>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Page 7 · Charging</span></div>
+</div>
+<div class="page ">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">TouchDesigner</span><h2>Route 1 — OSC, no code</h2></div>
+    <p class="lede">The quickest way in. Two steps, no scripting, every orb as ordinary CHOP channels. Start here.</p>
+  </div>
+  <div class="step"><div class="num">7</div><div class="art"><svg width="188" height="112" viewBox="0 0 188 112"><rect class="ln fillw" x="8" y="14" width="172" height="46" rx="6"/><path class="ln" d="M8 32h172"/><g class="lnT"><circle cx="20" cy="23" r="3"/><circle cx="30" cy="23" r="3"/></g><rect class="fillg" x="52" y="18" width="120" height="10" rx="5"/><text class="tinyg" x="57" y="26" style="font-size:8px">…/osc/subscribe?port=7000</text><path class="act" d="M94 62v16"/><path class="act" d="M88 72l6 6 6-6"/><rect class="ln fillw" x="46" y="84" width="96" height="22" rx="4"/><text class="tiny" x="58" y="99">OSC In CHOP</text></svg></div><div class="txt"><p class="big">Visit this address once, in any browser:</p><p class="big" style="margin:2mm 0"><code style="font-size:9.5pt;font-weight:600">http://10.55.0.1:8080/osc/subscribe?port=7000</code></p><p class="hint">This tells the station to stream to <em>your</em> machine. It is <strong>permanent</strong> — you can close the browser. Use <code>127.0.0.1</code> instead for the simulator.</p></div></div>
+  <div class="step"><div class="num">8</div><div class="art"><svg width="188" height="98" viewBox="0 0 188 98"><rect class="ln fillw" x="14" y="12" width="160" height="74" rx="5"/><path class="lnT" d="M14 28h160"/><text class="tiny" x="24" y="24">OSC In CHOP</text><text class="tinyg" x="24" y="46">Network Port</text><rect class="act" x="104" y="36" width="52" height="14" rx="3"/><text class="tiny" x="118" y="46">7000</text><g class="lnT"><path d="M24 62h60M24 74h74"/></g></svg></div><div class="txt"><p class="big">In TouchDesigner, add an <strong>OSC In CHOP</strong> and set <strong>Network Port</strong> to <code>7000</code>.</p><p class="hint">Channels appear straight away. Nothing else to configure.</p></div></div>
+  <h2 style="font-size:11pt;margin:4mm 0 0">What you get</h2>
+  <table>
+    <tr><th style="width:52mm">Channel</th><th>Meaning</th></tr>
+    <tr><td><code>orb/a1b2c3/accel1..3</code></td><td>Accelerometer x, y, z — in g, gravity included</td></tr>
+    <tr><td><code>orb/a1b2c3/gyro1..3</code></td><td>Gyroscope x, y, z — degrees per second</td></tr>
+    <tr><td><code>orb/a1b2c3/spin</code></td><td>One number for "is it spinning"</td></tr>
+    <tr><td><code>orb/a1b2c3/shake</code></td><td>One number for "is it being shaken"</td></tr>
+    <tr><td><code>orb/a1b2c3/tilt</code></td><td>−1 to 1, where 1 is upright</td></tr>
+    <tr><td><code>orb/a1b2c3/cluster</code></td><td>Which group the station has put it in (−1 = none)</td></tr>
+    <tr><td><code>orb/a1b2c3/charging</code></td><td>1 while the orb is sat in a well</td></tr>
+    <tr><td><code>orb/a1b2c3/battery</code></td><td>Volts. 3.0 is empty, 4.2 is full</td></tr>
+    <tr><td><code style="color:#1f6feb">prox/a1b2c3/d4e5f6</code></td><td><strong>How strongly those two orbs hear each other</strong> — 0 to 1</td></tr>
+    <tr><td><code>fleet/count &nbsp; fleet/rate</code></td><td>How many orbs are live, and the station's tick rate</td></tr>
+  </table>
+  <p class="hint" style="margin-top:3mm"><code>a1b2c3</code> is an orb's serial number, printed on the orb itself. It never changes, so you can safely point your patch at one particular orb.</p>
+  <div class="foot"><span>nOdes</span><span>Page 8 · OSC</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">TouchDesigner</span><h2>Route 2 — WebSocket, full data</h2></div>
+    <p class="lede">Use this when you want the complete picture — in particular the <strong>whole proximity grid</strong> as a fixed matrix. Three ready-made scripts are supplied in <code>touchdesigner/</code>.</p>
+  </div>
+  <div class="step"><div class="num">9</div><div class="art"><svg width="188" height="132" viewBox="0 0 188 132"><rect class="ln fillw" x="10" y="10" width="168" height="34" rx="4"/><text class="tiny" x="20" y="24">WebSocket DAT</text><text class="tinyg" x="20" y="38">ws://10.55.0.1:8080/ws</text><path class="act" d="M60 44v14"/><path class="act" d="M54 52l6 6 6-6"/><path class="act" d="M128 44v14"/><path class="act" d="M122 52l6 6 6-6"/><rect class="ln fillw" x="10" y="60" width="80" height="30" rx="4"/><text class="tiny" x="20" y="72">Script CHOP</text><text class="tinyg" x="20" y="84">orbs</text><rect class="ln fillw" x="98" y="60" width="80" height="30" rx="4"/><text class="tiny" x="108" y="72">Script CHOP</text><text class="tinyg" x="108" y="84">proximity</text><g class="lnT"><path d="M50 90v12M138 90v12"/></g><rect class="fillg" x="10" y="102" width="168" height="22" rx="4"/></svg></div><div class="txt"><p class="big">Add a <strong>WebSocket DAT</strong>.</p><table style="margin-top:1mm"><tr><td style="width:30mm;border:0;padding-left:0">Network Address</td><td style="border:0"><code>10.55.0.1</code></td></tr><tr><td style="border:0;padding-left:0">Network Port</td><td style="border:0"><code>8080</code></td></tr><tr><td style="border:0;padding-left:0">Request URL</td><td style="border:0"><code>/ws</code></td></tr></table><p class="hint" style="margin-top:2mm">Paste <code>websocket_callbacks.py</code> into its callbacks. Then add two Script CHOPs beside it named <code>orbs</code> and <code>proximity</code>, and paste the two matching scripts.</p></div></div>
+  <div class="blk">
+    <h2 style="font-size:12pt;margin:0 0 1mm">Understanding proximity</h2>
+    <div class="step"><div class="art"><svg width="188" height="118" viewBox="0 0 188 118">
+      <g class="ln fillw"><circle cx="40" cy="30" r="14"/><circle cx="80" cy="22" r="14"/>
+      <circle cx="64" cy="64" r="14"/><circle cx="160" cy="46" r="14"/></g>
+      <g class="act"><path d="M53 27 L67 24"/><path d="M47 42 L58 51"/><path d="M78 36 L70 51"/></g>
+      <path class="ctx dash" d="M96 52 L145 48"/></svg></div>
+    <div class="txt"><p>Each orb <strong>listens for every other orb</strong> on a short-range radio and reports how strongly it hears them. That is the proximity data. It is measured by the orbs themselves — not worked out from positions, and nothing to do with the Wi-Fi signal.</p>
+      <p class="hint" style="margin-top:2mm"><strong>0</strong> = cannot hear it &nbsp;·&nbsp; <strong>255</strong> (or 1.0 normalised) = touching. It is <strong>not a distance</strong>: it falls off unevenly, it is noisy, and bodies between two orbs weaken it. Treat it as <em>togetherness</em>, not metres.</p>
+      <p class="hint warn" style="margin-top:2mm"><strong>Expect saturation.</strong> On the firmware currently in the fleet, orbs closer than about half a metre all report near 255. A tight huddle therefore looks uniformly "touching" with little structure inside it. Spread the orbs out to see the gradient.</p></div></div>
+  </div>
+  <div class="dodont">
+    <div><div class="mark ok">✓</div><p>Key everything on the orb's <strong>serial</strong> (<code>a1b2c3</code>). It is printed on the orb and never changes.</p></div>
+    <div><div class="mark no">✗</div><p>Do not rely on <strong>slot numbers</strong> or a fixed orb count. Orbs join and drop out mid-session, and slots are reassigned on restart.</p></div>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Page 9 · WebSocket</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Important</span><h2>Simulated versus real</h2></div>
+    <p class="lede">The program serving the simulated data is <strong>the same one the real station runs</strong> — only the orbs are imaginary. Every field name and address is identical. But imaginary orbs behave too well.</p>
+  </div>
+  <div class="blk">
+    <h2 style="font-size:11pt;margin:0 0 1mm;color:#1c7a3e">✓ What the simulator gets right</h2>
+    <p class="lede" style="margin-bottom:0">Clusters genuinely form, split and merge. Proximity saturates close-up exactly as the real firmware does. Orbs cycle through rest, shake and spin, and occasionally jump. Battery, signal, firmware version and packet timing all match the real ranges.</p>
+  </div>
+  <div class="blk">
+    <h2 style="font-size:11pt;margin:0 0 1mm">What it gets wrong — design for these</h2>
+    <table>
+      <tr><th style="width:44mm">Not simulated</th><th>Why it matters on the day</th></tr>
+      <tr><td><strong>Orbs dropping out</strong></td><td>A real orb that is not charging sleeps after 30 seconds of stillness and vanishes until shaken. Your patch must survive orbs coming and going. <strong>This is the one that catches people out.</strong></td></tr>
+      <tr><td><strong>Packet loss</strong></td><td>Signal is perfect here. A room full of bodies on a congested 2.4&nbsp;GHz band is not. Smooth your inputs.</td></tr>
+      <tr><td><strong>Battery draining</strong></td><td>Voltages are static — nothing drains or fills. Do not build a piece that depends on battery level without testing on hardware.</td></tr>
+      <tr><td><strong>Heat</strong></td><td>Real orbs warm up in the wells and the case needs air. Plan for attended charging breaks in a long installation.</td></tr>
+    </table>
+  </div>
+  <div class="dodont">
+    <div><div class="mark ok">✓</div><p>Test with <code>./run.sh 12</code> and again with <code>./run.sh 2</code>. If it survives both, it will survive the room.</p></div>
+    <div><div class="mark no">✗</div><p>Do not assume a fixed orb count, and do not key anything on slot numbers.</p></div>
+  </div>
+  <div class="blk">
+    <h2 style="font-size:11pt;margin:0 0 1mm">Moving to the real orbs</h2>
+    <p class="lede" style="margin-bottom:1mm">One address, that is all.</p>
+    <table>
+      <tr><th style="width:60mm">Where you are</th><th>Address to use</th></tr>
+      <tr><td>Simulator, on your own machine</td><td><code>127.0.0.1</code></td></tr>
+      <tr><td>Eggbox, USB-C cable — preferred</td><td><code>10.55.0.1</code></td></tr>
+      <tr><td>Eggbox, joined to its <code>OrbAP</code> hotspot</td><td><code>10.0.0.8</code></td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Page 10 · Simulated vs real</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">After a session</span><h2>Taking the data away</h2></div>
+    <p class="lede">The station records every session. <strong>Those recordings live in memory and are erased when it powers off</strong> — copy them before you unplug anything.</p>
+  </div>
+  <div class="step"><div class="num">10</div><div class="art"><svg width="200" height="92" viewBox="0 0 200 92">
+        <rect class="ln fillw" x="10" y="10" width="180" height="72" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <text class="tinyg" x="22" y="50">$ scp nodes@10.55.0.1:</text><text class="tinyg" x="22" y="67">   orb_logs/* .</text></svg></div><div class="txt"><p class="big">In a terminal on your laptop:</p><p style="margin:2mm 0"><code style="font-size:10pt">scp nodes@10.55.0.1:orb_logs/* .</code></p><p class="hint">Password is <code>pass</code>. Use <code>10.0.0.8</code> if you are on Wi-Fi. This copies every recording into the current folder.</p></div></div>
+  <div class="blk">
+    <table>
+      <tr><th style="width:42mm">File</th><th style="width:30mm">One row per…</th><th>Columns</th></tr>
+      <tr><td><code>run-001.csv</code></td><td>orb, per sample</td><td>time, serial, cluster, accelerometer, gyroscope, hue, charging, battery, signal, nearest orb</td></tr>
+      <tr><td><code>run-001.prox.csv</code></td><td><strong>pair of orbs</strong>, per sample</td><td>time, orb A, orb B, strength 0–255 — the full proximity graph over the whole session</td></tr>
+    </table>
+    <p class="hint" style="margin-top:2mm">Both are plain CSV, ten samples a second. Join them on the <code>t</code> column. Time is seconds since the recording started — the station has no clock.</p>
+  </div>
+  <div class="blk">
+    <div class="steptitle"><span class="kicker">Shutting down</span><h2>Powering off</h2></div>
+  </div>  <div class="step"><div class="num">11</div><div class="art"><svg width="188" height="96" viewBox="0 0 188 96"><path class="ctx" d="M40 56 L94 72 L148 56 L148 68 L94 84 L40 68 Z"/><path class="ctx" d="M40 56 L94 40 L148 56 L94 72 Z"/><path class="ctx" d="M40 56 L40 24 L94 8 L94 40 Z"/><rect class="act" x="140" y="50" width="14" height="7" rx="3.5"/><path class="act" d="M158 53 L178 53"/><path class="act" d="M170 45l8 8-8 8"/></svg></div><div class="txt"><p class="big">Once you have copied your recordings — <strong>just pull the power out.</strong></p><p class="hint">No shutdown sequence is needed; the station's disk is protected against sudden power loss by design. <strong>Switch the charger supply off too</strong> — never leave it running unattended.</p></div></div>
+  <div class="dodont">
+    <div><div class="mark no">✗</div><p>Do not unplug before copying. Recordings are held in memory and are gone the instant power is lost.</p></div>
+    <div><div class="mark ok">✓</div><p>Copy first, unplug second. The files are small — copying twice costs nothing.</p></div>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Page 11 · Data &amp; shutdown</span></div>
+</div>
+<div class="page ">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">If something is wrong</span><h2>Troubleshooting</h2></div>
+    <p class="lede">Work down the list. Almost everything is one of the first three rows.</p>
+  </div>
+  <table>
+    <tr><th style="width:56mm">What you see</th><th>What to do</th></tr>
+    <tr><td>The screen in the lid shows no orbs</td><td>Almost always because they are <strong>charging</strong> — the display hides those on purpose (page 7). Lift one out and shake it. They are still in your data either way.</td></tr>
+    <tr><td>The browser cannot reach <code>:8080</code> at all</td><td>Wrong address for your route. Cable → <code>10.55.0.1</code>, Wi-Fi → <code>10.0.0.8</code>, simulator → <code>127.0.0.1</code>. If still nothing, try a <strong>different USB port</strong> — a weak port is the single most common cause.</td></tr>
+    <tr><td>Page loads, but says no orbs</td><td>The orbs are asleep — one that is not charging drops off after 30 seconds of stillness. Lift one out and shake it. If a good shake does nothing, that orb is flat: charge it for an hour, with someone present.</td></tr>
+    <tr><td>OSC channels never appear</td><td>Visit the <code>/osc/subscribe?port=7000</code> address again, then open <code>/health</code> — your machine's address should be listed under <code>osc_targets</code>. Check the port matches.</td></tr>
+    <tr><td>Data arrives, then freezes</td><td>Open <code>/health</code>. If <code>ok</code> is <code>false</code>, unplug the station, wait ten seconds, plug it back in.</td></tr>
+    <tr><td>A <code>prox/…</code> channel vanished</td><td>Normal. Those two orbs stopped hearing each other. It returns when they are close again. Use Route 2 for a fixed-size grid.</td></tr>
+    <tr><td>Orbs keep dropping off the Wi-Fi</td><td>Too many devices. The radio holds about eight in total. Take laptops and phones off <code>OrbAP</code> and use the cable.</td></tr>
+    <tr><td>An orb is very hot</td><td>Take it off the charger and let it cool. Warm is normal while charging; too hot to hold is not. Never charge unattended.</td></tr>
+    <tr><td>No sound from the speakers</td><td>Check you are plugged into the jack <strong>on the screen</strong>, not the one on the small computer — that one is switched off and is always silent (page 6). Then check the speakers' own volume.</td></tr>
+    <tr><td>Everything is strange and you want to start again</td><td>Unplug both supplies, wait ten seconds, plug them back in. The station rebuilds itself on every start — you cannot break it this way.</td></tr>
+  </table>  <div class="step"><div class="art"><svg width="150" height="112" viewBox="0 0 150 112"><path class="ln fillw" d="M20 82V46a4 4 0 0 1 4-4h40a4 4 0 0 1 4 4v36"/><path class="ln" d="M12 82h84l-6 9H18z"/><circle class="ln fillw" cx="104" cy="52" r="12"/><path class="ln" d="M104 68c-10 0-17 7-17 16"/><path class="act" d="M112 26h22a8 8 0 0 1 8 8v8a8 8 0 0 1-8 8h-10l-8 7v-7h-4a8 8 0 0 1-8-8v-8a8 8 0 0 1 8-8"/><text class="tiny" x="119" y="44" style="font-size:15px;fill:#1f6feb">?</text></svg></div><div class="txt"><p class="big">Still stuck?</p><p class="hint">Take a photo of the screen in the lid and of the <code>/health</code> page in your browser, and send both. Those two images answer nearly every question we could ask you.</p><p class="hint" style="margin-top:3mm">Full technical reference: <code>touchdesigner/README.md</code>, and <code>http://10.55.0.1:8080/schema.json</code> on the station itself, which documents every field in the data.</p><p class="hint" style="margin-top:3mm;font-style:italic">Buona fortuna — we are very curious to see what you make of the proximity data. Nobody has built anything visual on it yet.</p></div></div>
+
+  <div class="foot"><span>nOdes</span><span>Page 12 · Troubleshooting</span></div>
+</div>

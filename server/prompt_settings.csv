@@ -1,0 +1,182 @@
+prompt,key,value
+# ----- FREEZE -----
+# Compliance grows the longer an orb stays motionless.
+# An orb is "still" when |accel-1g| < still_accel_g AND |gyro| < still_gyro_dps.
+# Score ramps from 0 -> 1 across sustain_ms of continuous stillness.
+FREEZE,still_accel_g,0.08
+FREEZE,still_gyro_dps,25
+FREEZE,sustain_ms,1500
+# Keynsham: slow-build, peaks ~0.84-0.87 and gets clipped just under 0.90 at the
+# 30 s cap. Lower the bar so a genuine group freeze completes.
+FREEZE,topped_thresh,0.82
+FREEZE,led_brightness_min,0.15
+FREEZE,led_brightness_max,1.00
+FREEZE,viz_radius_min,0.10
+FREEZE,viz_radius_max,0.35
+
+# ----- SHAKE -----
+# Compliance = (peak-to-peak |accel| in last window_ms - p2p_min) / (p2p_max - p2p_min)
+SHAKE,p2p_min_g,0.4
+SHAKE,p2p_max_g,2.5
+SHAKE,window_ms,600
+# Framing-manipulation dry run 2026-08-06: floor 0.15 compresses the visible
+# range — the A/B contrast was judged too subtle in hand. Near-black floor
+# makes non-compliance read as dark. Revert if 0.02 flickers at rest.
+SHAKE,led_brightness_min,0.02
+SHAKE,led_brightness_max,1.00
+SHAKE,viz_radius_min,0.10
+SHAKE,viz_radius_max,0.45
+
+# ----- JUMP -----
+# Detect apex when |accel| dips below apex_g. Compliance pulses to 1.0 at apex
+# and decays linearly to 0 over decay_ms.
+JUMP,apex_g,0.55
+JUMP,decay_ms,900
+# Keynsham: JUMP/LEAP/HOP peak ~0.66 and were abandoned ~72% of the time against
+# the flat 0.90 bar. Lower their bar so a festival crowd can actually land them.
+JUMP,topped_thresh,0.60
+JUMP,led_brightness_min,0.15
+JUMP,led_brightness_max,1.00
+JUMP,viz_radius_min,0.10
+JUMP,viz_radius_max,0.55
+
+# ----- SPIN -----
+# Compliance scales with sustained gyro magnitude. Needs gyro > min_gyro_dps
+# AND sustained for sustain_ms; saturates at max_gyro_dps.
+SPIN,min_gyro_dps,150
+SPIN,max_gyro_dps,500
+SPIN,sustain_ms,800
+SPIN,led_brightness_min,0.15
+SPIN,led_brightness_max,1.00
+SPIN,viz_radius_min,0.10
+SPIN,viz_radius_max,0.45
+
+# ----- HUDDLE -----
+# Compliance per orb = (size of its cluster) / num_orbs. Max when everyone
+# is in one cluster. target_frac is just a hint, not a hard threshold.
+HUDDLE,target_frac,0.75
+HUDDLE,led_brightness_min,0.15
+HUDDLE,led_brightness_max,1.00
+HUDDLE,viz_radius_min,0.10
+HUDDLE,viz_radius_max,0.40
+
+# ----- SCATTER -----
+# Compliance = 1 if orb is alone in its cluster, else 0.
+SCATTER,led_brightness_min,0.15
+SCATTER,led_brightness_max,1.00
+SCATTER,viz_radius_min,0.10
+SCATTER,viz_radius_max,0.30
+
+# ----- PAIRS / THREES / FOURS / FIVES -----
+# target_size is the wanted cluster size. Compliance per orb:
+#   1.0          if cluster_size == target_size
+#   max(0, 1 - |cluster_size - target_size| / target_size) otherwise
+PAIRS,target_size,2
+# Cluster prompts rarely reach 1.0 (imperfect packing) and near-miss at scale;
+# a slightly lower base bar + the GLOBAL scale relaxation makes them landable.
+PAIRS,topped_thresh,0.85
+PAIRS,led_brightness_min,0.15
+PAIRS,led_brightness_max,1.00
+PAIRS,viz_radius_min,0.10
+PAIRS,viz_radius_max,0.40
+
+THREES,target_size,3
+THREES,topped_thresh,0.85
+THREES,led_brightness_min,0.15
+THREES,led_brightness_max,1.00
+THREES,viz_radius_min,0.10
+THREES,viz_radius_max,0.40
+
+FOURS,target_size,4
+FOURS,topped_thresh,0.85
+FOURS,led_brightness_min,0.15
+FOURS,led_brightness_max,1.00
+FOURS,viz_radius_min,0.10
+FOURS,viz_radius_max,0.40
+
+FIVES,target_size,5
+FIVES,topped_thresh,0.85
+FIVES,led_brightness_min,0.15
+FIVES,led_brightness_max,1.00
+FIVES,viz_radius_min,0.10
+FIVES,viz_radius_max,0.40
+
+# ----- Synonyms (no rows needed) -----
+# HOP/LEAP score as JUMP, TWIST/TURN as SPIN, FLOCK as HUDDLE, RAINBOW as
+# SCATTER, TRIANGLE as THREES, STATUE as FREEZE, RATTLE as SHAKE. They resolve
+# to their canonical measure (canonical_measure() in the server) and reuse the
+# rows above — so there is nothing to add here for a new synonym.
+
+# ----- WAVE -----
+# Sequential lift across the group (see compute_orb_compliance WAVE branch).
+WAVE,lift_g,1.25
+WAVE,window_ms,2500
+WAVE,min_fraction,0.6
+WAVE,led_brightness_min,0.15
+WAVE,led_brightness_max,1.00
+WAVE,viz_radius_min,0.10
+WAVE,viz_radius_max,0.50
+
+# ----- GLOBAL -----
+# Cross-prompt knobs read via prompt_settings.get("GLOBAL", key, default).
+# Bar smoothing: asymmetric EMA on compliance_mean. alpha_up is the rise rate
+# (snappy), alpha_down the fall rate (slow, to bridge clustering glitches).
+GLOBAL,smooth_alpha_up,0.60
+GLOBAL,smooth_alpha_down,0.05
+# "Topped" when the smoothed bar reaches this (cluster prompts rarely hit 1.0).
+# This is the DEFAULT base bar; a prompt row may override it (see JUMP/FREEZE/
+# cluster rows below), and it is relaxed with crowd size by the knobs beneath.
+GLOBAL,topped_thresh,0.90
+# Scale-aware relaxation (Keynsham: completion falls 72%->40% as the crowd grows
+# against a flat bar, most failures being 0.83-0.89 near-misses). Effective bar =
+# base topped_thresh minus topped_relax_per_orb for each eligible orb above
+# topped_relax_from, clamped at topped_thresh_floor. per_orb=0 disables it.
+# Published live as topped_thresh_eff in /tmp/orb_data. All hot-reload.
+GLOBAL,topped_relax_from,6
+GLOBAL,topped_relax_per_orb,0.02
+GLOBAL,topped_thresh_floor,0.62
+# Charger exclusion: charge current (mA) hysteresis + sustained-frame gate
+# (50 Hz, so 75 frames = 1.5 s charging before excluded, 50 = 1 s to re-enter).
+GLOBAL,charge_ma_on,10
+GLOBAL,charge_ma_off,5
+GLOBAL,charge_on_frames,75
+GLOBAL,charge_off_frames,50
+# Cluster anti-flicker: an orb must report the same NEW cluster for this many
+# consecutive frames (50 Hz) before the published id/hue switches. Raw BFS
+# labels are also relabelled for cross-frame stability before this gate.
+GLOBAL,cluster_switch_frames,25
+
+# Proximity RSSI matrix decay per frame (0..1). <1 fades links that stop being
+# reported so clusters can separate when orbs move apart; 1.0 = old no-decay
+# (matrix latches strongest-ever, everything blobs into one cluster). Lower =
+# faster separation but more sensitive to dropped reports. ~0.97 @ 20-50Hz.
+GLOBAL,rssi_decay,0.99
+# Absolute floor on the adaptive cluster threshold (0..255). Stops weak links
+# bridging distinct groups at high orb counts. Raise to split more readily,
+# lower to merge more readily.
+GLOBAL,cluster_min_thresh,220
+
+# --- Rate-independent latency (Phase 1) --- all default to legacy when <=0/<0.
+# Decay as a wall-clock time constant (s): per-frame factor = exp(-dt/tau), so a
+# 255 link breaks below the floor in tau*ln(255/thr) seconds at ANY loop rate.
+# <=0 => legacy per-frame rssi_decay. Legacy 0.99@20Hz ~= tau 5.0s; lower to cut latency.
+GLOBAL,rssi_decay_tau,6.0
+# Cluster membership debounce in wall-clock ms (so it doesn't stretch at low Hz).
+# <0 => legacy cluster_switch_frames. Legacy 25 frames@20Hz = 1250ms.
+GLOBAL,cluster_switch_ms,400
+# Threshold EWMA time constant (s); <=0 => legacy 0.9/0.1. Minor term.
+GLOBAL,thresh_ema_tau,-1
+# Per-orb miss EWMA time constant (s); <=0 => legacy 0.99/frame.
+GLOBAL,miss_ewma_tau,3.0
+
+# --- Motion-aware fast path (Phase 2) --- disabled until validated.
+GLOBAL,fast_path_enable,0
+GLOBAL,fast_move_g,0.10
+GLOBAL,fast_window_ms,1200
+GLOBAL,cluster_switch_ms_fast,150
+GLOBAL,fast_decay_tau,0.4
+
+# --- Latency measurement (Phase 0 instrumentation) ---
+GLOBAL,meas_enable,1
+GLOBAL,meas_move_g,0.12
+GLOBAL,meas_timeout_ms,4000

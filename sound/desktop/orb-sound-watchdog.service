@@ -1,0 +1,7 @@
+# One-shot sound-stack health probe, driven by orb-sound-watchdog.timer (user).
+[Unit]
+Description=nOdes sound stack watchdog
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash %h/projects/nOdes/sound/desktop/orb_sound_watchdog.sh

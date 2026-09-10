@@ -1,0 +1,129 @@
+{
+  "_comment": "Speaker geometry for the nOdes finale rig \u2014 THREE-RIG configuration (rewired 2026-08-25 for E7): back rig on the FRONT port (green, FL+FR), left rig on the SURROUND port (black, RL+RR), right rig on the BACK port (grey, SL+SR). Channel order is FIXED by the StarTech ICUSBAUDIO7D card map: FL FR FC LFE RL RR SL SR. The orange jack (FC+LFE) is UNUSED \u2014 role 'unused' keeps it out of anchor/E7 tooling. Both channels of a jack share that rig's xy and anchor_serial. xy is metres in the room frame (x right, y front, origin at anchor centroid) \u2014 TAPE-MEASURED 2026-08-25: left-back 2.0 m, left-right 2.7 m, right-back 2.7 m. Beacon identity shake-verified 2026-08-25 (006740=back; left/back RSSI pair reads anomalously weak \u2014 see E7 notes). Artefact mix convention: back renders centre, left/right pan hard.",
+  "room": {
+    "radius_m": 3.0,
+    "note": "nominal; DBAP mode only"
+  },
+  "focus": 2.5,
+  "smoothing": 0.25,
+  "activity": {
+    "enabled": false,
+    "deadband_g": 0.04,
+    "sensitivity": 2.5,
+    "attack": 0.5,
+    "release": 0.05,
+    "floor": 0.0,
+    "_comment": "motion envelope for the STANDALONE placeholder engine only. Disabled for the real rig: conductor_pi.py owns activity (spin gates, jump chimes) and orb_synth_spatial.scd needs pure position gains"
+  },
+  "master": 1.0,
+  "lfe": {
+    "mode": "off",
+    "gain": 0.6,
+    "note": "orange jack unused in the 3-rig finale config; LFE stays silent"
+  },
+  "channels": [
+    {
+      "idx": 0,
+      "id": "FL",
+      "role": "back",
+      "jack": "green",
+      "angle_deg": 180,
+      "xy": [
+        -0.406,
+        -1.239
+      ],
+      "anchor_serial": "006740"
+    },
+    {
+      "idx": 1,
+      "id": "FR",
+      "role": "back",
+      "jack": "green",
+      "angle_deg": 180,
+      "xy": [
+        -0.406,
+        -1.239
+      ],
+      "anchor_serial": "006740"
+    },
+    {
+      "idx": 2,
+      "id": "FC",
+      "role": "unused",
+      "jack": "orange",
+      "angle_deg": 0,
+      "xy": [
+        0.0,
+        0.0
+      ],
+      "anchor_serial": null,
+      "pan": false
+    },
+    {
+      "idx": 3,
+      "id": "LFE",
+      "role": "unused",
+      "jack": "orange",
+      "angle_deg": 0,
+      "xy": [
+        0.0,
+        0.0
+      ],
+      "anchor_serial": null,
+      "pan": false
+    },
+    {
+      "idx": 4,
+      "id": "RL",
+      "role": "left",
+      "jack": "black",
+      "angle_deg": -60,
+      "xy": [
+        -1.147,
+        0.619
+      ],
+      "anchor_serial": "006dc4"
+    },
+    {
+      "idx": 5,
+      "id": "RR",
+      "role": "left",
+      "jack": "black",
+      "angle_deg": -60,
+      "xy": [
+        -1.147,
+        0.619
+      ],
+      "anchor_serial": "006dc4"
+    },
+    {
+      "idx": 6,
+      "id": "SL",
+      "role": "right",
+      "jack": "grey",
+      "angle_deg": 60,
+      "xy": [
+        1.553,
+        0.619
+      ],
+      "anchor_serial": "0069a4"
+    },
+    {
+      "idx": 7,
+      "id": "SR",
+      "role": "right",
+      "jack": "grey",
+      "angle_deg": 60,
+      "xy": [
+        1.553,
+        0.619
+      ],
+      "anchor_serial": "0069a4"
+    }
+  ],
+  "sources": {
+    "_comment": "Which orbs are moving sound sources. 'auto' = every eligible orb that is NOT an anchor. Or list explicit serials.",
+    "select": "auto",
+    "serials": []
+  }
+}

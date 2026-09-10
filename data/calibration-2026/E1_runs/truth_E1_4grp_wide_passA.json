@@ -1,0 +1,54 @@
+{
+  "run": "E1_4grp_wide_passA",
+  "K_intended": 4,
+  "group_sizes_intended": [
+    9,
+    8,
+    4,
+    6
+  ],
+  "layout": "rough square: BL(9) -2m- BR(8) -4m- TR(4) -3m- TL(6); all gaps >=2m",
+  "separations_cm": {
+    "BL-BR": 200,
+    "BR-TR": 400,
+    "TR-TL": 300
+  },
+  "note": "wider rerun to resolve all 4 groups (the 50cm rig merged to 2). live ref resolves 4. [BL corrected 8->9 per count; intended sizes now match as_built 9/8/4/6, total 27.]",
+  "n_eligible": 27,
+  "as_built_serial_to_cluster": {
+    "006604": 1,
+    "00661c": 1,
+    "071870": 1,
+    "006a78": 0,
+    "0718b0": 3,
+    "071898": 2,
+    "07189c": 1,
+    "00662c": 3,
+    "006db4": 2,
+    "036074": 2,
+    "036038": 0,
+    "00666c": 3,
+    "006664": 0,
+    "036018": 2,
+    "071934": 3,
+    "035eec": 3,
+    "036030": 0,
+    "036028": 0,
+    "036034": 3,
+    "036054": 2,
+    "006944": 0,
+    "0718c8": 2,
+    "0065d0": 3,
+    "006624": 0,
+    "0069b4": 3,
+    "07188c": 0,
+    "0718a4": 0
+  },
+  "as_built_num_groups": 4,
+  "as_built_sizes": [
+    4,
+    6,
+    8,
+    9
+  ]
+}

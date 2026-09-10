@@ -1,0 +1,33 @@
+# conductor_pi.py tunables — hot-reloaded on save (mtime watch), no restart.
+# key,value
+activity_up_alpha,0.30
+activity_down_alpha,0.02
+shake_gain,1.0
+spin_gain,0.004
+cluster_in_s,1.5
+cluster_out_s,3.0
+# jump -> one chime ding when |accel| jolts jump_jolt away from 1g (lower = easier)
+jump_jolt,0.6
+jump_cooldown_s,0.25
+spin_dps,250.0
+# spin -> GATED pad: opens above spin_on_dps, releases below spin_off_dps, so
+# pad length tracks spin length. spin_alpha = EMA weight (higher = snappier).
+# Each voice detuned +/- spin_detune_cents (orbs in a cluster beat).
+spin_alpha,0.30
+spin_on_dps,150.0
+spin_off_dps,70.0
+spin_detune_cents,5.0
+# after a jump, suppress pad-gate open for this long (jump=chime, spin=pad)
+jump_spin_lockout_s,0.7
+# pad_attack_s = swell time (s): a short spin dies mid-attack, a long spin holds
+pad_attack_s,1.5
+# pad_restrike_s = while an orb spins, re-strike a short fire-and-forget pad note
+# this often (s); the shared GVerb smears them into a wash. Lower = denser/more DSP.
+pad_restrike_s,0.32
+# kick is muted for now; raise kick_gain (e.g. 1.0) to bring the heartbeat back
+kick_floor,0.25
+kick_gain,0.0
+master_amp,1.0
+# full-server audio output route: hdmi | headphone (ignored by the Pi rig, which
+# is HDMI-only). Applied by sound/desktop/orb-audio-route.sh + the dock toggle.
+audio_route,headphone

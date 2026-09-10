@@ -1,0 +1,263 @@
+{
+ "config": {
+  "n_boot": 2000,
+  "seed": 1,
+  "method": "circular moving-block bootstrap over frames; passes resampled with replacement where passes exist (E1); percentile 95% CIs",
+  "block_span_s": 6.0,
+  "e1": {
+   "ref_k": 10,
+   "min_thresh": 200,
+   "point_estimate": "mean of pass means (matches E1_part1_headtohead.json)",
+   "passes": {
+    "near_merged": [
+     {
+      "file": "topk_1782826362.jsonl",
+      "tag": "E1 4grp 4/7/10/5 @ 50/200/50cm passA",
+      "n_frames": 2001,
+      "fps": 16.68,
+      "block_len_frames": 101
+     },
+     {
+      "file": "topk_1782826627.jsonl",
+      "tag": "E1 4grp 4/7/10/5 @ 50/200/50cm passB",
+      "n_frames": 1844,
+      "fps": 15.37,
+      "block_len_frames": 93
+     },
+     {
+      "file": "topk_1782826858.jsonl",
+      "tag": "E1 4grp 4/7/10/5 @ 50/200/50cm passC",
+      "n_frames": 1997,
+      "fps": 16.64,
+      "block_len_frames": 100
+     }
+    ],
+    "wide": [
+     {
+      "file": "topk_1782827542.jsonl",
+      "tag": "E1 4grp-wide 8/8/4/6 square >=2m passA",
+      "n_frames": 1798,
+      "fps": 14.98,
+      "block_len_frames": 90
+     },
+     {
+      "file": "topk_1782827828.jsonl",
+      "tag": "E1 4grp-wide 8/8/4/6 square >=2m passB",
+      "n_frames": 1863,
+      "fps": 15.53,
+      "block_len_frames": 94
+     },
+     {
+      "file": "topk_1782828110.jsonl",
+      "tag": "E1 4grp-wide 8/8/4/6 square >=2m passC",
+      "n_frames": 1904,
+      "fps": 15.87,
+      "block_len_frames": 96
+     }
+    ]
+   }
+  },
+  "sat": {
+   "stride": 3,
+   "ari_one_tol": 0.9995,
+   "ncl_tol": 0.25,
+   "best_thr": {
+    "saturated": 222,
+    "de-saturated": 190
+   },
+   "truth": "map-neutral consensus from full sample, held fixed (sizes verified against physical 8/7/5/3/2/1)",
+   "n_frames_strided": 812,
+   "fps_effective": 8.11,
+   "block_len_frames": 49,
+   "thresholds": [
+    150,
+    254,
+    4
+   ]
+  }
+ },
+ "e1_selfconsistency_ari": {
+  "near_merged": {
+   "k6": {
+    "point": 0.7296,
+    "pass_means": [
+     0.8592,
+     0.7909,
+     0.5388
+    ],
+    "ci95": [
+     0.5395,
+     0.8542
+    ]
+   },
+   "k8": {
+    "point": 0.9491,
+    "pass_means": [
+     0.9703,
+     0.9964,
+     0.8806
+    ],
+    "ci95": [
+     0.8836,
+     0.9965
+    ]
+   }
+  },
+  "wide": {
+   "k6": {
+    "point": 0.9617,
+    "pass_means": [
+     0.9736,
+     0.9357,
+     0.9759
+    ],
+    "ci95": [
+     0.9358,
+     0.9759
+    ]
+   },
+   "k8": {
+    "point": 0.9997,
+    "pass_means": [
+     1.0,
+     0.9997,
+     0.9995
+    ],
+    "ci95": [
+     0.9994,
+     1.0
+    ]
+   }
+  },
+  "k6_diff_wide_minus_near": {
+   "point": 0.2321,
+   "ci95": [
+    0.1038,
+    0.4214
+   ],
+   "p_diff_le_0": 0.0
+  }
+ },
+ "saturation_vs_truth": {
+  "saturated": {
+   "best_thr": 222,
+   "ari_at_best": {
+    "point": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "window": {
+    "ari": {
+     "criterion": "mean ARI >= 0.9995",
+     "point": {
+      "lo_thr": 222,
+      "hi_thr": 250,
+      "n_thresholds": 8,
+      "span": 28
+     },
+     "ci95_lo_thr": [
+      222.0,
+      222.0
+     ],
+     "ci95_hi_thr": [
+      250.0,
+      250.0
+     ],
+     "ci95_n_thresholds": [
+      8.0,
+      8.0
+     ],
+     "p_upper_edge_at_254": 0.0,
+     "p_upper_edge_ge_250": 1.0,
+     "p_empty_window": 0.0
+    },
+    "ncl": {
+     "criterion": "|mean clusters - 6| <= 0.25",
+     "point": {
+      "lo_thr": 222,
+      "hi_thr": 250,
+      "n_thresholds": 8,
+      "span": 28
+     },
+     "ci95_lo_thr": [
+      222.0,
+      222.0
+     ],
+     "ci95_hi_thr": [
+      250.0,
+      250.0
+     ],
+     "ci95_n_thresholds": [
+      8.0,
+      8.0
+     ],
+     "p_upper_edge_at_254": 0.0,
+     "p_upper_edge_ge_250": 1.0,
+     "p_empty_window": 0.0
+    }
+   }
+  },
+  "de-saturated": {
+   "best_thr": 190,
+   "ari_at_best": {
+    "point": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "window": {
+    "ari": {
+     "criterion": "mean ARI >= 0.9995",
+     "point": {
+      "lo_thr": 190,
+      "hi_thr": 214,
+      "n_thresholds": 7,
+      "span": 24
+     },
+     "ci95_lo_thr": [
+      190.0,
+      190.0
+     ],
+     "ci95_hi_thr": [
+      210.0,
+      214.0
+     ],
+     "ci95_n_thresholds": [
+      6.0,
+      7.0
+     ],
+     "p_upper_edge_at_254": 0.0,
+     "p_upper_edge_ge_250": 0.0,
+     "p_empty_window": 0.0
+    },
+    "ncl": {
+     "criterion": "|mean clusters - 6| <= 0.25",
+     "point": {
+      "lo_thr": 190,
+      "hi_thr": 214,
+      "n_thresholds": 7,
+      "span": 24
+     },
+     "ci95_lo_thr": [
+      190.0,
+      190.0
+     ],
+     "ci95_hi_thr": [
+      214.0,
+      214.0
+     ],
+     "ci95_n_thresholds": [
+      7.0,
+      7.0
+     ],
+     "p_upper_edge_at_254": 0.0,
+     "p_upper_edge_ge_250": 0.0,
+     "p_empty_window": 0.0
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,126 @@
+/* Shared print design system for the nOdes printable guides
+   (EGGBOX_GUIDE.html, SIMULATOR_GUIDE.html).
+   Render to PDF with:
+     chrome --headless --no-pdf-header-footer --print-to-pdf=out.pdf file://<abs>.html
+   Line-art conventions: .ln normal, .lnT thin, .ctx greyed context,
+   .act the one thing this step asks you to touch. */
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #14161a;
+    background: #fff;
+  }
+  .page {
+    width: 210mm; height: 297mm;
+    padding: 18mm 16mm 14mm;
+    page-break-after: always;
+    position: relative;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* ---- running foot ---- */
+  .foot {
+    position: absolute; left: 16mm; right: 16mm; bottom: 8mm;
+    display: flex; justify-content: space-between;
+    font-size: 8pt; color: #99a0a8; letter-spacing: .06em;
+    text-transform: uppercase;
+    border-top: .6pt solid #dfe3e8; padding-top: 2.5mm;
+  }
+
+  /* ---- cover ---- */
+  .cover { justify-content: center; align-items: center; text-align: center; }
+  .cover h1 { font-size: 30pt; font-weight: 700; margin: 0; letter-spacing: -.02em; }
+  .cover .sub { font-size: 12pt; color: #6b737d; margin: 3mm 0 0; font-weight: 400; }
+  .cover .art { margin: 12mm 0 10mm; }
+  .cover .meta {
+    margin-top: 10mm; font-size: 9pt; color: #99a0a8;
+    letter-spacing: .1em; text-transform: uppercase;
+  }
+  .nowords {
+    display: flex; gap: 9mm; margin-top: 11mm;
+    justify-content: center; align-items: flex-start;
+  }
+  .nowords figure { margin: 0; width: 30mm; }
+  .nowords figcaption { font-size: 7.5pt; color: #6b737d; margin-top: 2mm; line-height: 1.35; }
+
+  /* ---- step pages ---- */
+  .steptitle { display: flex; align-items: baseline; gap: 4mm; margin: 0 0 1mm; }
+  .steptitle h2 { font-size: 15pt; margin: 0; font-weight: 700; letter-spacing: -.01em; }
+  .steptitle .kicker {
+    font-size: 8pt; color: #99a0a8; letter-spacing: .12em; text-transform: uppercase;
+  }
+  .lede { font-size: 9.5pt; color: #545c66; margin: 0 0 5mm; line-height: 1.5; max-width: 150mm; }
+
+  .step { display: flex; gap: 7mm; align-items: flex-start; margin-bottom: 7mm; }
+  .step:last-child { margin-bottom: 0; }
+  /* Pages with fewer steps breathe out to fill the sheet rather than leaving a
+     dead band above the footer. Applied per page, since the dense pages
+     (tables) have no slack to give. */
+  .spread { justify-content: space-between; padding-bottom: 26mm; }
+  .spread .step, .spread .dodont { margin-bottom: 0; margin-top: 0; }
+  .hdr, .blk { flex: 0 0 auto; }
+  /* A heading and the table it introduces must travel together when
+     the page distributes its slack, or the heading is orphaned. */
+  .blk > h2 { margin-bottom: 1mm; }
+  .hdr .lede { margin-bottom: 0; }
+  .num {
+    flex: 0 0 auto; width: 10mm; height: 10mm; border-radius: 50%;
+    border: 1.6pt solid #14161a; display: flex; align-items: center;
+    justify-content: center; font-size: 12pt; font-weight: 700; line-height: 1;
+  }
+  .step .art { flex: 0 0 auto; }
+  .step .txt { flex: 1 1 auto; padding-top: 1mm; }
+  .step .txt p { margin: 0 0 1.5mm; font-size: 10pt; line-height: 1.5; }
+  .step .txt .hint { font-size: 8.5pt; color: #6b737d; line-height: 1.45; }
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    background: #f1f3f5; padding: .4mm 1.2mm; border-radius: .8mm;
+    font-size: 9pt; border: .4pt solid #e2e6ea;
+  }
+  .big code { font-size: 11pt; font-weight: 600; }
+
+  .wait {
+    display: inline-flex; align-items: center; gap: 2mm;
+    background: #f1f3f5; border-radius: 6mm; padding: 1mm 3mm;
+    font-size: 8.5pt; color: #545c66; margin-top: 1mm;
+  }
+
+  /* ---- do / don't ---- */
+  .dodont { display: flex; gap: 6mm; margin-top: 4mm; }
+  .dodont > div { flex: 1; }
+  .mark { font-size: 15pt; font-weight: 700; line-height: 1; margin-bottom: 2mm; }
+  .ok  { color: #1c7a3e; }
+  .no  { color: #c0392b; }
+  .dodont p { font-size: 8.5pt; color: #545c66; margin: 0; line-height: 1.45; }
+
+  /* ---- tables ---- */
+  table { border-collapse: collapse; width: 100%; font-size: 9pt; margin-top: 2mm; }
+  th, td { text-align: left; padding: 1.8mm 2mm; border-bottom: .5pt solid #e2e6ea; vertical-align: top; }
+  th { font-size: 7.5pt; text-transform: uppercase; letter-spacing: .08em; color: #99a0a8; font-weight: 600; }
+
+  /* ---- parts inventory ---- */
+  .parts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10mm 5mm; margin-top: 4mm; }
+  .part { text-align: center; }
+  .part .qty {
+    font-size: 8.5pt; color: #14161a; margin-top: 1.5mm; font-weight: 600;
+  }
+  .part .nm { font-size: 8pt; color: #6b737d; line-height: 1.35; }
+
+  /* ---- svg line-art conventions ---- */
+  svg { display: block; }
+  .ln  { fill: none; stroke: #14161a; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .lnT { fill: none; stroke: #14161a; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .ctx { fill: none; stroke: #b6bcc4; stroke-width: 2;   stroke-linecap: round; stroke-linejoin: round; }
+  .fillw { fill: #fff; }
+  .fillg { fill: #eef0f3; }
+  .fillk { fill: #14161a; }
+  .act { fill: none; stroke: #1f6feb; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+  .actf { fill: #1f6feb; }
+  .dash { stroke-dasharray: 5 5; }
+  .tiny { font: 600 11px "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #14161a; }
+  .tinyg{ font: 500 10px "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #6b737d; }

@@ -1,0 +1,9 @@
+# The F-lines ARE the data product, so the console must keep up: ~20 orbs at
+# 50 Hz is ~1000 frames/s. At the stock 115200 (11 KB/s) most of the capture is
+# silently lost. NB the baudrate symbol only takes a value when UART_CUSTOM is
+# set -- with ESP_CONSOLE_UART_DEFAULT the value is pinned to 115200 and any
+# setting here is ignored without warning.
+CONFIG_ESP_CONSOLE_UART_CUSTOM=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=921600
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+CONFIG_ESP_TASK_WDT_INIT=n

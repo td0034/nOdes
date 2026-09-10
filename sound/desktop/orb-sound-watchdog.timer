@@ -1,0 +1,10 @@
+# Run the sound watchdog every minute (user timer).
+[Unit]
+Description=Run the nOdes sound watchdog every minute
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+
+[Install]
+WantedBy=timers.target

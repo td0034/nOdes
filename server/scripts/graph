@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+
+
+set -euo pipefail
+
+
+orb=$1
+inotifywait -m -q -e moved_to --format "%w%f" /tmp \
+| grep --line-buffered -x "/tmp/orb_data" \
+| while read -r _; do
+    jq -r "[.\"$orb\".batt_i] | @tsv" /tmp/orb_data
+    echo replot
+done \
+| feedgnuplot --stream 0  --exit --lines --xlen 5000 --ymin -500 --ymax 200 --xlabel "t (s)" --ylabel "value"
+
+

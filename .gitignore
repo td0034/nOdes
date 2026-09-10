@@ -1,0 +1,30 @@
+# ESP-IDF
+client/build/
+client/build-*/
+client/sdkconfig.old
+client/managed_components/
+tools/espnow_sniffer/build/
+tools/espnow_sniffer/sdkconfig.old
+.idf/
+.cmake/
+
+# Server build
+server/build/
+server/espidf_orb.bin      # staged OTA image; copy from client/build when releasing
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Runtime state
+/tmp/
+visualiser/grafana/data/
+nodes_sessions/
+*.log
+
+# Editors / OS
+.vscode/
+.DS_Store
+._*

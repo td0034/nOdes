@@ -1,0 +1,143 @@
+{
+  "_comment": "E7 ground-truth geometry. Frame: metres, origin at room centre, x right, y front (matches speaker_layout.json). EDIT every xy to the tape-measured value \u2014 the analysis is only as honest as this file. anchor serial null = beacon not assigned yet (tools/beacon_id.py).",
+  "room": {
+    "width_m": 4.4,
+    "depth_m": 3.6,
+    "note": "anchor triangle re-taped 2026-09-08: equilateral, side 3.25 m (tape read 320-330 cm between each pair, so treat side as 3.25 +/- 0.05; that 5 cm is well under the ~0.5 m errors being measured). Replaces the 2.0/2.7/2.7 m triangle of 2026-08-25 whose shortest pair was also its weakest link."
+  },
+  "environment": {
+    "note": "EDIT: lab occupancy, other 2.4GHz traffic, furniture",
+    "date": null
+  },
+  "anchors": [
+    {
+      "serial": "006740",
+      "corner": "back",
+      "xy": [
+        0.0,
+        -1.876
+      ]
+    },
+    {
+      "serial": "006dc4",
+      "corner": "left",
+      "xy": [
+        -1.625,
+        0.938
+      ]
+    },
+    {
+      "serial": "0069a4",
+      "corner": "right",
+      "xy": [
+        1.625,
+        0.938
+      ]
+    }
+  ],
+  "grid": {
+    "spacing_note": "4x3 grid, 0.5 m wall margin; plus CEN/MLB/MLR/MRB placement-friendly points (triangle centre + speaker-pair midpoints) | BL/BR/BB added 2026-09-08: 0.50 m radially BEHIND each speaker (outward from the centroid). Maximum-discrimination placement \u2014 each sits ~50 cm from its own anchor and ~3.7 m from the other two, so a centroid-biased estimator cannot score well. Chosen over the edge midpoints because it is far easier to place accurately, and placement error is indistinguishable from radio error. | XLB/XRB/XLR added 2026-09-08: the ACTUAL trilaterated positions of the three 'between the speakers' orbs in run n07_two_radii. They sit OUTSIDE the anchor triangle (1.83-2.19 m from centre), not on the edge midpoints MLB/MLR/MRB (0.94 m) that were assumed at capture time. Derived from tape distances to the two nearest anchors and confirmed against the third. | NL/NR/NB added 2026-09-08: 1.00 m from the centre, on the line toward each speaker, INSIDE the triangle. Deliberately the same bearings as BL/BR/BB (2.38 m) so the pair differs only in radius \u2014 the paired design that distinguishes a constant scale from a range-dependent compression.",
+    "points": {
+      "A1": [
+        -1.7,
+        -1.3
+      ],
+      "A2": [
+        -1.7,
+        0.0
+      ],
+      "A3": [
+        -1.7,
+        1.3
+      ],
+      "B1": [
+        -0.567,
+        -1.3
+      ],
+      "B2": [
+        -0.567,
+        0.0
+      ],
+      "B3": [
+        -0.567,
+        1.3
+      ],
+      "C1": [
+        0.567,
+        -1.3
+      ],
+      "C2": [
+        0.567,
+        0.0
+      ],
+      "C3": [
+        0.567,
+        1.3
+      ],
+      "D1": [
+        1.7,
+        -1.3
+      ],
+      "D2": [
+        1.7,
+        0.0
+      ],
+      "D3": [
+        1.7,
+        1.3
+      ],
+      "CEN": [
+        0.0,
+        0.0
+      ],
+      "MLB": [
+        -0.812,
+        -0.469
+      ],
+      "MLR": [
+        0.0,
+        0.938
+      ],
+      "MRB": [
+        0.812,
+        -0.469
+      ],
+      "BB": [
+        0.0,
+        -2.376
+      ],
+      "BL": [
+        -2.058,
+        1.188
+      ],
+      "BR": [
+        2.058,
+        1.188
+      ],
+      "XLB": [
+        -1.712,
+        -0.66
+      ],
+      "XRB": [
+        1.926,
+        -1.039
+      ],
+      "XLR": [
+        -0.117,
+        1.921
+      ],
+      "NB": [
+        0.0,
+        -1.0
+      ],
+      "NL": [
+        -0.866,
+        0.5
+      ],
+      "NR": [
+        0.866,
+        0.5
+      ]
+    }
+  }
+}

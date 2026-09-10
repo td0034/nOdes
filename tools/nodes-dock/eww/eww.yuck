@@ -1,0 +1,236 @@
+; nOdes desktop dashboard — eww config
+;
+; Layout (top to bottom, single column):
+;   Header       — branding
+;   Status       — mode badge, current prompt, compliance bar, system row
+;   Modes/prompt — cycle mode + prompt next/prev/clear (tmux relays).
+;   Study        — block/framing drive + runsheet prompts
+;   Session      — prompt-session start/stop + live score
+;   Sound        — SuperCollider stack + audio route
+;   Launchers    — visualiser, server, grafana, docs, OTA server.
+;   Footer       — record toggle, stop-all, active set.
+
+(deflisten status
+  :initial "{\"mode\":\"--\",\"prompt\":\"\",\"framing\":\"-\",\"study_block\":\"-\",\"comp_px\":0,\"orb_count\":0,\"eligible\":0,\"session_active\":false,\"session_total\":0,\"session_best\":0,\"session_points\":0,\"session_state\":\"\",\"batt_min\":\"-\",\"rssi_max\":\"-\",\"ap_ok\":false,\"sender_ok\":false,\"recording\":false,\"tmux_ok\":false,\"fw_server_ok\":false,\"synth_ok\":false,\"conductor_ok\":false,\"audio_route\":\"hdmi\",\"disk_free\":\"?\",\"active_set\":\"(none)\",\"slots\":[]}"
+  "~/.config/eww/scripts/nodes_status.sh")
+
+; ---- The dock window ----
+; :windowtype "normal" + :wm-ignore false → WM-managed normal-type window
+;   that Mutter is willing to move on begin_move_drag.
+; Our eww patch unconditionally strips set_decorated and adds a button-press
+;   handler on the window that fires begin_move_drag, so clicks on bare
+;   labels/boxes drag the window. Clicks on buttons still click normally
+;   because GtkButton consumes button-press.
+(defwindow nodes_dock
+  :monitor 0
+  :wm-ignore false
+  :windowtype "normal"
+  :geometry (geometry
+              :x "40px"
+              :y "60px"
+              :width "360px"
+              :height "720px"
+              :anchor "top left")
+  (dock))
+
+; Single column under the header: status, then controls (mode/prompt, study,
+; session, sound, launchers, footer).
+(defwidget dock []
+  (box :class "dock" :orientation "v" :space-evenly false :spacing 10
+    (header)
+    (status-block)
+    (mode-prompt)
+    (study-panel)
+    (session-block)
+    (sound-block)
+    (launchers)
+    (footer)))
+
+; ---- Header ----
+; Title rows on the left, ×-close button on the right. The X11 close button
+; in GNOME's chrome can be flaky after a windowtype change, so the in-dock
+; close button is the reliable way out.
+(defwidget header []
+  (box :class "header" :orientation "h" :space-evenly false :spacing 6
+    (box :orientation "v" :space-evenly false :spacing 2 :hexpand true :halign "start"
+      (label :class "brand"     :text "nOdes")
+      (label :class "brand-sub" :text "control deck"))
+    (button :class "close-x" :halign "end" :valign "start"
+            :onclick "GDK_BACKEND=x11 $HOME/.local/bin/eww close nodes_dock &"
+            "×")))
+
+; ---- Status block ----
+(defwidget status-block []
+  (box :class "status" :orientation "v" :space-evenly false :spacing 8
+    (box :orientation "h" :space-evenly false :spacing 6
+      (label :class "lbl"  :text "mode")
+      ; class needs the raw ('r') value — quoted "MODE" never matches the scss
+      (label :class "mode-badge ${jq(status, '.mode', 'r')}"
+             :text "${jq(status, '.mode')}"))
+    (box :orientation "v" :space-evenly false :spacing 4
+      (label :class "lbl" :text "prompt")
+      (label :class "prompt" :wrap true :limit-width 30
+             :text "${jq(status, '.prompt')}")
+      (box :class "comp-track"
+        (box :class "comp-fill" :hexpand false
+             :style "min-width: ${jq(status, '.comp_px')}px;")))
+    (box :orientation "h" :space-evenly true
+      (sys-light :name "AP"     :ok "${jq(status, '.ap_ok')}")
+      (sys-light :name "server" :ok "${jq(status, '.sender_ok')}")
+      (sys-light :name "tmux"   :ok "${jq(status, '.tmux_ok')}")
+      (box :orientation "h" :space-evenly false :spacing 4
+        (label :class "lbl"  :text "disk")
+        (label :class "val"  :text "${jq(status, '.disk_free')}")))))
+
+(defwidget sys-light [name ok]
+  (box :orientation "h" :space-evenly false :spacing 4
+    (label :class "dot ${ok == 'true' ? 'ok' : 'bad'}" :text "●")
+    (label :class "lbl" :text {name})))
+
+; ---- Mode + prompt controls (also tmux relays) ----
+(defwidget mode-prompt []
+  (box :class "mode-prompt" :orientation "v" :space-evenly false :spacing 6
+    (box :orientation "h" :space-evenly true :spacing 6
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh mode-next &"    "cycle mode")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh prompt-prev &"  "‹ prompt")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh prompt-next &"  "prompt ›")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh prompt-clear &" "clear"))))
+
+; ---- Study 33302 — block + prompt drive ----
+; Buttons write /tmp/orb_prompt_cmd via study/session/study_cmd.py: A/B set
+; the block label and framing in ONE atomic command (block boundaries stay
+; clean in blocks.csv); the prompt buttons put the runsheet actions on the
+; stage display with the framing-appropriate wording, so the facilitator
+; never has to call prompts out. Block readout comes from the server's own
+; telemetry, so what you see is what blocks_log.py records.
+(defwidget study-panel []
+  (box :class "session" :orientation "v" :space-evenly false :spacing 6
+    (box :orientation "h" :space-evenly false :spacing 6
+      (label :class "section" :text "study 33302" :hexpand true :halign "start")
+      (label :class "lbl" :text "block ${jq(status, '.study_block')} · ${jq(status, '.framing')}"))
+    (box :orientation "h" :space-evenly true :spacing 6
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-block-a &" "▶ A collective")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-block-b &" "▶ B individual"))
+    (box :orientation "h" :space-evenly true :spacing 6
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-washout &" "washout")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-reset &"   "reset count"))
+    (box :orientation "h" :space-evenly true :spacing 4
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh finale-screen &" "▶ SCREEN")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh finale-cond &"   "▶ COND")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh finale-ens &"    "▶ ENS"))
+    (box :orientation "h" :space-evenly true :spacing 4
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-prompt SHAKE &"  "shake")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-prompt SPIN &"   "swirl")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-prompt FREEZE &" "still"))
+    (box :orientation "h" :space-evenly true :spacing 4
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-prompt RATTLE &" "flick")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-prompt JUMP &"   "raise")
+      (button :class "small" :onclick "~/.config/eww/scripts/launch.sh study-prompt WAVE &"   "sway"))))
+
+; ---- Prompt session — start/stop the auto-advance scoring loop ----
+; Distinct Start / Stop buttons (the inactive one greys out) for
+; tools/orb_session_controller.py; the score row shows live totals + an
+; N/12 players line while a session is running. NB this is the *prompt*
+; session — separate from "record data" in the footer (raw /tmp/orb_data).
+(defwidget session-block []
+  (box :class "session" :orientation "v" :space-evenly false :spacing 6
+    (label :class "section" :text "prompt session")
+    (box :orientation "h" :space-evenly true :spacing 6
+      (button :class "small session-start ${jq(status, '.session_active') == 'true' ? 'dim' : 'on'}"
+              :hexpand true
+              :onclick "~/.config/eww/scripts/launch.sh session-start &" "▶ start")
+      (button :class "small session-stop ${jq(status, '.session_active') == 'true' ? 'on' : 'dim'}"
+              :hexpand true
+              :onclick "~/.config/eww/scripts/launch.sh session-stop &" "■ stop"))
+    (box :class "session-stats" :orientation "h" :space-evenly true
+      (box :orientation "v" :space-evenly false :spacing 1
+        (label :class "lbl" :text "score")
+        (label :class "score-val" :text "${jq(status, '.session_total')}"))
+      (box :orientation "v" :space-evenly false :spacing 1
+        (label :class "lbl" :text "best")
+        (label :class "val" :text "${jq(status, '.session_best')}"))
+      (box :orientation "v" :space-evenly false :spacing 1
+        (label :class "lbl" :text "pts")
+        (label :class "val" :text "+${jq(status, '.session_points')}")))
+    (label :class "players" :halign "center"
+           :text "${jq(status, '.eligible')}/12 players")))
+
+; ---- Sound (full-server SuperCollider stack + audio route) ----
+; Start/stop the user services (orb-synth + orb-conductor) and flip the audio
+; output between HDMI and the headphone (analog) sink live. Dots show synth +
+; conductor service state; midi→gear routes nOdes-out to a USB-MIDI interface.
+(defwidget sound-block []
+  (box :class "sound" :orientation "v" :space-evenly false :spacing 6
+    (label :class "section" :text "sound")
+    (box :orientation "h" :space-evenly true :spacing 6
+      (button :class "small session-start ${jq(status, '.synth_ok') == 'true' ? 'dim' : 'on'}"
+              :hexpand true
+              :onclick "~/.config/eww/scripts/launch.sh sound-start &" "▶ start")
+      (button :class "small session-stop ${jq(status, '.synth_ok') == 'true' ? 'on' : 'dim'}"
+              :hexpand true
+              :onclick "~/.config/eww/scripts/launch.sh sound-stop &" "■ stop"))
+    (box :orientation "h" :space-evenly false :spacing 6
+      (label :class "lbl" :text "route" :hexpand true :halign "start")
+      ; NB string fields need jq's raw-output arg ('r') — plain jq() keeps the
+      ; JSON quotes, so == against a bare string silently never matches.
+      (button :class "small route ${jq(status, '.audio_route', 'r') == 'hdmi' ? 'on' : ''}"
+              :onclick "~/.config/eww/scripts/launch.sh audio-hdmi &" "HDMI")
+      (button :class "small route ${jq(status, '.audio_route', 'r') == 'headphone' ? 'on' : ''}"
+              :onclick "~/.config/eww/scripts/launch.sh audio-headphone &" "phones")
+      (button :class "small route ${jq(status, '.audio_route', 'r') == 'surround' ? 'on' : ''}"
+              :onclick "~/.config/eww/scripts/launch.sh audio-surround &" "7.1"))
+    (box :orientation "h" :space-evenly false :spacing 4
+      (label :class "dot ${jq(status, '.synth_ok') == 'true' ? 'ok' : 'bad'}" :text "●")
+      (label :class "lbl" :text "synth" :hexpand true :halign "start")
+      (label :class "dot ${jq(status, '.conductor_ok') == 'true' ? 'ok' : 'bad'}" :text "●")
+      (label :class "lbl" :text "cond" :hexpand true :halign "start")
+      (button :class "small" :halign "end"
+              :onclick "~/.config/eww/scripts/launch.sh midi-out &" "midi→gear"))))
+
+; ---- Launchers ----
+(defwidget launchers []
+  (box :class "launchers" :orientation "v" :space-evenly false :spacing 6
+    (label :class "section" :text "launch")
+    (launch-btn :label "visualiser" :icon "◉" :cmd "visualiser")
+    (launch-btn :label "server"     :icon "▶" :cmd "sender")
+    (launch-btn :label "grafana"    :icon "▤" :cmd "grafana")
+    (launch-btn :label "docs"       :icon "✎" :cmd "docs")
+    ; Firmware HTTP server toggle — `python3 -m http.server 8000` over
+    ; client/build so orbs can fetch espidf_orb.bin during OTA without anyone
+    ; needing to open a terminal. Label flips when the process is running.
+    (button :class "launch fw-server ${jq(status, '.fw_server_ok') == 'true' ? 'on' : ''}"
+            :onclick "~/.config/eww/scripts/launch.sh fw-server &"
+      (box :orientation "h" :space-evenly false :spacing 10
+        (label :class "icon"  :text "${jq(status, '.fw_server_ok') == 'true' ? '■' : '⬢'}")
+        (label :class "label" :text "${jq(status, '.fw_server_ok') == 'true' ? 'OTA server :8000 ✓' : 'OTA server'}")))))
+
+(defwidget launch-btn [label icon cmd]
+  (button :class "launch" :onclick "~/.config/eww/scripts/launch.sh ${cmd} &"
+    (box :orientation "h" :space-evenly false :spacing 10
+      (label :class "icon"  :text {icon})
+      (label :class "label" :text {label}))))
+
+; ---- Footer ----
+(defwidget footer []
+  (box :class "footer" :orientation "v" :space-evenly false :spacing 6
+    ; ---- Data capture — start/stop the session capture stack ----
+    ; Distinct Start / Stop (the inactive one greys out), same pattern as the
+    ; prompt session. Drives tools/prompt_capture.py (per-prompt completion
+    ; episodes) + tools/orb_capture.py (aggregate swarm activity), both writing
+    ; timestamped files under nodes_sessions. Separate from the always-on Pi
+    ; flight recorder and from the prompt session above. `.recording` is true
+    ; whenever prompt_capture is running.
+    (label :class "section" :text "data capture")
+    (box :orientation "h" :space-evenly true :spacing 6
+      (button :class "small session-start ${jq(status, '.recording') == 'true' ? 'dim' : 'on'}"
+              :hexpand true
+              :onclick "~/.config/eww/scripts/launch.sh record-start &" "● start")
+      (button :class "small session-stop ${jq(status, '.recording') == 'true' ? 'on' : 'dim'}"
+              :hexpand true
+              :onclick "~/.config/eww/scripts/launch.sh record-stop &" "■ stop"))
+    (button :class "stop"
+            :onclick "~/.config/eww/scripts/launch.sh kill-all &"
+      (label :text "✕ kill all"))
+    (box :class "active-set" :orientation "v" :space-evenly false :spacing 2
+      (label :class "lbl"     :text "active set")
+      (label :class "set-val" :text "${jq(status, '.active_set')}"))))

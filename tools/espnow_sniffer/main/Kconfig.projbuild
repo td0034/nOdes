@@ -1,0 +1,11 @@
+menu "E6 sniffer"
+    config E6_WIFI_SSID
+        string "AP SSID the fleet is on"
+        default "OrbAP"
+        help
+            Associating with this AP is what puts the sniffer on the fleet's
+            ESP-NOW channel. It must be the same AP the orbs use.
+    config E6_WIFI_PASS
+        string "AP password"
+        default ""
+endmenu

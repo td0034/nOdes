@@ -1,0 +1,329 @@
+<meta charset="utf-8">
+<html lang="it">
+<title>nOdes — Guida sul Campo</title>
+<link rel="stylesheet" href="guide.css">
+<style>
+  .warnbox { border-left: 2.4pt solid #c0392b; padding-left: 4mm; }
+  p.warn { font-size: 9pt; color: #7a2a20; margin: 0 0 1.6mm; line-height: 1.45; }
+  .hint.warn { color: #a33; }
+</style>
+<div class="page cover">
+  <svg class="art" width="300" height="200" viewBox="0 0 300 200">
+    
+    <path class="ln fillw" d="M40 118 L150 152 L260 118 L260 150 L150 184 L40 150 Z"/>
+    <path class="ln fillg" d="M40 118 L150 84 L260 118 L150 152 Z"/>
+    <g class="lnT">
+      <ellipse cx="103" cy="112" rx="17" ry="8.5"/><ellipse cx="150" cy="126" rx="17" ry="8.5"/>
+      <ellipse cx="197" cy="112" rx="17" ry="8.5"/><ellipse cx="103" cy="127" rx="17" ry="8.5"/>
+      <ellipse cx="150" cy="141" rx="17" ry="8.5"/><ellipse cx="197" cy="127" rx="17" ry="8.5"/>
+    </g>
+    <g class="ln fillw">
+      <circle cx="103" cy="104" r="13"/><circle cx="150" cy="118" r="13"/>
+      <circle cx="197" cy="104" r="13"/>
+    </g>
+    <path class="ln fillw" d="M40 118 L40 46 L150 12 L150 84 Z"/>
+    <path class="ln fillg" d="M56 108 L56 56 L136 31 L136 83 Z"/>
+    <g class="lnT" opacity=".6">
+      <circle cx="80" cy="80" r="6"/><circle cx="106" cy="66" r="6"/><circle cx="120" cy="88" r="6"/>
+      <path d="M80 80 L106 66 M106 66 L120 88 M80 80 L120 88"/>
+    </g>
+  </svg>
+  <h1>nOdes</h1>
+  <p class="sub">Kit da campo eggbox — installazione, dati e TouchDesigner</p>
+  <div class="nowords">
+    <figure><svg width="100%" viewBox="0 0 80 60">
+      <rect class="ln fillw" x="12" y="14" width="56" height="34" rx="4"/>
+      <path class="ln" d="M22 26h26M22 34h18"/>
+      <circle class="act" cx="58" cy="40" r="9"/><path class="act" d="M54 40l3 3 6-7"/>
+    </svg><figcaption>Nessun attrezzo necessario</figcaption></figure>
+    <figure><svg width="100%" viewBox="0 0 80 60">
+      <circle class="ln fillw" cx="40" cy="30" r="19"/><path class="ln" d="M40 19v12l8 5"/>
+    </svg><figcaption>~3 minuti al primo dato</figcaption></figure>
+    <figure><svg width="100%" viewBox="0 0 80 60">
+      <path class="ln fillw" d="M26 42a8 8 0 0 1 .6-16 12 12 0 0 1 22.6-2A9 9 0 0 1 52 42Z"/>
+      <path style="stroke:#c0392b;stroke-width:2.6;fill:none;stroke-linecap:round" d="M18 48L60 16"/>
+    </svg><figcaption>Funziona senza internet</figcaption></figure>
+  </div>
+  <p class="meta">Inizia da pagina 3 — la valigetta non serve ancora</p>
+  <p class="meta" style="margin-top:3mm;color:#c0392b">⚠ Leggi la nota di sicurezza a pagina 2 prima di ricaricare</p>
+  <div class="foot"><span>nOdes</span><span>Copertina</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Prima di iniziare</span><h2>Cosa c'è nella valigetta</h2></div>
+    <p class="lede">Controlla che ci sia tutto. La valigetta eggbox contiene l'intero sistema: un piccolo computer, uno schermo e sei alloggiamenti di ricarica wireless.</p>
+  </div>
+  <div class="parts">
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><path class="ln fillw" d="M20 48 L60 60 L100 48 L100 62 L60 74 L20 62 Z"/><path class="ln fillg" d="M20 48 L60 36 L100 48 L60 60 Z"/><path class="ln fillw" d="M20 48 L20 16 L60 4 L60 36 Z"/></svg><div class="qty">×1</div><div class="nm">Valigetta eggbox<br>(computer + schermo nel coperchio)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><g class="ln fillw"><circle cx="42" cy="40" r="15"/><circle cx="78" cy="40" r="15"/></g><g class="lnT"><circle cx="42" cy="40" r="7"/><circle cx="78" cy="40" r="7"/></g></svg><div class="qty">×6</div><div class="nm">Sfere<br>(70&nbsp;mm, numero di serie stampato su ognuna)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><rect class="ln fillw" x="14" y="24" width="30" height="32" rx="5"/><path class="lnT" d="M22 34h14M22 42h9"/><path class="ln" d="M44 40h20"/><rect class="act" x="64" y="31" width="34" height="18" rx="9"/><path class="lnT" d="M72 40h18"/><text class="tinyg" x="58" y="68" style="font-size:11px">piatto / ovale</text></svg><div class="qty">×1</div><div class="nm">Alimentatore USB-C<br>(alimenta il computer)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><rect class="ln fillw" x="14" y="24" width="30" height="32" rx="5"/><path class="lnT" d="M22 34h14M22 42h9"/><path class="ln" d="M44 40h26"/><circle class="act" cx="83" cy="40" r="13"/><circle class="fillk" cx="83" cy="40" r="4"/><text class="tinyg" x="62" y="68" style="font-size:11px">rotondo</text></svg><div class="qty">×1</div><div class="nm">Alimentatore dei caricatori<br>(alimenta i sei alloggiamenti)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><path class="ln" d="M26 40c14-16 54 16 68 0"/><rect class="ln fillg" x="18" y="33" width="12" height="14" rx="4"/><rect class="ln fillg" x="90" y="33" width="12" height="14" rx="4"/></svg><div class="qty">×1</div><div class="nm">Cavo USB-C<br>(il tuo computer → eggbox)</div></div>
+    <div class="part"><svg width="100%" height="92" viewBox="0 0 120 80"><path class="ln fillw" d="M32 54V26a4 4 0 0 1 4-4h48a4 4 0 0 1 4 4v28"/><path class="ln" d="M22 54h76l-6 8H28z"/><path class="lnT" d="M44 34h32M44 42h20"/></svg><div class="qty">×1</div><div class="nm">Il tuo computer<br>(non incluso)</div></div>
+  </div>
+  <div class="blk warnbox">
+    <h2 style="font-size:11.5pt;margin:0 0 1.5mm;color:#a33">⚠ Sicurezza — la ricarica scalda</h2>
+    <p class="warn"><strong>Le sfere diventano piuttosto calde durante la ricarica.</strong> È normale per la ricarica wireless, ma significa che la ricarica deve avvenire <strong>solo in presenza di qualcuno</strong>.</p>
+    <p class="warn">Non lasciare mai l'alimentatore dei caricatori acceso senza sorveglianza: né di notte, né quando la stanza è vuota. Spegni l'alimentatore quando esci.</p>
+    <p class="warn">Tieni il coperchio aperto durante la ricarica per far uscire il calore e non coprire la valigetta con tessuti o carta.</p>
+    <p class="warn">Una sfera tiepida è normale. Una sfera troppo calda da tenere in mano no: toglila dal caricatore e lasciala raffreddare.</p>
+  </div>
+  <div class="blk">
+    <h2 style="font-size:11.5pt;margin:0 0 1mm">Due modi per collegarsi. Meglio il cavo.</h2>
+    <table>
+      <tr><th style="width:26mm">Collegamento</th><th style="width:28mm">Indirizzo</th><th>Quando usarlo</th></tr>
+      <tr><td><strong>Cavo USB-C</strong></td><td><code>10.55.0.1</code></td><td><strong>Consigliato.</strong> Più veloce, più affidabile e non occupa uno dei pochi posti Wi-Fi della stazione.</td></tr>
+      <tr><td><strong>Hotspot Wi-Fi</strong></td><td><code>10.0.0.8</code></td><td>Solo se il cavo non è praticabile. La radio regge circa <strong>otto</strong> dispositivi in tutto e le sfere hanno bisogno di quei posti: ogni computer che si collega può costarti una sfera.</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Pagina 2 · Componenti e sicurezza</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Inizia da qui</span><h2>Lavora senza la valigetta</h2></div>
+    <p class="lede">Sei sfere immaginarie girano sul tuo computer e pubblicano esattamente ciò che pubblica la stazione reale. Costruisci il tuo patch adesso: quando arriva l'eggbox cambi un indirizzo e funziona.</p>
+  </div>
+  <div class="step"><div class="num">1</div><div class="art"><svg width="200" height="92" viewBox="0 0 200 92">
+        <rect class="ln fillw" x="10" y="10" width="180" height="72" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <text class="tinyg" x="22" y="50">$ python3 --version</text><text class="tinyg" x="22" y="67">Python 3.12.3</text></svg></div><div class="txt"><p class="big">Verifica di avere <strong>Python 3</strong>.</p><p class="hint">Versione 3.8 o successiva. Nient'altro da installare.<br>macOS — <code>xcode-select --install</code><br>Windows — installa da <code>python.org</code></p></div></div>
+  <div class="step"><div class="num">2</div><div class="art"><svg width="200" height="92" viewBox="0 0 200 92">
+        <rect class="ln fillw" x="10" y="10" width="180" height="72" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <text class="tinyg" x="22" y="50">$ cd simulator</text><text class="tiny" x="22" y="67">$ ./run.sh</text></svg></div><div class="txt"><p class="big">In un terminale, entra nella cartella <code>simulator</code> ed eseguilo.</p><p style="margin:2mm 0"><code style="font-size:11pt;font-weight:600">./run.sh</code></p><p class="hint">Stampa gli indirizzi e resta in esecuzione. Lascialo aperto; <strong>Ctrl-C</strong> lo ferma. Più sfere: <code>./run.sh 12</code>. Per provare le sfere in carica: <code>./run.sh 6 --charging 2</code>.</p><p class="hint" style="margin-top:2mm">Su Windows, o se <code>./run.sh</code> non parte, esegui le due parti in due terminali:<br><code>python3 fake_orb_data.py --orbs 6 --hz 25</code><br><code>python3 orb_td_bridge.py</code></p></div></div>
+  <div class="step"><div class="num">3</div><div class="art"><svg width="200" height="100" viewBox="0 0 200 100">
+        <rect class="ln fillw" x="10" y="10" width="180" height="82" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <rect class="fillg" x="56" y="15" width="128" height="10" rx="5"/>
+        <text class="tinyg" x="61" y="23" style="font-size:8px">127.0.0.1:8080</text>
+        <rect class="actf" x="22" y="42" width="56" height="9" rx="4.5"/>
+        <g class="lnT"><path d="M22 60h150M22 72h150M22 84h110"/></g>
+        <g class="act"><circle cx="160" cy="82" r="9"/><path d="M156 82l3 3 6-7"/></g></svg></div><div class="txt"><p class="big">Apri il browser su <code>http://127.0.0.1:8080</code></p><p class="hint">Una tabella dal vivo con sei sfere, aggiornata ogni due secondi. <strong>Se questa pagina funziona, funzionerà tutto il resto di questa guida.</strong></p></div></div>
+
+  <div class="foot"><span>nOdes</span><span>Pagina 3 · Simulatore</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">La valigetta vera</span><h2>Accensione</h2></div>
+    <p class="lede">I due alimentatori sono indipendenti. Quello USB-C alimenta il computer, l'altro i sei alloggiamenti di ricarica.</p>
+  </div>
+  <div class="step"><div class="num">1</div><div class="art"><svg width="188" height="118" viewBox="0 0 188 118"><path class="ctx" d="M28 84 L94 104 L160 84 L160 96 L94 116 L28 96 Z"/><path class="ctx" d="M28 84 L94 64 L160 84 L94 104 Z"/><path class="ctx" d="M28 84 L28 34 L94 14 L94 64 Z"/><rect class="act" x="150" y="76" width="15" height="7" rx="3.5"/><path class="act dash" d="M165 79 C182 79 182 40 168 34"/><rect class="ln fillw" x="140" y="16" width="30" height="26" rx="5"/><path class="lnT" d="M148 24h14M148 32h9"/></svg></div><div class="txt"><p class="big">Collega l'<strong>alimentatore USB-C</strong> alla presa sul fianco della valigetta, poi alla corrente.</p><p class="hint">Lo schermo nel coperchio si accende da solo. Non c'è nulla da premere.</p><div class="wait"><svg width="12" height="12" viewBox="0 0 24 24"><circle class="lnT" cx="12" cy="12" r="9"/><path class="lnT" d="M12 7v5l3 2"/></svg>Aspetta circa <strong>60 secondi</strong> che la stazione si avvii</div></div></div>
+  <div class="step"><div class="num">2</div><div class="art"><svg width="188" height="118" viewBox="0 0 188 118"><path class="ctx" d="M28 84 L94 104 L160 84 L160 96 L94 116 L28 96 Z"/><path class="ctx" d="M28 84 L94 64 L160 84 L94 104 Z"/><path class="ctx" d="M28 84 L28 34 L94 14 L94 64 Z"/><circle class="act" cx="34" cy="88" r="5"/><path class="act dash" d="M29 88 C10 88 10 44 22 38"/><rect class="ln fillw" x="14" y="16" width="34" height="24" rx="5"/><path class="lnT" d="M22 28h18"/></svg></div><div class="txt"><p class="big">Collega l'<strong>alimentatore dei caricatori</strong> alla presa rotonda, poi alla corrente.</p><p class="hint warn" style="margin-top:2mm">⚠ Fallo solo se c'è qualcuno presente — vedi la nota di sicurezza a pagina 2. Spegnilo quando esci dalla stanza.</p></div></div>
+  <div class="step"><div class="num">3</div><div class="art"><svg width="188" height="118" viewBox="0 0 188 118"><path class="ctx" d="M40 82 L100 100 L160 82 L160 94 L100 112 L40 94 Z"/><path class="ctx" d="M40 82 L100 64 L160 82 L100 100 Z"/><ellipse class="ctx" cx="76" cy="78" rx="14" ry="7"/><circle class="act" cx="112" cy="30" r="16"/><path class="act dash" d="M92 66 C96 48 100 40 104 36"/><path class="ln" d="M138 20c6 5 6 15 0 20M86 20c-6 5-6 15 0 20"/></svg></div><div class="txt"><p class="big">Prendi una sfera e <strong>scuotila</strong> per svegliarla.</p><p class="hint">Si collega in un paio di secondi. Ripeti per tutte le sfere che vuoi attive.</p><p class="hint" style="margin-top:2mm"><strong>Una sfera che non è in carica va in standby dopo 30 secondi di immobilità</strong> e sparisce dai dati finché non viene scossa. È normale.</p></div></div>
+  <div class="dodont">
+    <div><div class="mark ok">✓</div><p>Lascia le sfere negli alloggiamenti tra una sessione e l'altra, con il caricatore acceso e qualcuno presente. Mentre sono davvero in carica restano sveglie.</p></div>
+    <div><div class="mark no">✗</div><p>Evita di alimentare la stazione da una porta USB del computer. Una porta debole fa calare la tensione e il collegamento cade. Usa l'alimentatore da parete in dotazione.</p></div>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Pagina 4 · Accensione</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">La valigetta vera</span><h2>Collega il computer</h2></div>
+    <p class="lede">Scegli <strong>uno</strong> dei due. Il metodo A è migliore sotto ogni aspetto; usa il B solo se il cavo non arriva.</p>
+  </div>
+  <div class="step"><div class="num">4</div><div class="art"><svg width="188" height="122" viewBox="0 0 188 122"><path class="ln fillw" d="M12 62V24a4 4 0 0 1 4-4h52a4 4 0 0 1 4 4v38"/><path class="ln" d="M4 62h84l-6 9H10z"/><path class="act" d="M74 46 C104 46 108 84 130 88"/><path class="ctx" d="M104 88 L142 100 L180 88 L180 100 L142 112 L104 100 Z"/><path class="ctx" d="M104 88 L142 76 L180 88 L142 100 Z"/><path class="ctx" d="M104 88 L104 52 L142 40 L142 76 Z"/><text class="tiny" x="14" y="40">A</text></svg></div><div class="txt"><p class="big"><strong>Metodo A — cavo USB-C.</strong> Collega il computer all'eggbox. Il passaggio è tutto qui.</p><p class="hint">La stazione appare come un dispositivo di rete via cavo. Lascia le impostazioni di rete su automatico: il tuo Wi-Fi e internet continuano a funzionare. macOS e Windows non richiedono driver.</p><p style="margin-top:2mm">La stazione si trova a <code style="font-size:11pt;font-weight:600">10.55.0.1</code></p></div></div>
+  <div class="step"><div class="num">5</div><div class="art"><svg width="188" height="122" viewBox="0 0 188 122"><path class="ln fillw" d="M12 62V24a4 4 0 0 1 4-4h52a4 4 0 0 1 4 4v38"/><path class="ln" d="M4 62h84l-6 9H10z"/><g class="act"><path d="M92 58c5-6 5-16 0-22"/><path d="M102 64c9-11 9-29 0-40"/><path d="M112 70c13-16 13-42 0-58"/></g><path class="ctx" d="M124 88 L152 98 L180 88 L180 100 L152 110 L124 100 Z"/><path class="ctx" d="M124 88 L152 78 L180 88 L152 98 Z"/><path class="ctx" d="M124 88 L124 56 L152 46 L152 78 Z"/><text class="tiny" x="14" y="40">B</text></svg></div><div class="txt"><p class="big"><strong>Metodo B — hotspot Wi-Fi.</strong> Collegati alla rete trasmessa dalla stazione.</p><table style="margin-top:1mm"><tr><td style="width:24mm;border:0;padding-left:0">Rete</td><td style="border:0"><code>OrbAP</code></td></tr><tr><td style="border:0;padding-left:0">Password</td><td style="border:0"><code>&lt;your-passphrase&gt;</code></td></tr><tr><td style="border:0;padding-left:0">Stazione a</td><td style="border:0"><code>10.0.0.8</code></td></tr></table><p class="hint" style="margin-top:2mm">Questa rete <strong>non ha internet</strong>: è normale. Il computer potrebbe avvisarti; ignora l'avviso.</p></div></div>
+  <div class="step"><div class="num">6</div><div class="art"><svg width="200" height="100" viewBox="0 0 200 100">
+        <rect class="ln fillw" x="10" y="10" width="180" height="82" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <rect class="fillg" x="56" y="15" width="128" height="10" rx="5"/>
+        <text class="tinyg" x="61" y="23" style="font-size:8px">10.55.0.1:8080</text>
+        <rect class="actf" x="22" y="42" width="56" height="9" rx="4.5"/>
+        <g class="lnT"><path d="M22 60h150M22 72h150M22 84h110"/></g>
+        <g class="act"><circle cx="160" cy="82" r="9"/><path d="M156 82l3 3 6-7"/></g></svg></div><div class="txt"><p class="big">Apri il browser e vai alla pagina della stazione.</p><p class="big" style="margin-top:2mm"><code style="font-size:10.5pt;font-weight:600">http://10.55.0.1:8080</code> <span style="color:#99a0a8">(cavo)</span><br><code style="font-size:10.5pt;font-weight:600">http://10.0.0.8:8080</code> <span style="color:#99a0a8">(Wi-Fi)</span></p><p class="hint" style="margin-top:2mm">Una tabella dal vivo delle sfere, aggiornata ogni due secondi. <strong>Se questa pagina funziona, funzionerà tutto il resto.</strong></p></div></div>
+
+  <div class="foot"><span>nOdes</span><span>Pagina 5 · Collegamento</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Audio</span><h2>Far uscire l'audio</h2></div>
+    <p class="lede">Le sfere producono il proprio suono e la stazione genera anche un mix completo dell'intero gruppo. Quel mix esce da un jack da 3,5&nbsp;mm — ma non quello che ti aspetti.</p>
+  </div>
+  <div class="step"><div class="art"><svg width="210" height="140" viewBox="0 0 210 140">
+        <!-- lid + screen, with the jack called out on the SCREEN -->
+        <path class="ln fillw" d="M30 96 L30 26 L126 4 L126 74 Z"/>
+        <path class="ln fillg" d="M44 88 L44 36 L112 20 L112 72 Z"/>
+        <path class="ctx" d="M30 96 L96 114 L162 96 L162 106 L96 124 L30 106 Z"/>
+        <path class="ctx" d="M30 96 L96 78 L162 96 L96 114 Z"/>
+        <!-- the live jack -->
+        <circle class="act" cx="128" cy="52" r="7"/>
+        <path class="act" d="M135 52 L168 52"/>
+        <circle class="actf" cx="176" cy="52" r="7"/>
+        <text class="tiny" x="132" y="34" style="fill:#1f6feb">✓</text>
+        <!-- the dead jack on the computer -->
+        <circle class="ctx" cx="150" cy="101" r="5"/>
+        <path style="stroke:#c0392b;stroke-width:2.4;fill:none;stroke-linecap:round"
+              d="M143 94 L157 108 M157 94 L143 108"/>
+      </svg></div><div class="txt"><p class="big">Collega casse o cuffie alla presa da 3,5&nbsp;mm <strong>sullo schermo</strong>, nel coperchio.</p><p class="hint warn" style="margin-top:2mm">⚠ <strong>Non la presa sul piccolo computer.</strong> Quella è disattivata via software e resterà sempre muta, qualunque cosa tu ci colleghi. Il suono arriva allo schermo attraverso il cavo video interno.</p><p class="hint" style="margin-top:2mm">Le casse amplificate funzionano meglio. Regola il volume sulle casse stesse: la stazione non ha un proprio controllo di volume.</p></div></div>
+  <div class="step"><div class="art"><svg width="210" height="104" viewBox="0 0 210 104">
+        <path class="ln fillw" d="M14 60V24a4 4 0 0 1 4-4h50a4 4 0 0 1 4 4v36"/>
+        <path class="ln" d="M6 60h82l-6 9H12z"/>
+        <path class="act" d="M76 44 C104 44 108 62 128 64"/>
+        <rect class="ln fillw" x="128" y="50" width="72" height="28" rx="4"/>
+        <text class="tiny" x="138" y="68">orbstation</text>
+        <g class="lnT"><path d="M30 34h26M30 42h16"/></g>
+        <text class="tinyg" x="132" y="42" style="font-size:10px">MIDI</text>
+      </svg></div><div class="txt"><p class="big">Vuoi invece pilotare i tuoi strumenti? Lo stesso cavo USB-C porta anche il <strong>MIDI</strong>.</p><p class="hint">Il tuo computer vede un dispositivo MIDI chiamato <strong>orbstation</strong> senza alcuna configurazione. Selezionalo come ingresso MIDI in TouchDesigner, Ableton o qualsiasi altro programma.</p></div></div>
+  <div class="blk">
+    <h2 style="font-size:11pt;margin:0 0 1mm">Cosa arriva via MIDI</h2>
+    <table>
+      <tr><td style="width:52mm"><strong>Canale MIDI</strong></td><td>il gruppo (cluster) — 1° gruppo → canale 1, 2° → canale 2, e così via. Instrada ognuno su uno strumento diverso.</td></tr>
+      <tr><td><strong>Note basse (intorno al Do3)</strong></td><td>un pad che cresce — una sfera che ruota</td></tr>
+      <tr><td><strong>Note alte (intorno al Do5)</strong></td><td>un rintocco — una sfera scossa o lanciata</td></tr>
+    </table>
+    <p class="hint" style="margin-top:2mm">Puoi quindi prendere il mix della stazione dal jack dello schermo, oppure ignorarlo del tutto e costruire il tuo suono dal MIDI. Entrambe le cose insieme vanno bene.</p>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Pagina 6 · Audio</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Importante</span><h2>Le sfere in carica spariscono dallo schermo</h2></div>
+    <p class="lede">Questo sorprende tutti, quindi è meglio saperlo prima che ti confonda.</p>
+  </div>
+  <div class="step"><div class="art"><svg width="200" height="130" viewBox="0 0 200 130"><rect class="ln fillw" x="10" y="10" width="120" height="78" rx="5"/><path class="ln" d="M10 28h120"/><g class="lnT"><circle cx="22" cy="19" r="3"/><circle cx="32" cy="19" r="3"/></g><text class="tinyg" x="34" y="60" style="font-size:12px">— — —</text><path class="ln" d="M46 96h48l6 10H40z"/><g class="ctx"><circle cx="158" cy="36" r="13"/><circle cx="158" cy="72" r="13"/></g><path class="lnT" d="M150 92h16M152 100h12"/><path style="stroke:#c0392b;stroke-width:2.2;fill:none;stroke-linecap:round" d="M146 24L172 84"/></svg></div><div class="txt"><p>Il display della stazione — lo schermo nel coperchio, con il grafico di prossimità — <strong>nasconde di proposito ogni sfera appoggiata su un caricatore</strong>. Quindi una valigetta piena di sfere in carica mostra uno schermo vuoto. Non è un guasto.</p><p style="margin-top:2mm"><strong>Ma sono comunque nei dati.</strong> Le sfere in carica arrivano normalmente a TouchDesigner, contrassegnate così puoi decidere cosa farne.</p></div></div>
+  <div class="blk">
+    <table>
+      <tr><th style="width:56mm">Dove</th><th>Una sfera in carica…</th></tr>
+      <tr><td>Schermo nel coperchio</td><td><strong style="color:#c0392b">è completamente nascosta</strong></td></tr>
+      <tr><td>Il tuo patch TouchDesigner</td><td><strong style="color:#1c7a3e">arriva normalmente, con <code>charging</code> = 1</strong></td></tr>
+      <tr><td>La pagina di stato <code>/</code></td><td>è elencata, indicata come <em>charging</em></td></tr>
+    </table>
+    <p class="lede" style="margin-top:3mm">Quindi: per vedere le sfere sullo schermo nel coperchio, toglile dagli alloggiamenti. Per decidere nel tuo patch, filtra su <code>charging</code>.</p>
+    <p class="hint">Puoi provarlo senza la valigetta: <code>./run.sh 6 --charging 2</code> segna due sfere simulate come in carica.</p>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Pagina 7 · Ricarica</span></div>
+</div>
+<div class="page ">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">TouchDesigner</span><h2>Metodo 1 — OSC, senza codice</h2></div>
+    <p class="lede">Il modo più rapido. Due passaggi, nessuno script, ogni sfera come normali canali CHOP. Inizia da qui.</p>
+  </div>
+  <div class="step"><div class="num">7</div><div class="art"><svg width="188" height="112" viewBox="0 0 188 112"><rect class="ln fillw" x="8" y="14" width="172" height="46" rx="6"/><path class="ln" d="M8 32h172"/><g class="lnT"><circle cx="20" cy="23" r="3"/><circle cx="30" cy="23" r="3"/></g><rect class="fillg" x="52" y="18" width="120" height="10" rx="5"/><text class="tinyg" x="57" y="26" style="font-size:8px">…/osc/subscribe?port=7000</text><path class="act" d="M94 62v16"/><path class="act" d="M88 72l6 6 6-6"/><rect class="ln fillw" x="46" y="84" width="96" height="22" rx="4"/><text class="tiny" x="58" y="99">OSC In CHOP</text></svg></div><div class="txt"><p class="big">Visita questo indirizzo una volta, da qualsiasi browser:</p><p class="big" style="margin:2mm 0"><code style="font-size:9.5pt;font-weight:600">http://10.55.0.1:8080/osc/subscribe?port=7000</code></p><p class="hint">Questo dice alla stazione di trasmettere al <em>tuo</em> computer. È <strong>permanente</strong>: puoi chiudere il browser. Usa <code>127.0.0.1</code> per il simulatore.</p></div></div>
+  <div class="step"><div class="num">8</div><div class="art"><svg width="188" height="98" viewBox="0 0 188 98"><rect class="ln fillw" x="14" y="12" width="160" height="74" rx="5"/><path class="lnT" d="M14 28h160"/><text class="tiny" x="24" y="24">OSC In CHOP</text><text class="tinyg" x="24" y="46">Network Port</text><rect class="act" x="104" y="36" width="52" height="14" rx="3"/><text class="tiny" x="118" y="46">7000</text><g class="lnT"><path d="M24 62h60M24 74h74"/></g></svg></div><div class="txt"><p class="big">In TouchDesigner, aggiungi un <strong>OSC In CHOP</strong> e imposta <strong>Network Port</strong> su <code>7000</code>.</p><p class="hint">I canali appaiono subito. Non c'è altro da configurare.</p></div></div>
+  <h2 style="font-size:11pt;margin:4mm 0 0">Cosa ottieni</h2>
+  <table>
+    <tr><th style="width:52mm">Canale</th><th>Significato</th></tr>
+    <tr><td><code>orb/a1b2c3/accel1..3</code></td><td>Accelerometro x, y, z — in g, gravità inclusa</td></tr>
+    <tr><td><code>orb/a1b2c3/gyro1..3</code></td><td>Giroscopio x, y, z — gradi al secondo</td></tr>
+    <tr><td><code>orb/a1b2c3/spin</code></td><td>Un solo numero per "sta ruotando?"</td></tr>
+    <tr><td><code>orb/a1b2c3/shake</code></td><td>Un solo numero per "la stanno scuotendo?"</td></tr>
+    <tr><td><code>orb/a1b2c3/tilt</code></td><td>da −1 a 1, dove 1 è dritta</td></tr>
+    <tr><td><code>orb/a1b2c3/cluster</code></td><td>In quale gruppo l'ha messa la stazione (−1 = nessuno)</td></tr>
+    <tr><td><code>orb/a1b2c3/charging</code></td><td>1 mentre la sfera è in un alloggiamento</td></tr>
+    <tr><td><code>orb/a1b2c3/battery</code></td><td>Volt. 3.0 è scarica, 4.2 è carica</td></tr>
+    <tr><td><code style="color:#1f6feb">prox/a1b2c3/d4e5f6</code></td><td><strong>Quanto forte quelle due sfere si sentono</strong> — da 0 a 1</td></tr>
+    <tr><td><code>fleet/count &nbsp; fleet/rate</code></td><td>Quante sfere sono attive e la frequenza della stazione</td></tr>
+  </table>
+  <p class="hint" style="margin-top:3mm"><code>a1b2c3</code> è il numero di serie di una sfera, stampato sulla sfera stessa. Non cambia mai, quindi puoi tranquillamente puntare il patch su una sfera precisa.</p>
+  <div class="foot"><span>nOdes</span><span>Pagina 8 · OSC</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">TouchDesigner</span><h2>Metodo 2 — WebSocket, dati completi</h2></div>
+    <p class="lede">Usalo quando vuoi il quadro completo — in particolare <strong>l'intera griglia di prossimità</strong> come matrice fissa. Tre script pronti sono in <code>touchdesigner/</code>.</p>
+  </div>
+  <div class="step"><div class="num">9</div><div class="art"><svg width="188" height="132" viewBox="0 0 188 132"><rect class="ln fillw" x="10" y="10" width="168" height="34" rx="4"/><text class="tiny" x="20" y="24">WebSocket DAT</text><text class="tinyg" x="20" y="38">ws://10.55.0.1:8080/ws</text><path class="act" d="M60 44v14"/><path class="act" d="M54 52l6 6 6-6"/><path class="act" d="M128 44v14"/><path class="act" d="M122 52l6 6 6-6"/><rect class="ln fillw" x="10" y="60" width="80" height="30" rx="4"/><text class="tiny" x="20" y="72">Script CHOP</text><text class="tinyg" x="20" y="84">orbs</text><rect class="ln fillw" x="98" y="60" width="80" height="30" rx="4"/><text class="tiny" x="108" y="72">Script CHOP</text><text class="tinyg" x="108" y="84">proximity</text><g class="lnT"><path d="M50 90v12M138 90v12"/></g><rect class="fillg" x="10" y="102" width="168" height="22" rx="4"/></svg></div><div class="txt"><p class="big">Aggiungi un <strong>WebSocket DAT</strong>.</p><table style="margin-top:1mm"><tr><td style="width:30mm;border:0;padding-left:0">Network Address</td><td style="border:0"><code>10.55.0.1</code></td></tr><tr><td style="border:0;padding-left:0">Network Port</td><td style="border:0"><code>8080</code></td></tr><tr><td style="border:0;padding-left:0">Request URL</td><td style="border:0"><code>/ws</code></td></tr></table><p class="hint" style="margin-top:2mm">Incolla <code>websocket_callbacks.py</code> nelle sue callback. Poi aggiungi due Script CHOP accanto, chiamati <code>orbs</code> e <code>proximity</code>, e incolla i due script corrispondenti.</p></div></div>
+  <div class="blk">
+    <h2 style="font-size:12pt;margin:0 0 1mm">Capire la prossimità</h2>
+    <div class="step"><div class="art"><svg width="188" height="118" viewBox="0 0 188 118">
+      <g class="ln fillw"><circle cx="40" cy="30" r="14"/><circle cx="80" cy="22" r="14"/>
+      <circle cx="64" cy="64" r="14"/><circle cx="160" cy="46" r="14"/></g>
+      <g class="act"><path d="M53 27 L67 24"/><path d="M47 42 L58 51"/><path d="M78 36 L70 51"/></g>
+      <path class="ctx dash" d="M96 52 L145 48"/></svg></div>
+    <div class="txt"><p>Ogni sfera <strong>ascolta tutte le altre sfere</strong> su una radio a corto raggio e riferisce quanto forte le sente. Questi sono i dati di prossimità. Sono misurati dalle sfere stesse — non ricavati da posizioni, e non hanno nulla a che vedere con il Wi-Fi.</p>
+      <p class="hint" style="margin-top:2mm"><strong>0</strong> = non la sente &nbsp;·&nbsp; <strong>255</strong> (o 1.0 normalizzato) = a contatto. <strong>Non è una distanza</strong>: cala in modo irregolare, è rumorosa, e i corpi fra due sfere la indeboliscono. Consideralo un indice di <em>vicinanza sociale</em>, non metri.</p>
+      <p class="hint warn" style="margin-top:2mm"><strong>Aspettati la saturazione.</strong> Con il firmware attualmente installato, le sfere a meno di circa mezzo metro riportano tutte valori vicini a 255. Un gruppo stretto appare quindi uniformemente "a contatto", con poca struttura interna. Allontana le sfere per vedere il gradiente.</p></div></div>
+  </div>
+  <div class="dodont">
+    <div><div class="mark ok">✓</div><p>Basa tutto sul <strong>numero di serie</strong> della sfera (<code>a1b2c3</code>). È stampato sulla sfera e non cambia mai.</p></div>
+    <div><div class="mark no">✗</div><p>Non fidarti dei <strong>numeri di slot</strong> né di un numero fisso di sfere. Le sfere entrano ed escono durante la sessione e gli slot vengono riassegnati al riavvio.</p></div>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Pagina 9 · WebSocket</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Importante</span><h2>Simulato contro reale</h2></div>
+    <p class="lede">Il programma che serve i dati simulati è <strong>lo stesso che gira sulla stazione reale</strong>: solo le sfere sono immaginarie. Ogni nome di campo e indirizzo è identico. Ma le sfere immaginarie si comportano troppo bene.</p>
+  </div>
+  <div class="blk">
+    <h2 style="font-size:11pt;margin:0 0 1mm;color:#1c7a3e">✓ Cosa riproduce bene il simulatore</h2>
+    <p class="lede" style="margin-bottom:0">I gruppi si formano, si dividono e si uniscono davvero. La prossimità satura da vicino esattamente come il firmware reale. Le sfere alternano riposo, scuotimento e rotazione, e ogni tanto saltano. Batteria, segnale, versione del firmware e tempi dei pacchetti rientrano tutti negli intervalli reali.</p>
+  </div>
+  <div class="blk">
+    <h2 style="font-size:11pt;margin:0 0 1mm">Cosa non riproduce — progetta tenendone conto</h2>
+    <table>
+      <tr><th style="width:44mm">Non simulato</th><th>Perché conta il giorno stesso</th></tr>
+      <tr><td><strong>Sfere che spariscono</strong></td><td>Una sfera reale che non è in carica va in standby dopo 30 secondi di immobilità e sparisce finché non viene scossa. Il tuo patch deve sopravvivere alle sfere che vanno e vengono. <strong>È questo che frega tutti.</strong></td></tr>
+      <tr><td><strong>Perdita di pacchetti</strong></td><td>Qui il segnale è perfetto. Una stanza piena di persone su una banda 2.4&nbsp;GHz congestionata no. Smorza i tuoi ingressi.</td></tr>
+      <tr><td><strong>Scaricamento della batteria</strong></td><td>Le tensioni sono statiche: nulla si scarica o si ricarica. Non costruire un'opera che dipenda dal livello di batteria senza provarla sull'hardware.</td></tr>
+      <tr><td><strong>Calore</strong></td><td>Le sfere reali si scaldano negli alloggiamenti e la valigetta ha bisogno d'aria. In un'installazione lunga, prevedi pause di ricarica sorvegliate.</td></tr>
+    </table>
+  </div>
+  <div class="dodont">
+    <div><div class="mark ok">✓</div><p>Prova con <code>./run.sh 12</code> e poi con <code>./run.sh 2</code>. Se sopravvive a entrambi, sopravvivrà alla stanza.</p></div>
+    <div><div class="mark no">✗</div><p>Non dare per scontato un numero fisso di sfere e non basare nulla sui numeri di slot.</p></div>
+  </div>
+  <div class="blk">
+    <h2 style="font-size:11pt;margin:0 0 1mm">Passare alle sfere reali</h2>
+    <p class="lede" style="margin-bottom:1mm">Un indirizzo, tutto qui.</p>
+    <table>
+      <tr><th style="width:60mm">Dove ti trovi</th><th>Indirizzo da usare</th></tr>
+      <tr><td>Simulatore, sul tuo computer</td><td><code>127.0.0.1</code></td></tr>
+      <tr><td>Eggbox, cavo USB-C — consigliato</td><td><code>10.55.0.1</code></td></tr>
+      <tr><td>Eggbox, collegato al suo hotspot <code>OrbAP</code></td><td><code>10.0.0.8</code></td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Pagina 10 · Simulato e reale</span></div>
+</div>
+<div class="page spread">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Dopo una sessione</span><h2>Portare via i dati</h2></div>
+    <p class="lede">La stazione registra ogni sessione. <strong>Queste registrazioni stanno in memoria e vengono cancellate allo spegnimento</strong>: copiale prima di staccare qualsiasi cosa.</p>
+  </div>
+  <div class="step"><div class="num">10</div><div class="art"><svg width="200" height="92" viewBox="0 0 200 92">
+        <rect class="ln fillw" x="10" y="10" width="180" height="72" rx="6"/>
+        <path class="ln" d="M10 30h180"/>
+        <g class="lnT"><circle cx="22" cy="21" r="3"/><circle cx="32" cy="21" r="3"/><circle cx="42" cy="21" r="3"/></g>
+        <text class="tinyg" x="22" y="50">$ scp nodes@10.55.0.1:</text><text class="tinyg" x="22" y="67">   orb_logs/* .</text></svg></div><div class="txt"><p class="big">In un terminale sul tuo computer:</p><p style="margin:2mm 0"><code style="font-size:10pt">scp nodes@10.55.0.1:orb_logs/* .</code></p><p class="hint">La password è <code>pass</code>. Usa <code>10.0.0.8</code> se sei in Wi-Fi. Copia ogni registrazione nella cartella corrente.</p></div></div>
+  <div class="blk">
+    <table>
+      <tr><th style="width:42mm">File</th><th style="width:30mm">Una riga per…</th><th>Colonne</th></tr>
+      <tr><td><code>run-001.csv</code></td><td>sfera, per campione</td><td>tempo, numero di serie, gruppo, accelerometro, giroscopio, tinta, carica, batteria, segnale, sfera più vicina</td></tr>
+      <tr><td><code>run-001.prox.csv</code></td><td><strong>coppia di sfere</strong>, per campione</td><td>tempo, sfera A, sfera B, intensità 0–255 — l'intero grafo di prossimità per tutta la sessione</td></tr>
+    </table>
+    <p class="hint" style="margin-top:2mm">Entrambi sono semplici CSV, dieci campioni al secondo. Uniscili sulla colonna <code>t</code>. Il tempo è in secondi dall'inizio della registrazione: la stazione non ha un orologio.</p>
+  </div>
+  <div class="blk">
+    <div class="steptitle"><span class="kicker">Spegnimento</span><h2>Spegnere</h2></div>
+  </div>  <div class="step"><div class="num">11</div><div class="art"><svg width="188" height="96" viewBox="0 0 188 96"><path class="ctx" d="M40 56 L94 72 L148 56 L148 68 L94 84 L40 68 Z"/><path class="ctx" d="M40 56 L94 40 L148 56 L94 72 Z"/><path class="ctx" d="M40 56 L40 24 L94 8 L94 40 Z"/><rect class="act" x="140" y="50" width="14" height="7" rx="3.5"/><path class="act" d="M158 53 L178 53"/><path class="act" d="M170 45l8 8-8 8"/></svg></div><div class="txt"><p class="big">Dopo aver copiato le registrazioni — <strong>stacca semplicemente la corrente.</strong></p><p class="hint">Non serve alcuna procedura di spegnimento: il disco della stazione è protetto per costruzione dalle interruzioni di corrente. <strong>Spegni anche l'alimentatore dei caricatori</strong>: non lasciarlo mai acceso senza sorveglianza.</p></div></div>
+  <div class="dodont">
+    <div><div class="mark no">✗</div><p>Non staccare prima di aver copiato. Le registrazioni stanno in memoria e spariscono nell'istante in cui manca la corrente.</p></div>
+    <div><div class="mark ok">✓</div><p>Prima copia, poi stacca. I file sono piccoli: copiare due volte non costa nulla.</p></div>
+  </div>
+  <div class="foot"><span>nOdes</span><span>Pagina 11 · Dati e spegnimento</span></div>
+</div>
+<div class="page ">
+  <div class="hdr">
+    <div class="steptitle"><span class="kicker">Se qualcosa non va</span><h2>Risoluzione dei problemi</h2></div>
+    <p class="lede">Procedi dall'alto. Quasi tutto rientra nelle prime tre righe.</p>
+  </div>
+  <table>
+    <tr><th style="width:56mm">Cosa vedi</th><th>Cosa fare</th></tr>
+    <tr><td>Lo schermo nel coperchio non mostra sfere</td><td>Quasi sempre perché sono <strong>in carica</strong>: il display le nasconde di proposito (pagina 7). Prendine una e scuotila. In ogni caso restano nei tuoi dati.</td></tr>
+    <tr><td>Il browser non raggiunge <code>:8080</code></td><td>Indirizzo sbagliato per il tuo collegamento. Cavo → <code>10.55.0.1</code>, Wi-Fi → <code>10.0.0.8</code>, simulatore → <code>127.0.0.1</code>. Se ancora nulla, prova una <strong>porta USB diversa</strong>: una porta debole è la causa più comune in assoluto.</td></tr>
+    <tr><td>La pagina si apre ma non ci sono sfere</td><td>Le sfere sono in standby: una che non è in carica si stacca dopo 30 secondi di immobilità. Prendine una e scuotila. Se una bella scossa non fa nulla, quella sfera è scarica: ricaricala per un'ora, con qualcuno presente.</td></tr>
+    <tr><td>I canali OSC non appaiono mai</td><td>Visita di nuovo l'indirizzo <code>/osc/subscribe?port=7000</code>, poi apri <code>/health</code>: l'indirizzo del tuo computer deve comparire sotto <code>osc_targets</code>. Verifica che la porta corrisponda.</td></tr>
+    <tr><td>I dati arrivano, poi si bloccano</td><td>Apri <code>/health</code>. Se <code>ok</code> è <code>false</code>, stacca la stazione, aspetta dieci secondi e riattaccala.</td></tr>
+    <tr><td>Un canale <code>prox/…</code> è sparito</td><td>Normale. Quelle due sfere hanno smesso di sentirsi. Torna quando si riavvicinano. Usa il Metodo 2 per una griglia di dimensione fissa.</td></tr>
+    <tr><td>Le sfere continuano a cadere dal Wi-Fi</td><td>Troppi dispositivi. La radio ne regge circa otto in tutto. Togli computer e telefoni da <code>OrbAP</code> e usa il cavo.</td></tr>
+    <tr><td>Una sfera è molto calda</td><td>Toglila dal caricatore e lasciala raffreddare. Tiepida è normale durante la ricarica; troppo calda da tenere in mano no. Non ricaricare mai senza sorveglianza.</td></tr>
+    <tr><td>Nessun suono dalle casse</td><td>Verifica di essere collegato al jack <strong>sullo schermo</strong>, non a quello sul piccolo computer: quest'ultimo è disattivato ed è sempre muto (pagina 6). Poi controlla il volume delle casse.</td></tr>
+    <tr><td>Tutto è strano e vuoi ricominciare</td><td>Stacca entrambi gli alimentatori, aspetta dieci secondi e riattaccali. La stazione si ricostruisce a ogni avvio: così non puoi romperla.</td></tr>
+  </table>  <div class="step"><div class="art"><svg width="150" height="112" viewBox="0 0 150 112"><path class="ln fillw" d="M20 82V46a4 4 0 0 1 4-4h40a4 4 0 0 1 4 4v36"/><path class="ln" d="M12 82h84l-6 9H18z"/><circle class="ln fillw" cx="104" cy="52" r="12"/><path class="ln" d="M104 68c-10 0-17 7-17 16"/><path class="act" d="M112 26h22a8 8 0 0 1 8 8v8a8 8 0 0 1-8 8h-10l-8 7v-7h-4a8 8 0 0 1-8-8v-8a8 8 0 0 1 8-8"/><text class="tiny" x="119" y="44" style="font-size:15px;fill:#1f6feb">?</text></svg></div><div class="txt"><p class="big">Ancora bloccato?</p><p class="hint">Fai una foto dello schermo nel coperchio e della pagina <code>/health</code> nel browser, e mandale entrambe. Quelle due immagini rispondono a quasi ogni domanda che potremmo farti.</p><p class="hint" style="margin-top:3mm">Riferimento tecnico completo: <code>touchdesigner/README.md</code> e <code>http://10.55.0.1:8080/schema.json</code> sulla stazione stessa, che documenta ogni campo dei dati.</p><p class="hint" style="margin-top:3mm;font-style:italic">Buon lavoro — siamo molto curiosi di vedere cosa farete con i dati di prossimità. Nessuno ci ha ancora costruito nulla di visivo.</p></div></div>
+
+  <div class="foot"><span>nOdes</span><span>Pagina 12 · Problemi</span></div>
+</div>

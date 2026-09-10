@@ -1,0 +1,298 @@
+{
+  "generated": "2026-09-08 15:06",
+  "method": "circular moving-block bootstrap over frames; block spans one EWMA time constant (per-cell tau for E3); percentile 95% CIs",
+  "e2": {
+    "raw": "E2_20260908-123956.jsonl.gz",
+    "rig": "spiral 6/5/4/3/2/1, 21 orbs, LEDs 25%, FINE upper-edge sweep",
+    "firmware": [
+      "3.23"
+    ],
+    "truth_groups": 6,
+    "truth_sizes": [
+      6,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "block_len_frames": 10,
+    "n_boot": 2000,
+    "resolving_window": [
+      232,
+      236
+    ],
+    "sweep": [
+      {
+        "thr": 232,
+        "n_frames": 30,
+        "ari_mean": 1.0,
+        "ari_ci95": [
+          1.0,
+          1.0
+        ],
+        "nclusters_mean": 6,
+        "nclusters_ci95": [
+          6.0,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 236,
+        "n_frames": 30,
+        "ari_mean": 1.0,
+        "ari_ci95": [
+          1.0,
+          1.0
+        ],
+        "nclusters_mean": 6,
+        "nclusters_ci95": [
+          6.0,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 240,
+        "n_frames": 30,
+        "ari_mean": 0.9827,
+        "ari_ci95": [
+          0.9827,
+          0.9827
+        ],
+        "nclusters_mean": 7,
+        "nclusters_ci95": [
+          7.0,
+          7.0
+        ],
+        "resolves": false
+      },
+      {
+        "thr": 244,
+        "n_frames": 30,
+        "ari_mean": 0.6785,
+        "ari_ci95": [
+          0.6643,
+          0.6928
+        ],
+        "nclusters_mean": 8.9,
+        "nclusters_ci95": [
+          8.8,
+          9.0
+        ],
+        "resolves": false
+      },
+      {
+        "thr": 248,
+        "n_frames": 30,
+        "ari_mean": 0.5133,
+        "ari_ci95": [
+          0.5042,
+          0.5213
+        ],
+        "nclusters_mean": 12.433,
+        "nclusters_ci95": [
+          12.1333,
+          12.7
+        ],
+        "resolves": false
+      }
+    ]
+  },
+  "e3": {
+    "raw": "E3_20260908-124617.jsonl.gz",
+    "rig": "spiral 6/5/4/3/2/1, 21 orbs, LEDs 25%, cluster_min_thresh=220, 2026-09-08",
+    "firmware": [
+      "3.23"
+    ],
+    "n_boot": 2000,
+    "grid": [
+      {
+        "tau": 1.5,
+        "sw_ms": 100,
+        "n_frames": 95,
+        "block_len_frames": 2,
+        "blocks": 47.0,
+        "settle_frames_dropped": 5,
+        "instability_mean": 0.2497,
+        "instability_ci95": [
+          0.2151,
+          0.2846
+        ],
+        "nclusters_mean": 8.36
+      },
+      {
+        "tau": 1.5,
+        "sw_ms": 400,
+        "n_frames": 95,
+        "block_len_frames": 2,
+        "blocks": 47.0,
+        "settle_frames_dropped": 5,
+        "instability_mean": 0.0152,
+        "instability_ci95": [
+          0.0061,
+          0.0272
+        ],
+        "nclusters_mean": 6.22
+      },
+      {
+        "tau": 1.5,
+        "sw_ms": 800,
+        "n_frames": 95,
+        "block_len_frames": 2,
+        "blocks": 47.0,
+        "settle_frames_dropped": 5,
+        "instability_mean": 0.0019,
+        "instability_ci95": [
+          0.0,
+          0.0058
+        ],
+        "nclusters_mean": 6.01
+      },
+      {
+        "tau": 3.0,
+        "sw_ms": 100,
+        "n_frames": 90,
+        "block_len_frames": 5,
+        "blocks": 17.8,
+        "settle_frames_dropped": 10,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 3.0,
+        "sw_ms": 400,
+        "n_frames": 90,
+        "block_len_frames": 5,
+        "blocks": 17.8,
+        "settle_frames_dropped": 10,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 3.0,
+        "sw_ms": 800,
+        "n_frames": 90,
+        "block_len_frames": 5,
+        "blocks": 17.8,
+        "settle_frames_dropped": 10,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 6.0,
+        "sw_ms": 100,
+        "n_frames": 80,
+        "block_len_frames": 10,
+        "blocks": 7.9,
+        "settle_frames_dropped": 20,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 6.0,
+        "sw_ms": 400,
+        "n_frames": 80,
+        "block_len_frames": 10,
+        "blocks": 7.9,
+        "settle_frames_dropped": 20,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 6.0,
+        "sw_ms": 800,
+        "n_frames": 80,
+        "block_len_frames": 10,
+        "blocks": 7.9,
+        "settle_frames_dropped": 20,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 100,
+        "n_frames": 60,
+        "block_len_frames": 20,
+        "blocks": 3.0,
+        "settle_frames_dropped": 40,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 400,
+        "n_frames": 60,
+        "block_len_frames": 20,
+        "blocks": 3.0,
+        "settle_frames_dropped": 40,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 800,
+        "n_frames": 60,
+        "block_len_frames": 20,
+        "blocks": 3.0,
+        "settle_frames_dropped": 40,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      }
+    ],
+    "underpowered_cells": [
+      {
+        "tau": 12.0,
+        "sw_ms": 100,
+        "blocks": 3.0
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 400,
+        "blocks": 3.0
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 800,
+        "blocks": 3.0
+      }
+    ]
+  }
+}

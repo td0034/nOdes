@@ -1,0 +1,48 @@
+{
+  "run": "E1_4grp_passA",
+  "K_intended": 4,
+  "group_sizes_intended": [
+    4,
+    7,
+    10,
+    5
+  ],
+  "layout": "C1(4) --50cm-- C2(7) --200cm-- C3(10) --50cm-- C4(5)",
+  "separations_cm": {
+    "C1-C2": 50,
+    "C2-C3": 200,
+    "C3-C4": 50
+  },
+  "note": "50cm pairs expected to merge; only the 200cm gap resolvable. No per-serial physical labels captured (27 orbs); as_built = live server clustering at setup.",
+  "n_eligible": 27,
+  "as_built_serial_to_cluster": {
+    "006604": 1,
+    "00661c": 1,
+    "071870": 1,
+    "006a78": 1,
+    "0718b0": 0,
+    "071898": 0,
+    "07189c": 0,
+    "00662c": 0,
+    "006db4": 0,
+    "036074": 0,
+    "036038": 0,
+    "00666c": 0,
+    "006664": 1,
+    "036018": 0,
+    "071934": 0,
+    "035eec": 0,
+    "036030": 0,
+    "036028": 0,
+    "036034": 0,
+    "036054": 0,
+    "006944": 1,
+    "0718c8": 1,
+    "0065d0": 1,
+    "006624": 1,
+    "0069b4": 1,
+    "07188c": 1,
+    "0718a4": 1
+  },
+  "as_built_num_groups": 2
+}

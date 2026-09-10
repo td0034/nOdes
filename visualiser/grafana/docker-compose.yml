@@ -1,0 +1,39 @@
+services:
+  influxdb:
+    image: influxdb:2
+    container_name: orb_influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: orb
+      DOCKER_INFLUXDB_INIT_PASSWORD: orbpassword
+      DOCKER_INFLUXDB_INIT_ORG: orb
+      DOCKER_INFLUXDB_INIT_BUCKET: orb_metrics
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: orb-influxdb-token
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: orb_grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/orb_cluster.json
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+      - ./dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      influxdb:
+        condition: service_healthy

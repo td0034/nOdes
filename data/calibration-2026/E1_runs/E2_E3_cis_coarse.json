@@ -1,0 +1,433 @@
+{
+  "generated": "2026-09-08 15:06",
+  "method": "circular moving-block bootstrap over frames; block spans one EWMA time constant (per-cell tau for E3); percentile 95% CIs",
+  "e2": {
+    "raw": "E2_20260908-122228.jsonl.gz",
+    "rig": "spiral 6/5/4/3/2/1, 21 orbs, LEDs 25%, 2026-09-08",
+    "firmware": [
+      "3.23"
+    ],
+    "truth_groups": 6,
+    "truth_sizes": [
+      6,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "block_len_frames": 10,
+    "n_boot": 2000,
+    "resolving_window": [
+      40,
+      232
+    ],
+    "sweep": [
+      {
+        "thr": 40,
+        "n_frames": 30,
+        "ari_mean": 0.9814,
+        "ari_ci95": [
+          0.9442,
+          1.0
+        ],
+        "nclusters_mean": 5.933,
+        "nclusters_ci95": [
+          5.8333,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 56,
+        "n_frames": 30,
+        "ari_mean": 0.9349,
+        "ari_ci95": [
+          0.8977,
+          0.9721
+        ],
+        "nclusters_mean": 5.767,
+        "nclusters_ci95": [
+          5.6667,
+          5.9
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 72,
+        "n_frames": 30,
+        "ari_mean": 0.9349,
+        "ari_ci95": [
+          0.8884,
+          0.9814
+        ],
+        "nclusters_mean": 5.767,
+        "nclusters_ci95": [
+          5.6,
+          5.9333
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 88,
+        "n_frames": 30,
+        "ari_mean": 0.8419,
+        "ari_ci95": [
+          0.7767,
+          0.907
+        ],
+        "nclusters_mean": 5.433,
+        "nclusters_ci95": [
+          5.2,
+          5.6667
+        ],
+        "resolves": false
+      },
+      {
+        "thr": 104,
+        "n_frames": 30,
+        "ari_mean": 0.9907,
+        "ari_ci95": [
+          0.9721,
+          1.0
+        ],
+        "nclusters_mean": 5.967,
+        "nclusters_ci95": [
+          5.9,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 120,
+        "n_frames": 30,
+        "ari_mean": 0.9535,
+        "ari_ci95": [
+          0.9163,
+          1.0
+        ],
+        "nclusters_mean": 5.833,
+        "nclusters_ci95": [
+          5.7,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 136,
+        "n_frames": 30,
+        "ari_mean": 1.0,
+        "ari_ci95": [
+          1.0,
+          1.0
+        ],
+        "nclusters_mean": 6,
+        "nclusters_ci95": [
+          6.0,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 152,
+        "n_frames": 30,
+        "ari_mean": 0.9907,
+        "ari_ci95": [
+          0.9721,
+          1.0
+        ],
+        "nclusters_mean": 5.967,
+        "nclusters_ci95": [
+          5.9,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 168,
+        "n_frames": 30,
+        "ari_mean": 1.0,
+        "ari_ci95": [
+          1.0,
+          1.0
+        ],
+        "nclusters_mean": 6,
+        "nclusters_ci95": [
+          6.0,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 184,
+        "n_frames": 30,
+        "ari_mean": 0.9721,
+        "ari_ci95": [
+          0.9628,
+          0.9814
+        ],
+        "nclusters_mean": 5.9,
+        "nclusters_ci95": [
+          5.8667,
+          5.9333
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 200,
+        "n_frames": 30,
+        "ari_mean": 0.9721,
+        "ari_ci95": [
+          0.9256,
+          1.0
+        ],
+        "nclusters_mean": 5.9,
+        "nclusters_ci95": [
+          5.7333,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 216,
+        "n_frames": 30,
+        "ari_mean": 0.9598,
+        "ari_ci95": [
+          0.9163,
+          0.997
+        ],
+        "nclusters_mean": 5.9,
+        "nclusters_ci95": [
+          5.7,
+          6.0667
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 232,
+        "n_frames": 30,
+        "ari_mean": 1.0,
+        "ari_ci95": [
+          1.0,
+          1.0
+        ],
+        "nclusters_mean": 6,
+        "nclusters_ci95": [
+          6.0,
+          6.0
+        ],
+        "resolves": true
+      },
+      {
+        "thr": 248,
+        "n_frames": 30,
+        "ari_mean": 0.5002,
+        "ari_ci95": [
+          0.4962,
+          0.5052
+        ],
+        "nclusters_mean": 12.867,
+        "nclusters_ci95": [
+          12.7333,
+          13.0
+        ],
+        "resolves": false
+      }
+    ]
+  },
+  "e3": {
+    "raw": "E3_20260908-124617.jsonl.gz",
+    "rig": "spiral 6/5/4/3/2/1, 21 orbs, LEDs 25%, cluster_min_thresh=220, 2026-09-08",
+    "firmware": [
+      "3.23"
+    ],
+    "n_boot": 2000,
+    "grid": [
+      {
+        "tau": 1.5,
+        "sw_ms": 100,
+        "n_frames": 95,
+        "block_len_frames": 2,
+        "blocks": 47.0,
+        "settle_frames_dropped": 5,
+        "instability_mean": 0.2497,
+        "instability_ci95": [
+          0.2148,
+          0.2834
+        ],
+        "nclusters_mean": 8.36
+      },
+      {
+        "tau": 1.5,
+        "sw_ms": 400,
+        "n_frames": 95,
+        "block_len_frames": 2,
+        "blocks": 47.0,
+        "settle_frames_dropped": 5,
+        "instability_mean": 0.0152,
+        "instability_ci95": [
+          0.0061,
+          0.027
+        ],
+        "nclusters_mean": 6.22
+      },
+      {
+        "tau": 1.5,
+        "sw_ms": 800,
+        "n_frames": 95,
+        "block_len_frames": 2,
+        "blocks": 47.0,
+        "settle_frames_dropped": 5,
+        "instability_mean": 0.0019,
+        "instability_ci95": [
+          0.0,
+          0.0058
+        ],
+        "nclusters_mean": 6.01
+      },
+      {
+        "tau": 3.0,
+        "sw_ms": 100,
+        "n_frames": 90,
+        "block_len_frames": 5,
+        "blocks": 17.8,
+        "settle_frames_dropped": 10,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 3.0,
+        "sw_ms": 400,
+        "n_frames": 90,
+        "block_len_frames": 5,
+        "blocks": 17.8,
+        "settle_frames_dropped": 10,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 3.0,
+        "sw_ms": 800,
+        "n_frames": 90,
+        "block_len_frames": 5,
+        "blocks": 17.8,
+        "settle_frames_dropped": 10,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 6.0,
+        "sw_ms": 100,
+        "n_frames": 80,
+        "block_len_frames": 10,
+        "blocks": 7.9,
+        "settle_frames_dropped": 20,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 6.0,
+        "sw_ms": 400,
+        "n_frames": 80,
+        "block_len_frames": 10,
+        "blocks": 7.9,
+        "settle_frames_dropped": 20,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 6.0,
+        "sw_ms": 800,
+        "n_frames": 80,
+        "block_len_frames": 10,
+        "blocks": 7.9,
+        "settle_frames_dropped": 20,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 100,
+        "n_frames": 60,
+        "block_len_frames": 20,
+        "blocks": 3.0,
+        "settle_frames_dropped": 40,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 400,
+        "n_frames": 60,
+        "block_len_frames": 20,
+        "blocks": 3.0,
+        "settle_frames_dropped": 40,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 800,
+        "n_frames": 60,
+        "block_len_frames": 20,
+        "blocks": 3.0,
+        "settle_frames_dropped": 40,
+        "instability_mean": 0.0,
+        "instability_ci95": [
+          0.0,
+          0.0
+        ],
+        "nclusters_mean": 6
+      }
+    ],
+    "underpowered_cells": [
+      {
+        "tau": 12.0,
+        "sw_ms": 100,
+        "blocks": 3.0
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 400,
+        "blocks": 3.0
+      },
+      {
+        "tau": 12.0,
+        "sw_ms": 800,
+        "blocks": 3.0
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "server_pid": 931181,
+  "capture_started": 1788870265.960978,
+  "C0_baseline": 1788870269.9610598,
+  "C1_departure_SIGSTOP": 1788870329.9612765,
+  "C3_return_SIGCONT": 1788870389.9614682,
+  "finished": 1788870419.9616218
+}

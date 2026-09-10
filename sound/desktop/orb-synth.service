@@ -1,0 +1,24 @@
+# Headless SuperCollider host on the full server (systemd --user).
+# Runs through pw-jack so JACK calls land in the user PipeWire session; the
+# desktop has plenty of cores so there is no CPU pinning, and Qt has a display
+# so there is no offscreen flag (both of which the Pi unit needs).
+[Unit]
+Description=nOdes SuperCollider synth host
+# No After=orb-server/graph: like the conductor it self-heals and tolerates any
+# start order, so it never participates in an ordering cycle.
+
+[Service]
+# 1) wait for the user PipeWire socket; 2) pin the default sink to the configured
+#    route (sound_settings.csv audio_route) so scsynth auto-connects to it.
+ExecStartPre=/bin/sh -c 'for i in $(seq 30); do [ -S "$XDG_RUNTIME_DIR/pipewire-0" ] && exit 0; sleep 1; done; exit 1'
+ExecStartPre=/bin/sh -c '%h/projects/nOdes/sound/desktop/orb-audio-route.sh || true'
+ExecStart=/usr/bin/pw-jack /usr/bin/sclang %h/projects/nOdes/sound/orb_synth_pi.scd
+# Re-apply the route once scsynth has actually created its stream.
+ExecStartPost=/bin/sh -c 'sleep 8; %h/projects/nOdes/sound/desktop/orb-audio-route.sh || true'
+LimitRTPRIO=95
+LimitMEMLOCK=infinity
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

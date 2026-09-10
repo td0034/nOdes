@@ -1,0 +1,16 @@
+# Substrate-S conductor: /tmp/orb_data -> MIDI for the synth host (systemd --user).
+[Unit]
+Description=nOdes sound conductor
+# DELIBERATELY no After=orb-synth: the conductor opens its own virtual MIDI port,
+# re-attaches to SuperCollider every 5s, and tolerates /tmp/orb_data being
+# absent, so it self-heals whatever order things come up in. Retry forever.
+StartLimitIntervalSec=0
+
+[Service]
+# Use the visualiser venv — it already has python-rtmidi installed.
+ExecStart=%h/projects/nOdes/visualiser/.venv/bin/python %h/projects/nOdes/sound/conductor_pi.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

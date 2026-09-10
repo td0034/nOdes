@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=nOdes Dock
+Comment=eww dashboard for the nOdes box — launches at GNOME login
+Exec=/bin/bash -lc 'GDK_BACKEND=x11 $HOME/.local/bin/eww daemon && sleep 1 && GDK_BACKEND=x11 $HOME/.local/bin/eww open nodes_dock'
+Terminal=false
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=3

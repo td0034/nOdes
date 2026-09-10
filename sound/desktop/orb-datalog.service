@@ -1,0 +1,14 @@
+# Flight recorder: samples /tmp/orb_data -> ~/orb_logs/run-NNN.csv (user service).
+# Reuses the Pi's logger verbatim (stdlib only; writes under $HOME). Unlike the
+# Pi's RAM-backed read-only root, these logs persist on the PC's disk.
+[Unit]
+Description=nOdes orb data flight recorder
+
+[Service]
+Environment=ORB_LOG_HZ=10
+ExecStart=/usr/bin/python3 %h/projects/nOdes/tools/orb_data_logger.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

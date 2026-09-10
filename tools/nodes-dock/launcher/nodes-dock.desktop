@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=nOdes Dock
+GenericName=nOdes Control Deck
+Comment=Toggle the eww dashboard for the nOdes box
+Exec=/bin/bash -lc 'GDK_BACKEND=x11 $HOME/.local/bin/eww ping >/dev/null 2>&1 || GDK_BACKEND=x11 $HOME/.local/bin/eww daemon; sleep 0.3; GDK_BACKEND=x11 $HOME/.local/bin/eww open --toggle nodes_dock'
+Icon=preferences-desktop
+Terminal=false
+Categories=Utility;System;
+Keywords=nodes;orb;dock;dashboard;
+StartupNotify=false

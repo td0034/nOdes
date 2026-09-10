@@ -1,0 +1,730 @@
+{
+  "generated": "2026-09-08 15:01",
+  "beta": 2.0,
+  "runs": [
+    {
+      "run": "e7_20260825-160320_triangle_r1.jsonl.gz",
+      "label": "triangle_r1",
+      "note": "first live E7 run, 3-anchor triangle, room quiet",
+      "n_free": 4,
+      "n_snaps": 900,
+      "estimators": {
+        "wcl": {
+          "stats": {
+            "n": 4,
+            "mean_m": 0.642,
+            "median_m": 0.757,
+            "rmse_m": 0.691,
+            "p90_m": 0.834
+          },
+          "per_orb": {
+            "07189c": {
+              "point": "CEN",
+              "truth": [
+                0.0,
+                0.0
+              ],
+              "est": [
+                -0.196,
+                -0.058
+              ],
+              "err_m": 0.204
+            },
+            "0065d0": {
+              "point": "MLB",
+              "truth": [
+                -0.777,
+                -0.31
+              ],
+              "est": [
+                0.049,
+                -0.116
+              ],
+              "err_m": 0.849
+            },
+            "00661c": {
+              "point": "MLR",
+              "truth": [
+                0.203,
+                0.619
+              ],
+              "est": [
+                -0.156,
+                -0.096
+              ],
+              "err_m": 0.8
+            },
+            "0718a0": {
+              "point": "MRB",
+              "truth": [
+                0.574,
+                -0.31
+              ],
+              "est": [
+                -0.045,
+                0.045
+              ],
+              "err_m": 0.714
+            }
+          }
+        },
+        "amds": {
+          "stats": {
+            "n": 4,
+            "mean_m": 1.512,
+            "median_m": 1.675,
+            "rmse_m": 1.804,
+            "p90_m": 2.488
+          },
+          "per_orb": {
+            "07189c": {
+              "point": "CEN",
+              "truth": [
+                0.0,
+                0.0
+              ],
+              "est": [
+                -0.975,
+                -0.335
+              ],
+              "err_m": 1.031
+            },
+            "0065d0": {
+              "point": "MLB",
+              "truth": [
+                -0.777,
+                -0.31
+              ],
+              "est": [
+                -0.719,
+                -0.434
+              ],
+              "err_m": 0.137
+            },
+            "00661c": {
+              "point": "MLR",
+              "truth": [
+                0.203,
+                0.619
+              ],
+              "est": [
+                -1.336,
+                -1.116
+              ],
+              "err_m": 2.32
+            },
+            "0718a0": {
+              "point": "MRB",
+              "truth": [
+                0.574,
+                -0.31
+              ],
+              "est": [
+                -1.789,
+                -1.297
+              ],
+              "err_m": 2.561
+            }
+          }
+        }
+      }
+    },
+    {
+      "run": "e7_20260908-141453_n04_equilateral.jsonl.gz",
+      "label": "n04_equilateral",
+      "note": "3.25m equilateral triangle re-taped 2026-09-08; BL/BR/BB 50cm behind each speaker + CEN; 2 unplaced orbs (006944, 0718a4) awake in the room; LEDs at 25%",
+      "n_free": 4,
+      "n_snaps": 600,
+      "estimators": {
+        "wcl": {
+          "stats": {
+            "n": 4,
+            "mean_m": 1.474,
+            "median_m": 1.872,
+            "rmse_m": 1.653,
+            "p90_m": 1.96
+          },
+          "per_orb": {
+            "07188c": {
+              "point": "BL",
+              "truth": [
+                -2.058,
+                1.188
+              ],
+              "est": [
+                -0.475,
+                0.314
+              ],
+              "err_m": 1.808
+            },
+            "00661c": {
+              "point": "BR",
+              "truth": [
+                2.058,
+                1.188
+              ],
+              "est": [
+                0.354,
+                0.199
+              ],
+              "err_m": 1.97
+            },
+            "006604": {
+              "point": "BB",
+              "truth": [
+                0.0,
+                -2.376
+              ],
+              "est": [
+                -0.094,
+                -0.442
+              ],
+              "err_m": 1.937
+            },
+            "0065d0": {
+              "point": "CEN",
+              "truth": [
+                0.0,
+                0.0
+              ],
+              "est": [
+                -0.014,
+                0.179
+              ],
+              "err_m": 0.179
+            }
+          }
+        },
+        "amds": {
+          "stats": {
+            "n": 4,
+            "mean_m": 1.4,
+            "median_m": 1.306,
+            "rmse_m": 1.576,
+            "p90_m": 2.163
+          },
+          "per_orb": {
+            "07188c": {
+              "point": "BL",
+              "truth": [
+                -2.058,
+                1.188
+              ],
+              "est": [
+                -0.904,
+                0.696
+              ],
+              "err_m": 1.255
+            },
+            "00661c": {
+              "point": "BR",
+              "truth": [
+                2.058,
+                1.188
+              ],
+              "est": [
+                1.91,
+                1.643
+              ],
+              "err_m": 0.478
+            },
+            "006604": {
+              "point": "BB",
+              "truth": [
+                0.0,
+                -2.376
+              ],
+              "est": [
+                -1.199,
+                -1.741
+              ],
+              "err_m": 1.357
+            },
+            "0065d0": {
+              "point": "CEN",
+              "truth": [
+                0.0,
+                0.0
+              ],
+              "est": [
+                -0.556,
+                2.446
+              ],
+              "err_m": 2.508
+            }
+          }
+        }
+      }
+    },
+    {
+      "run": "e7_20260908-142300_n07_corrected.jsonl.gz",
+      "label": "n07_corrected",
+      "note": "RE-SCORED 2026-09-08: the three 'between the speakers' orbs were assumed at the edge midpoints (0.94 m from centre) but were actually placed OUTSIDE the triangle at 1.83-2.19 m. Truth here is trilaterated from tape distances to the two nearest anchors, confirmed against the third. Same 600 snapshots as n07_two_radii; only the reference changed.",
+      "n_free": 7,
+      "n_snaps": 600,
+      "estimators": {
+        "wcl": {
+          "stats": {
+            "n": 7,
+            "mean_m": 1.404,
+            "median_m": 1.804,
+            "rmse_m": 1.534,
+            "p90_m": 1.917
+          },
+          "per_orb": {
+            "07188c": {
+              "point": "BL",
+              "truth": [
+                -2.058,
+                1.188
+              ],
+              "est": [
+                -0.474,
+                0.316
+              ],
+              "err_m": 1.808
+            },
+            "00661c": {
+              "point": "BR",
+              "truth": [
+                2.058,
+                1.188
+              ],
+              "est": [
+                0.347,
+                0.329
+              ],
+              "err_m": 1.915
+            },
+            "006604": {
+              "point": "BB",
+              "truth": [
+                0.0,
+                -2.376
+              ],
+              "est": [
+                -0.104,
+                -0.458
+              ],
+              "err_m": 1.921
+            },
+            "0065d0": {
+              "point": "CEN",
+              "truth": [
+                0.0,
+                0.0
+              ],
+              "est": [
+                -0.013,
+                0.128
+              ],
+              "err_m": 0.128
+            },
+            "036038": {
+              "point": "XLR",
+              "truth": [
+                -0.117,
+                1.921
+              ],
+              "est": [
+                0.063,
+                0.938
+              ],
+              "err_m": 0.999
+            },
+            "006624": {
+              "point": "XLB",
+              "truth": [
+                -1.712,
+                -0.66
+              ],
+              "est": [
+                -0.124,
+                0.197
+              ],
+              "err_m": 1.804
+            },
+            "036034": {
+              "point": "XRB",
+              "truth": [
+                1.926,
+                -1.039
+              ],
+              "est": [
+                0.82,
+                -0.448
+              ],
+              "err_m": 1.254
+            }
+          }
+        },
+        "amds": {
+          "stats": {
+            "n": 7,
+            "mean_m": 1.154,
+            "median_m": 1.112,
+            "rmse_m": 1.254,
+            "p90_m": 1.75
+          },
+          "per_orb": {
+            "07188c": {
+              "point": "BL",
+              "truth": [
+                -2.058,
+                1.188
+              ],
+              "est": [
+                -1.039,
+                0.743
+              ],
+              "err_m": 1.112
+            },
+            "00661c": {
+              "point": "BR",
+              "truth": [
+                2.058,
+                1.188
+              ],
+              "est": [
+                1.813,
+                1.723
+              ],
+              "err_m": 0.589
+            },
+            "006604": {
+              "point": "BB",
+              "truth": [
+                0.0,
+                -2.376
+              ],
+              "est": [
+                -0.931,
+                -2.157
+              ],
+              "err_m": 0.956
+            },
+            "0065d0": {
+              "point": "CEN",
+              "truth": [
+                0.0,
+                0.0
+              ],
+              "est": [
+                -0.434,
+                1.533
+              ],
+              "err_m": 1.593
+            },
+            "036038": {
+              "point": "XLR",
+              "truth": [
+                -0.117,
+                1.921
+              ],
+              "est": [
+                1.447,
+                0.697
+              ],
+              "err_m": 1.986
+            },
+            "006624": {
+              "point": "XLB",
+              "truth": [
+                -1.712,
+                -0.66
+              ],
+              "est": [
+                -0.763,
+                0.264
+              ],
+              "err_m": 1.324
+            },
+            "036034": {
+              "point": "XRB",
+              "truth": [
+                1.926,
+                -1.039
+              ],
+              "est": [
+                1.481,
+                -0.769
+              ],
+              "err_m": 0.52
+            }
+          }
+        }
+      }
+    },
+    {
+      "run": "e7_20260908-145937_n10_paired_radii.jsonl.gz",
+      "label": "n10_paired_radii",
+      "note": "3.25m equilateral. PAIRED: NL/NR/NB at 1.00m and BL/BR/BB at 2.38m on identical bearings (150/30/-90), plus XLB/XLR/XRB at 1.83-2.19m (trilaterated) and CEN. Placements verified by inter-orb geometry. CAVEAT: right beacon shadowed toward room centre by its own cabinet (BR<->NR link 124 vs 162/163 for the equivalent left/back pairs at the same 1.38m); per-anchor gain fit left +7.6 back -1.8 right -5.9.",
+      "n_free": 10,
+      "n_snaps": 600,
+      "estimators": {
+        "wcl": {
+          "stats": {
+            "n": 10,
+            "mean_m": 1.451,
+            "median_m": 1.798,
+            "rmse_m": 1.549,
+            "p90_m": 1.901
+          },
+          "per_orb": {
+            "07188c": {
+              "point": "BL",
+              "truth": [
+                -2.058,
+                1.188
+              ],
+              "est": [
+                -0.467,
+                0.316
+              ],
+              "err_m": 1.815
+            },
+            "00661c": {
+              "point": "BR",
+              "truth": [
+                2.058,
+                1.188
+              ],
+              "est": [
+                0.448,
+                0.185
+              ],
+              "err_m": 1.896
+            },
+            "006604": {
+              "point": "BB",
+              "truth": [
+                0.0,
+                -2.376
+              ],
+              "est": [
+                -0.201,
+                -0.548
+              ],
+              "err_m": 1.839
+            },
+            "0065d0": {
+              "point": "CEN",
+              "truth": [
+                0.0,
+                0.0
+              ],
+              "est": [
+                -0.121,
+                0.283
+              ],
+              "err_m": 0.308
+            },
+            "036038": {
+              "point": "XLR",
+              "truth": [
+                -0.117,
+                1.921
+              ],
+              "est": [
+                -0.035,
+                0.051
+              ],
+              "err_m": 1.872
+            },
+            "006624": {
+              "point": "XLB",
+              "truth": [
+                -1.712,
+                -0.66
+              ],
+              "est": [
+                -0.128,
+                0.156
+              ],
+              "err_m": 1.782
+            },
+            "036034": {
+              "point": "XRB",
+              "truth": [
+                1.926,
+                -1.039
+              ],
+              "est": [
+                0.209,
+                -0.139
+              ],
+              "err_m": 1.939
+            },
+            "0718a0": {
+              "point": "NL",
+              "truth": [
+                -0.866,
+                0.5
+              ],
+              "est": [
+                -0.836,
+                -0.413
+              ],
+              "err_m": 0.913
+            },
+            "0718c8": {
+              "point": "NR",
+              "truth": [
+                0.866,
+                0.5
+              ],
+              "est": [
+                -0.214,
+                -0.11
+              ],
+              "err_m": 1.24
+            },
+            "00662c": {
+              "point": "NB",
+              "truth": [
+                0.0,
+                -1.0
+              ],
+              "est": [
+                -0.096,
+                -0.103
+              ],
+              "err_m": 0.902
+            }
+          }
+        },
+        "amds": {
+          "stats": {
+            "n": 10,
+            "mean_m": 1.929,
+            "median_m": 1.735,
+            "rmse_m": 2.077,
+            "p90_m": 2.693
+          },
+          "per_orb": {
+            "07188c": {
+              "point": "BL",
+              "truth": [
+                -2.058,
+                1.188
+              ],
+              "est": [
+                -0.733,
+                0.272
+              ],
+              "err_m": 1.611
+            },
+            "00661c": {
+              "point": "BR",
+              "truth": [
+                2.058,
+                1.188
+              ],
+              "est": [
+                0.627,
+                2.364
+              ],
+              "err_m": 1.852
+            },
+            "006604": {
+              "point": "BB",
+              "truth": [
+                0.0,
+                -2.376
+              ],
+              "est": [
+                -0.507,
+                -2.092
+              ],
+              "err_m": 0.581
+            },
+            "0065d0": {
+              "point": "CEN",
+              "truth": [
+                0.0,
+                0.0
+              ],
+              "est": [
+                -2.275,
+                0.965
+              ],
+              "err_m": 2.471
+            },
+            "036038": {
+              "point": "XLR",
+              "truth": [
+                -0.117,
+                1.921
+              ],
+              "est": [
+                -1.515,
+                1.9
+              ],
+              "err_m": 1.398
+            },
+            "006624": {
+              "point": "XLB",
+              "truth": [
+                -1.712,
+                -0.66
+              ],
+              "est": [
+                -0.168,
+                -0.176
+              ],
+              "err_m": 1.618
+            },
+            "036034": {
+              "point": "XRB",
+              "truth": [
+                1.926,
+                -1.039
+              ],
+              "est": [
+                0.312,
+                0.11
+              ],
+              "err_m": 1.982
+            },
+            "0718a0": {
+              "point": "NL",
+              "truth": [
+                -0.866,
+                0.5
+              ],
+              "est": [
+                -2.448,
+                0.63
+              ],
+              "err_m": 1.587
+            },
+            "0718c8": {
+              "point": "NR",
+              "truth": [
+                0.866,
+                0.5
+              ],
+              "est": [
+                -2.728,
+                0.644
+              ],
+              "err_m": 3.596
+            },
+            "00662c": {
+              "point": "NB",
+              "truth": [
+                0.0,
+                -1.0
+              ],
+              "est": [
+                -2.241,
+                -2.303
+              ],
+              "err_m": 2.593
+            }
+          }
+        }
+      }
+    }
+  ]
+}

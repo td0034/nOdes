@@ -1,0 +1,75 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36" version="29.3.8">
+  <diagram name="Page-1" id="6CsEcjAuDXLvdZQEO3OT">
+    <mxGraphModel dx="938" dy="606" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Server&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="160" x="160" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-8" edge="1" parent="1" source="C6JGAbmnf9tXr6wxKGQj-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;" target="C6JGAbmnf9tXr6wxKGQj-5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-11" connectable="0" parent="C6JGAbmnf9tXr6wxKGQj-8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Ethernet" vertex="1">
+          <mxGeometry relative="1" x="0.0646" y="-3" as="geometry">
+            <mxPoint y="-3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Mini PC&lt;div&gt;Linux&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="180" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-6" edge="1" parent="1" source="C6JGAbmnf9tXr6wxKGQj-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="C6JGAbmnf9tXr6wxKGQj-4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-7" connectable="0" parent="C6JGAbmnf9tXr6wxKGQj-6" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="JSON" vertex="1">
+          <mxGeometry relative="1" x="-0.16" y="-4" as="geometry">
+            <mxPoint x="4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="C++ server application" vertex="1">
+          <mxGeometry height="60" width="120" x="180" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;b&gt;External System&lt;/b&gt;&lt;div&gt;Generative sound &amp;amp; light&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="180" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-21" edge="1" parent="1" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.068;entryY=0.245;entryDx=0;entryDy=0;entryPerimeter=0;" target="C6JGAbmnf9tXr6wxKGQj-12" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="330.0000000000001" as="sourcePoint" />
+            <mxPoint x="610" y="330.0000000000001" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-23" connectable="0" parent="C6JGAbmnf9tXr6wxKGQj-21" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="UDP&lt;div&gt;Multicast&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.0759" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Ruckus R500&lt;div&gt;Wi-Fi Access Point&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="400" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-15" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" value="Orb 2" vertex="1">
+          <mxGeometry height="80" width="80" x="660" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-25" edge="1" parent="1" source="C6JGAbmnf9tXr6wxKGQj-12" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;exitX=0.097;exitY=0.748;exitDx=0;exitDy=0;exitPerimeter=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="610" y="370.0400000000001" as="sourcePoint" />
+            <mxPoint x="520" y="370.0000000000001" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-26" connectable="0" parent="C6JGAbmnf9tXr6wxKGQj-25" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="UDP&lt;div&gt;Unicast&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1921" y="2" as="geometry">
+            <mxPoint x="-18" y="-2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-16" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" value="Orb N" vertex="1">
+          <mxGeometry height="80" width="80" x="710" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div&gt;&lt;b&gt;Charging Station&lt;/b&gt;&lt;/div&gt;&lt;div&gt;27x Wireless Power Transmitters&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="200" x="600" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="C6JGAbmnf9tXr6wxKGQj-12" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" value="Orb 1" vertex="1">
+          <mxGeometry height="80" width="80" x="610" y="310" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

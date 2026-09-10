@@ -1,0 +1,51 @@
+diff --git a/crates/eww/src/app.rs b/crates/eww/src/app.rs
+index c89e6f6..bd2fa34 100644
+--- a/crates/eww/src/app.rs
++++ b/crates/eww/src/app.rs
+@@ -16,6 +16,7 @@ use codespan_reporting::files::Files;
+ use eww_shared_util::{Span, VarName};
+ use gdk::Monitor;
+ use glib::ObjectExt;
++use gtk::prelude::WidgetExtManual;
+ use gtk::{gdk, glib};
+ use itertools::Itertools;
+ use once_cell::sync::Lazy;
+@@ -608,10 +609,37 @@ fn initialize_window<B: DisplayBackend>(
+         window.set_size_request(actual_window_rect.width(), actual_window_rect.height());
+         window.set_default_size(actual_window_rect.width(), actual_window_rect.height());
+     }
++    // Always strip the GNOME titlebar — the dashboard provides its own ×.
++    // skip_pager stays (we don't want the dashboard in alt-tab/workspace
++    // overviews as a generic window) but we keep it in the taskbar so the
++    // user has another way to reach it if the X window goes off-screen.
+     window.set_decorated(false);
+-    window.set_skip_taskbar_hint(true);
+     window.set_skip_pager_hint(true);
+ 
++    // Drag-from-non-button-area: clicks on bare labels/boxes bubble up to
++    // the GtkWindow, where we call begin_move_drag. Buttons consume their
++    // own button-press, so launcher/action clicks still work.
++    // - GtkWindow's default event mask omits BUTTON_PRESS_MASK → opt in.
++    // - For begin_move_drag to do anything, Mutter must actually manage
++    //   the window, which requires `:wm-ignore false` (Toplevel, not Popup)
++    //   AND a window type the WM is willing to move (NORMAL/DIALOG/UTILITY
++    //   — DOCK is treated as fixed). Set `:windowtype "normal"` in yuck.
++    window.add_events(gdk::EventMask::BUTTON_PRESS_MASK);
++    let window_for_drag = window.clone();
++    window.connect_button_press_event(move |_w, evt| {
++        if evt.button() == 1 {
++            let (rx, ry) = evt.root();
++            window_for_drag.begin_move_drag(
++                evt.button() as i32,
++                rx as i32,
++                ry as i32,
++                evt.time(),
++            );
++            return glib::Propagation::Stop;
++        }
++        glib::Propagation::Proceed
++    });
++
+     // run on_screen_changed to set the visual correctly initially.
+     on_screen_changed(&window, None);
+     window.connect_screen_changed(on_screen_changed);

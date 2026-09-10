@@ -1,0 +1,54 @@
+{
+ "n_frames": 812,
+ "physical_sizes": [
+  8,
+  7,
+  5,
+  3,
+  2,
+  1
+ ],
+ "best_global_thr": 188,
+ "arms": {
+  "adaptive-gap floodfill (floor 200)": {
+   "size_match_pct": 0.0,
+   "mean_k": 18.29,
+   "ari_consensus": 0.312
+  },
+  "floodfill @ best global thr (188)": {
+   "size_match_pct": 1.4,
+   "mean_k": 5.99,
+   "ari_consensus": 0.999
+  },
+  "single-linkage->k=6 [= truth gen]": {
+   "size_match_pct": 1.4,
+   "mean_k": 6,
+   "ari_consensus": 1.0
+  },
+  "mutual-kNN k=3": {
+   "size_match_pct": 0.0,
+   "mean_k": 6.8,
+   "ari_consensus": 0.665
+  },
+  "mutual-kNN k=4": {
+   "size_match_pct": 0.0,
+   "mean_k": 3.04,
+   "ari_consensus": 0.7
+  },
+  "mutual-kNN k=5": {
+   "size_match_pct": 0.0,
+   "mean_k": 3,
+   "ari_consensus": 0.698
+  },
+  "mutual-kNN k=6": {
+   "size_match_pct": 0.0,
+   "mean_k": 3.0,
+   "ari_consensus": 0.698
+  },
+  "mutual-kNN + modularity-select {3..6}": {
+   "size_match_pct": 0.0,
+   "mean_k": 3,
+   "ari_consensus": 0.698
+  }
+ }
+}

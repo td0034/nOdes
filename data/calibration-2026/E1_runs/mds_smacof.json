@@ -1,0 +1,54 @@
+{
+  "captures": [
+    {
+      "capture": "topk_1782827542.jsonl",
+      "frames_used": 180,
+      "classical_stress1": 0.337,
+      "smacof_filled_stress1": 0.3013,
+      "smacof_measured_stress1": 0.1663
+    },
+    {
+      "capture": "topk_1782827828.jsonl",
+      "frames_used": 187,
+      "classical_stress1": 0.4217,
+      "smacof_filled_stress1": 0.3305,
+      "smacof_measured_stress1": 0.1798
+    },
+    {
+      "capture": "topk_1782828110.jsonl",
+      "frames_used": 191,
+      "classical_stress1": 0.4373,
+      "smacof_filled_stress1": 0.3375,
+      "smacof_measured_stress1": 0.1941
+    }
+  ],
+  "rig": "E1 four-group wide (>=2 m), the rig used for the paper's MDS figure",
+  "n_frames": 558,
+  "stride": 10,
+  "block_len_frames": 9,
+  "n_boot": 600,
+  "classical_stress1": {
+    "mean": 0.3997,
+    "ci95": [
+      0.3879,
+      0.4113
+    ]
+  },
+  "smacof_filled_stress1": {
+    "mean": 0.3235,
+    "ci95": [
+      0.3194,
+      0.3276
+    ]
+  },
+  "smacof_measured_stress1": {
+    "mean": 0.1803,
+    "ci95": [
+      0.1776,
+      0.1834
+    ]
+  },
+  "optimiser_effect": 0.0762,
+  "missing_data_effect": 0.1432,
+  "note": "All three scored by stress-1 over MEASURED pairs only, identical to mds_layout._stress. Arms: (1) classical MDS on the geodesic-filled matrix; (2) SMACOF on the same filled matrix, all pairs weighted -- isolates the optimiser; (3) SMACOF weighting measured pairs only -- adds the effect of not having to fit invented dissimilarities. SMACOF is initialised from the classical solution, so it can only improve on it."
+}
