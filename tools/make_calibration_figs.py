@@ -1,48 +1,27 @@
 #!/usr/bin/env python3
-"""Figures for the 2026-09-08 measurement session (E2, E3, E7).
+"""Paper figures — one panel per claim, the title states the claim.
 
-Every figure regenerates from the committed run JSON, so the plots are derived
-artifacts, not hand-kept ones.
-
-Design notes, applied deliberately:
-  * NO dual-axis plots. Where two measures share a driver (E2: the floor drives
-    both the effective cut and the resulting accuracy) they get stacked panels
-    on a SHARED x-axis, so the causal link is read vertically instead of being
-    faked by a second y-scale.
-  * Okabe-Ito categorical hues in the fixed order BLUE, GREEN, VERM, PURP.
-    That order is validated: worst adjacent pair dE 11.0 under deuteranopia,
-    16.4 normal-vision. The previous BLUE, VERM, GREEN, PURP order put green
-    next to purple at dE 7.6 (deutan), inside the floor band.
-  * Series identity is never colour-alone: every series also carries a distinct
-    marker and a direct label.
-  * E3 is a grid of 12 cells, 9 of them exactly zero. A log-scale line plot has
-    to clamp those zeros to a fake 1e-4 floor, which reads as a measured value.
-    A small annotated heatmap states the zeros as zeros.
-  * E7 is plotted in POLAR components (radius, bearing) rather than as
-    truth->estimate arrows in Cartesian space. The finding is polar -- bearing
-    is recovered on the far ring, radius is compressed ~4.4x -- and the arrow
-    map hides it in a tangle at the origin.
-  * Recessive grid and axes; text in ink, not in series colour.
+Every figure regenerates from committed run data. Design rationale and the
+rejected alternatives: docs/Frontiers HSI 2026/FIGURE_BRAINSTORM_2026-09-10.md.
+Okabe-Ito palette in the validated order BLUE, GREEN, VERM, PURP.
 """
-import gzip, json, math, os, statistics as st
+import csv, gzip, json, math, os, statistics as st
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
+import matplotlib.image as mpimg
 
-# Okabe-Ito, in validated adjacency order.
 BLUE, GREEN, VERM, PURP = "#0072B2", "#009E73", "#D55E00", "#CC79A7"
 INK, MUTED, GRID = "#1a1a1a", "#5c5c5c", "#d8d8d8"
 D = "data/calibration-2026"
 OUT = f"{D}/figs"
-os.makedirs(OUT, exist_ok=True)
 plt.rcParams.update({
-    "font.size": 8.5, "axes.labelsize": 8.5, "axes.titlesize": 9,
-    "xtick.labelsize": 8, "ytick.labelsize": 8, "legend.fontsize": 8,
+    "font.size": 9, "axes.labelsize": 9, "axes.titlesize": 10.5, "axes.titleweight": "bold",
+    "xtick.labelsize": 8.5, "ytick.labelsize": 8.5,
     "axes.edgecolor": MUTED, "axes.labelcolor": INK, "text.color": INK,
     "xtick.color": MUTED, "ytick.color": MUTED,
-    "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6, "grid.alpha": 0.9,
+    "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6,
     "axes.axisbelow": True, "figure.dpi": 300, "savefig.dpi": 300,
 })
 
@@ -52,89 +31,278 @@ def tidy(ax):
         ax.spines[s].set_visible(False)
 
 
-# ---------------------------------------------------------------- E2
-def fig_e2():
-    """The floor is inert until it bites, and then it destroys resolution.
-
-    Stacked, shared x: the mechanism (what cut the clusterer actually used)
-    sits directly above the consequence (accuracy against physical truth), so
-    the reader reads one x-position down through both panels.
-    """
-    coarse = json.load(open(f"{D}/E1_runs/E2_E3_cis_coarse.json"))["e2"]
-    fine = json.load(open(f"{D}/E1_runs/E2_E3_cis.json"))["e2"]
-
-    def eff(raw):
-        by = {}
-        for line in gzip.open(f"{D}/E1_runs/raw/{raw}", "rt"):
-            d = json.loads(line)
-            if d.get("type") == "frame" and d.get("thr_eff") and d.get("phase") != "dist":
-                by.setdefault(d["thr"], []).append(d["thr_eff"])
-        return {k: st.mean(v) for k, v in by.items()}
-
-    allv = {**eff(coarse["raw"]), **eff(fine["raw"])}
-    xs = sorted(allv)
-    lim = (32, 256)
-
-    fig, (axA, axB) = plt.subplots(
-        2, 1, figsize=(5.6, 4.5), sharex=True,
-        gridspec_kw=dict(height_ratios=[1, 1.15], hspace=0.16))
-
-    # --- A: mechanism. What cut did the clusterer actually use?
-    axA.axvspan(218, 236, color=GREEN, alpha=0.10, lw=0, zorder=0)
-    axA.plot(lim, lim, "--", color=MUTED, lw=1.0, zorder=1)
-    axA.plot(xs, [allv[x] for x in xs], "o-", color=BLUE, lw=1.8, ms=4.5, zorder=3)
-    axA.axhline(217.7, color=VERM, lw=1.2, ls=":", zorder=2)
-    axA.text(38, 226, "adaptive cut, 217.7", color=VERM, fontsize=7.5, va="bottom")
-    axA.text(140, 96, "if the floor bound,\nit would follow this",
-             color=MUTED, fontsize=7.5, ha="center", va="center")
-    axA.annotate("floor finally binds", xy=(240, 240), xytext=(214, 176),
-                 fontsize=7.5, color=INK, ha="right",
-                 arrowprops=dict(arrowstyle="->", color=MUTED, lw=0.8))
-    axA.set_ylim(*lim)
-    axA.set_ylabel("effective cut used")
-    axA.set_title("A   Below 218 the floor changes nothing", loc="left")
-    tidy(axA)
-
-    # --- B: consequence. Accuracy against physical truth, with CIs.
-    for src, col, lab, mk in ((coarse, BLUE, "coarse sweep, step 16", "o"),
-                              (fine, VERM, "fine sweep, step 4", "s")):
-        t = [r["thr"] for r in src["sweep"]]
-        m = [r["ari_mean"] for r in src["sweep"]]
-        lo = [r["ari_ci95"][0] for r in src["sweep"]]
-        hi = [r["ari_ci95"][1] for r in src["sweep"]]
-        axB.fill_between(t, lo, hi, color=col, alpha=0.20, lw=0, zorder=2)
-        axB.plot(t, m, mk + "-", color=col, lw=1.8, ms=4.5, label=lab, zorder=3)
-
-    axB.axvspan(218, 236, color=GREEN, alpha=0.10, lw=0, zorder=1)
-    axB.text(227, 1.14, "the only band\nthat bites: 218–236", color=GREEN,
-             fontsize=7.5, ha="center", va="bottom")
-    # Labels sit beside their own points, so no leader line crosses another.
-    axB.annotate("perfect\nthrough 236", xy=(236, 1.0), xytext=(233, 0.72),
-                 fontsize=7.5, color=INK, ha="right", va="center",
-                 arrowprops=dict(arrowstyle="->", color=MUTED, lw=0.8))
-    axB.annotate("collapse\nat 244", xy=(244, 0.678), xytext=(228, 0.40),
-                 fontsize=7.5, color=INK, ha="right", va="center",
-                 arrowprops=dict(arrowstyle="->", color=MUTED, lw=0.8))
-    axB.plot([200], [0.972], marker="*", ms=12, color=INK, zorder=5)
-    axB.annotate("deployed default, 200 —\nbelow the band, so inert",
-                 xy=(200, 0.972), xytext=(150, 0.60), fontsize=7.5, color=INK,
-                 ha="center",
-                 arrowprops=dict(arrowstyle="->", color=MUTED, lw=0.8))
-    axB.set_xlim(*lim)
-    axB.set_ylim(0, 1.30)
-    axB.set_xlabel("cluster_min_thresh  (configured floor)")
-    axB.set_ylabel("ARI vs physical truth")
-    axB.legend(frameon=False, loc="lower left", bbox_to_anchor=(0.0, 0.02))
-    axB.set_title("B   Accuracy, with 95% block-bootstrap CI", loc="left")
-    tidy(axB)
-
+def save(fig, name):
     fig.tight_layout()
-    fig.savefig(f"{OUT}/E2_threshold_2026-09-08.png", bbox_inches="tight")
+    fig.savefig(f"{OUT}/{name}", bbox_inches="tight")
     plt.close(fig)
-    print("  E2 figure written")
+    print("  wrote", name)
 
 
-# ---------------------------------------------------------------- E3
+# ------------------------------------------------------------------ Fig 1 v2
+def churn_bins(win=5.0, min_orbs=20):
+    T, A, K, N = [], [], [], []
+    t0 = None
+    # optional input; the figure is skipped if the deployment telemetry is not present
+    for line in open(f"{D}/deployment-20260722-telemetry.jsonl"):
+        try:
+            d = json.loads(line)
+        except Exception:
+            continue
+        w = d.get("wall")
+        t0 = w if t0 is None else t0
+        a, k, n = d.get("activity"), d.get("num_clusters"), d.get("num_orbs")
+        if a is None or k is None or not n:
+            continue
+        T.append(w - t0); A.append(float(a)); K.append(float(k)); N.append(n)
+    acc = {}
+    for t, a, k, n in zip(T, A, K, N):
+        acc.setdefault(int(t // win), [[], [], []])
+        for i, v in enumerate((a, k, n)):
+            acc[int(t // win)][i].append(v)
+    return [(st.mean(v[0]), st.mean(v[1])) for b, v in sorted(acc.items()) if st.mean(v[2]) >= min_orbs]
+
+
+def spearman(x, y):
+    def rank(v):
+        o = sorted(range(len(v)), key=lambda i: v[i]); r = [0] * len(v)
+        for i, idx in enumerate(o):
+            r[idx] = i
+        return r
+    rx, ry = rank(x), rank(y)
+    mx, my = st.mean(rx), st.mean(ry)
+    num = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
+    den = math.sqrt(sum((a - mx) ** 2 for a in rx) * sum((b - my) ** 2 for b in ry))
+    return num / den
+
+
+def fig_churn_v2():
+    pts = churn_bins()
+    x = [p[0] for p in pts]; y = [p[1] for p in pts]
+    rho = spearman(x, y)
+    fig, ax = plt.subplots(figsize=(5.2, 3.6))
+    ax.axhline(21, color=MUTED, lw=1, ls="--")
+    ax.plot(x, y, "o", color=BLUE, ms=6, alpha=.55, mec="white", mew=.7)
+    ax.annotate("fleet set down:\none or two groups", xy=(0.06, 2.2), xytext=(0.28, 4.5),
+                fontsize=9, color=INK, ha="left",
+                arrowprops=dict(arrowstyle="->", color=MUTED, lw=.9))
+    ax.annotate("fleet carried:\nevery orb on its own", xy=(0.8, 20), xytext=(0.52, 13.5),
+                fontsize=9, color=INK, ha="left",
+                arrowprops=dict(arrowstyle="->", color=MUTED, lw=.9))
+    ax.text(0.99, 21.4, "one cluster per orb (23 in play)", color=MUTED, fontsize=8, ha="right", va="bottom")
+    ax.set_xlabel("fleet motion  (accelerometers, 5 s bins)")
+    ax.set_ylabel("clusters recovered  (RSSI graph)")
+    ax.set_xlim(0, 1.0); ax.set_ylim(0, 24)
+    ax.set_title(f"When people move, the swarm fragments   (Spearman ρ = {rho:.2f})", loc="left")
+    tidy(ax)
+    save(fig, "F1_topology_churn.png")
+
+
+# ------------------------------------------------------------------ E2 v2
+def fig_e2_v2():
+    coarse = json.load(open(f"{D}/E1_runs/E2_E3_cis_coarse.json"))["e2"]["sweep"]
+    fine = json.load(open(f"{D}/E1_runs/E2_E3_cis.json"))["e2"]["sweep"]
+    pts = {r["thr"]: r for r in coarse}
+    pts.update({r["thr"]: r for r in fine})
+    t = sorted(pts); m = [pts[k]["ari_mean"] for k in t]
+    lo = [pts[k]["ari_ci95"][0] for k in t]; hi = [pts[k]["ari_ci95"][1] for k in t]
+    fig, ax = plt.subplots(figsize=(6.0, 3.3))
+    ax.axvspan(32, 218, color="#000000", alpha=0.05, lw=0)
+    ax.axvspan(218, 238, color=GREEN, alpha=0.14, lw=0)
+    ax.axvspan(238, 256, color=VERM, alpha=0.12, lw=0)
+    ax.text(125, 1.10, "below the adaptive cut —\nfloor is not in use", ha="center", va="bottom", fontsize=8.5, color=MUTED)
+    ax.text(228, 1.08, "binds &\nresolves", ha="center", va="bottom", fontsize=8.5, color=GREEN, fontweight="bold")
+    ax.text(255, 1.26, "too high: breaks", ha="right", va="bottom", fontsize=8.5, color=VERM, fontweight="bold")
+    ax.axvline(217.7, color=INK, lw=1.1, ls=":")
+    ax.text(216, 0.08, "adaptive cut 217.7", rotation=90, ha="right", va="bottom", fontsize=8, color=INK)
+    ax.fill_between(t, lo, hi, color=BLUE, alpha=0.2, lw=0)
+    ax.plot(t, m, "o-", color=BLUE, lw=1.8, ms=4)
+    ax.plot([200], [pts[200]["ari_mean"]], marker="*", ms=13, color=INK, zorder=5)
+    ax.text(200, 0.86, "deployed\ndefault", ha="center", va="top", fontsize=8, color=INK)
+    ax.set_xlim(32, 256); ax.set_ylim(0, 1.4)
+    ax.set_yticks([0, .25, .5, .75, 1.0])
+    ax.set_xlabel("cluster_min_thresh  (configured floor)")
+    ax.set_ylabel("ARI vs physical truth")
+    ax.set_title("The threshold floor only matters between 218 and 236", loc="left")
+    tidy(ax)
+    save(fig, "E2_threshold.png")
+
+
+# ------------------------------------------------------------------ E6 v2
+def fig_e6_v2():
+    rigs = ["near-threshold rig\n(groups 40–60 cm)", "wide rig\n(groups > 1 m)"]
+    deficit = [5.79 - 5.61, 5.98 - 5.95]
+    inst = [(0.0922, 0.1559), (0.0000, 0.0124)]
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.0, 3.1), gridspec_kw=dict(width_ratios=[1.35, 1], wspace=0.5))
+    bars = a.bar(rigs, deficit, color=[VERM, GREEN], width=0.55)
+    for r, v, lab in zip(bars, deficit, ["predicted by E1", "null condition"]):
+        a.text(r.get_x() + r.get_width() / 2, v + 0.006, f"{v:.2f}\n{lab}", ha="center", va="bottom", fontsize=8.5, color=INK)
+    a.set_ylabel("clusters lost when the server goes away")
+    a.set_ylim(0, 0.26); a.grid(axis="x", visible=False)
+    a.set_title("Standalone loses accuracy only\nnear the resolution limit", loc="left")
+    tidy(a)
+    xs = np.arange(2); w = 0.36
+    b.bar(xs - w / 2, [i[0] for i in inst], w, color=BLUE, label="server-driven")
+    b.bar(xs + w / 2, [i[1] for i in inst], w, color=VERM, label="standalone")
+    b.set_xticks(xs, ["near-threshold", "wide"])
+    b.set_ylabel("at-rest instability (1 − ARI)")
+    b.set_ylim(0, 0.2); b.grid(axis="x", visible=False)
+    b.legend(frameon=False, fontsize=8, loc="upper right")
+    b.set_title("One prediction failed:\nstandalone is less stable", loc="left")
+    tidy(b)
+    save(fig, "E6_handover.png")
+
+
+# ------------------------------------------------------------------ E7 v2 (polar)
+GROUPS = [("far ring 2.38 m", ["BL", "BR", "BB"], GREEN), ("near ring 1.00 m", ["NL", "NR", "NB"], BLUE),
+          ("between anchors", ["XLB", "XLR", "XRB"], VERM), ("centre", ["CEN"], PURP)]
+
+
+def fig_e7_v2():
+    d = json.load(open(f"{D}/E7_runs/E7_summary.json"))
+    run = next(r for r in d["runs"] if r["label"] == "n10_paired_radii")
+    per = {v["point"]: v for v in run["estimators"]["wcl"]["per_orb"].values()}
+    fig = plt.figure(figsize=(5.4, 5.0))
+    ax = fig.add_subplot(111, projection="polar")
+    ax.set_theta_zero_location("E"); ax.set_theta_direction(1)
+    ax.set_rlim(0, 2.7); ax.set_rticks([1, 2]); ax.set_rlabel_position(200)
+    ax.set_xticklabels([]); ax.set_yticklabels(["1 m", "2 m"])
+    ax.grid(color=GRID, lw=.6)
+    for lab, pts, col in GROUPS:
+        bold = lab.startswith("far")
+        al, lw, ms_t, ms_e = (1.0, 2.4, 9, 7) if bold else (0.38, 1.2, 7, 5)
+        for p in pts:
+            tx, ty = per[p]["truth"]; ex, ey = per[p]["est"]
+            th_t, r_t = math.atan2(ty, tx), math.hypot(tx, ty)
+            th_e, r_e = math.atan2(ey, ex), math.hypot(ex, ey)
+            ax.plot([th_t, th_e], [r_t, r_e], "-", color=col, lw=lw, alpha=al, zorder=2 + bold)
+            ax.plot([th_t], [r_t], "o", mfc="white", mec=col, mew=1.8, ms=ms_t, alpha=al, zorder=3 + bold)
+            ax.plot([th_e], [r_e], "o", color=col, ms=ms_e, alpha=al, zorder=4 + bold)
+    # anchors, if the room file has them
+    try:
+        room = json.load(open(f"{D}/E7_room.json"))
+        A = [(math.atan2(a["xy"][1], a["xy"][0]), math.hypot(*a["xy"][:2])) for a in room.get("anchors") or []]
+        for th, r in A:
+            ax.plot([th], [r], "s", color=INK, ms=8, zorder=5)
+        if len(A) == 3:
+            ths = [t for t, _ in A] + [A[0][0]]; rs = [r for _, r in A] + [A[0][1]]
+            # straight chords between anchors, drawn in cartesian then mapped back
+            import numpy as _np
+            for (t1, r1), (t2, r2) in zip(A, A[1:] + A[:1]):
+                x1, y1, x2, y2 = r1 * math.cos(t1), r1 * math.sin(t1), r2 * math.cos(t2), r2 * math.sin(t2)
+                xs = _np.linspace(x1, x2, 30); ys = _np.linspace(y1, y2, 30)
+                ax.plot(_np.arctan2(ys, xs), _np.hypot(xs, ys), "-", color=INK, lw=0.8, alpha=0.35, zorder=1)
+    except Exception:
+        pass
+    ax.plot([], [], "o", mfc="white", mec=INK, mew=1.8, ms=8, label="true position")
+    ax.plot([], [], "o", color=INK, ms=6, label="estimate")
+    ax.plot([], [], "s", color=INK, ms=8, label="anchor")
+    ax.legend(loc="lower left", bbox_to_anchor=(-0.12, -0.12), frameon=False, fontsize=8)
+    ax.set_title("Estimates slide toward the centre along their own bearing", loc="left", fontsize=11, pad=18)
+    ax.text(0.0, 1.06, "bold: far ring — direction kept, distance ≈ 4.4× short.  faded: near ring and between-anchor points",
+            transform=ax.transAxes, fontsize=8, color=MUTED, ha="left")
+    save(fig, "E7_polar.png")
+
+
+# ------------------------------------------------------------------ E4 v2
+def fig_e4_v2():
+    d = json.load(open(f"{D}/E1_runs/E4_countsweep.json"))
+    fig, ax = plt.subplots(figsize=(5.4, 3.3))
+    for arm, col, lab in (("fixed50", VERM, "fixed 50 Hz"), ("autorate", BLUE, "adaptive rate")):
+        ks = sorted(int(k) for k in d[arm]); ys = [d[arm][str(k)]["miss"] for k in ks]
+        ax.plot(ks, ys, "o-", color=col, lw=2, ms=4)
+        ax.text(ks[-1] + 0.4, ys[-1], f"{lab}\n{ys[-1]:.2f}", color=col, fontsize=9, va="center", fontweight="bold")
+    ax.set_xlabel("orbs in play"); ax.set_ylabel("per-orb packet miss")
+    ax.set_xlim(3, 31); ax.set_ylim(0, 1.0)
+    ax.set_title("A fixed 50 Hz starves the fleet; the adaptive rate holds miss below 10 %", loc="left")
+    tidy(ax)
+    save(fig, "E4_countsweep.png")
+
+
+# ------------------------------------------------------------------ saturation v2
+def fig_sat_v2():
+    d = json.load(open(f"{D}/E1_runs/sat_ari_truth.json"))
+    arms = d["arms"]
+    fig, ax = plt.subplots(figsize=(5.8, 3.5))
+    y0 = -0.10
+    for i, (name, col) in enumerate(((k, c) for k, c in zip(arms, (BLUE, VERM)))):
+        a = arms[name]; t = a["thr"]; ari = a["ari_truth"]
+        ax.plot(t, ari, "o-", color=col, lw=1.8, ms=3.5)
+        ok = [tt for tt, v in zip(t, ari) if v >= 0.99]
+        if ok:
+            lo, hi = min(ok), max(ok); open_end = hi >= t[-2]
+            yy = y0 - i * 0.07
+            ax.plot([lo, hi], [yy, yy], "-", color=col, lw=6, solid_capstyle="butt")
+            if open_end:
+                ax.annotate("", xy=(t[-1] + 6, yy), xytext=(hi, yy), arrowprops=dict(arrowstyle="-|>", color=col, lw=2, mutation_scale=14))
+            ax.text(lo - 2, yy, f"{name}: {lo} → {'open' if open_end else hi}", ha="right", va="center", fontsize=8.5, color=col, fontweight="bold")
+    ax.set_ylim(-0.22, 1.05); ax.set_xlim(145, 262)
+    ax.set_yticks([0, .5, 1.0])
+    ax.axhline(0, color=MUTED, lw=.8)
+    ax.set_xlabel("cluster threshold"); ax.set_ylabel("ARI vs physical truth")
+    ax.set_title("Saturation turns a bounded correct window into an open-ended one", loc="left")
+    tidy(ax)
+    save(fig, "sat_ari_truth.png")
+
+
+# ------------------------------------------------------------------ E1 v2
+def fig_e1_v2():
+    d = json.load(open(f"{D}/E1_runs/E1_part1_headtohead.json"))
+    fig, ax = plt.subplots(figsize=(5.4, 3.3))
+    for key, col, lab in (("wide", GREEN, "well separated"), ("merged", VERM, "near the resolution limit")):
+        a = d[key]; ks = sorted(int(k) for k in a["ari"]); ys = [a["ari"][str(k)] for k in ks]
+        sd = a.get("sd") or {}
+        ax.plot(ks, ys, "o-", color=col, lw=2, ms=4)
+        if sd:
+            s = [sd.get(str(k), 0) for k in ks]
+            ax.fill_between(ks, [y - e for y, e in zip(ys, s)], [min(1, y + e) for y, e in zip(ys, s)], color=col, alpha=.15, lw=0)
+        ax.text(ks[0] - 0.2, ys[0], lab, color=col, fontsize=9, ha="right", va="center", fontweight="bold")
+    ax.axvline(8, color=INK, lw=1, ls=":")
+    ax.text(8.1, 0.3, "8 neighbours: enough\neven near the limit", fontsize=8.5, color=INK, va="center")
+    ax.annotate("", xy=(6, d["wide"]["ari"]["6"]), xytext=(6, d["merged"]["ari"]["6"]), arrowprops=dict(arrowstyle="<->", color=MUTED, lw=1))
+    ax.text(6.15, (d["wide"]["ari"]["6"] + d["merged"]["ari"]["6"]) / 2, "gap at 6", fontsize=8.5, color=MUTED, va="center")
+    ax.set_xlim(-0.5, 10.5); ax.set_ylim(0.2, 1.03)
+    ax.set_xlabel("neighbours reported per orb (k)"); ax.set_ylabel("ARI vs top-10 reference")
+    ax.set_title("Six neighbours suffice when groups are apart; near the limit you need eight", loc="left")
+    tidy(ax)
+    save(fig, "E1_headtohead.png")
+
+
+# ------------------------------------------------------------------ E5 v2
+def fig_e5_v2():
+    f = f"{D}/net_orb_e5dyn.csv"  # per-orb E5 capture; not in the public release, figure skipped
+    rows = list(csv.DictReader(open(f)))
+    cols = rows[0].keys()
+    tcol = next((c for c in cols if c in ("t_s", "t", "time")), None)
+    ocol = next((c for c in cols if c in ("serial", "slot", "orb")), None)
+    acc = {}
+    for r in rows:
+        try:
+            rssi = float(r["rssi"]); miss = float(r["missed"])
+        except Exception:
+            continue
+        if rssi == 0:
+            continue
+        key = (r[ocol], int(float(r[tcol]) // 2)) if tcol and ocol else id(r)
+        acc.setdefault(key, [[], []]); acc[key][0].append(rssi); acc[key][1].append(miss)
+    binned = {}
+    for (rs, ms) in acc.values():
+        b = int(st.mean(rs) // 3) * 3
+        binned.setdefault(b, []).append(st.mean(ms))
+    xs = sorted(b for b in binned if len(binned[b]) >= 10)
+    med = [st.median(binned[b]) for b in xs]; q75 = [np.percentile(binned[b], 75) for b in xs]
+    fig, ax = plt.subplots(figsize=(5.6, 3.3))
+    ax.fill_between(xs, 0, q75, color=BLUE, alpha=.15, lw=0, step="mid")
+    ax.plot(xs, med, "o-", color=BLUE, lw=2, ms=4)
+    ax.axhline(0.20, color=VERM, lw=1, ls="--"); ax.text(xs[0], 0.207, "never above 20 %", color=VERM, fontsize=8.5, va="bottom")
+    ax.text(xs[0], max(med) + 0.02, f"median miss ≤ {max(med):.2f} everywhere the fleet went  (shaded: upper quartile)", fontsize=8.5, color=BLUE, va="bottom")
+    ax.set_xlabel("signal at the orb (RSSI, dBm)  ← weaker            stronger →"); ax.set_ylabel("per-orb miss  (median, 2 s bins)")
+    ax.set_ylim(0, 0.3)
+    ax.set_title("In a well-covered room, where you stand barely matters", loc="left")
+    tidy(ax)
+    save(fig, "E5_coverage.png")
+
+
+# ------------------------------------------------------------------ E3
 def fig_e3():
     """12 cells, 9 of them exactly zero. Say so, rather than clamping to a
     log-scale floor that reads as a measurement."""
@@ -177,261 +345,12 @@ def fig_e3():
         sp.set_visible(False)
     ax.tick_params(length=0)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/E3_stability_2026-09-08.png", bbox_inches="tight")
-    plt.close(fig)
-    print("  E3 figure written")
-
-
-# ---------------------------------------------------------------- E7
-# Placement groups for the N=10 paired-radii run. NL/NR/NB and BL/BR/BB share
-# bearings (150/30/-90 deg) and differ only in radius, which is what makes the
-# compression ratio comparable between the two rings.
-E7_GROUPS = [
-    ("far ring, 2.38 m",  ["BL", "BR", "BB"],    GREEN, "o"),
-    ("near ring, 1.00 m", ["NL", "NR", "NB"],    BLUE,  "s"),
-    ("off-ring, 1.8–2.2 m", ["XLB", "XLR", "XRB"], VERM, "^"),
-    ("centre",            ["CEN"],               PURP,  "D"),
-]
-
-
-def _e7_rows():
-    d = json.load(open(f"{D}/E7_runs/E7_summary.json"))
-    run = next(r for r in d["runs"] if r["label"] == "n10_paired_radii")
-    rows = []
-    for serial, v in run["estimators"]["wcl"]["per_orb"].items():
-        tx, ty = v["truth"]
-        ex, ey = v["est"]
-        tr, er = math.hypot(tx, ty), math.hypot(ex, ey)
-        db = None
-        if tr > 1e-6 and er > 1e-6:
-            db = (math.degrees(math.atan2(ey, ex) - math.atan2(ty, tx)) + 180) % 360 - 180
-        rows.append(dict(point=v["point"], tr=tr, er=er, dbear=db, err=v["err_m"]))
-    return run, rows
-
-
-def fig_e7():
-    """Bearing is recovered on the far ring; radius is compressed ~4.4x.
-
-    Plotted as polar components. The truth->estimate arrow map that this
-    replaces put every arrow through the origin, which is where the
-    compression lives, so the tangle hid the result it was meant to show.
-    """
-    run, rows = _e7_rows()
-    by = {r["point"]: r for r in rows}
-    fig, (axA, axB) = plt.subplots(1, 2, figsize=(7.0, 2.9),
-                                   gridspec_kw=dict(width_ratios=[1.15, 1]))
-
-    # --- A: radius in vs radius out.
-    axA.plot([0, 2.6], [0, 2.6], "--", color=MUTED, lw=1.0, zorder=1)
-    axA.text(1.62, 1.72, "no compression", color=MUTED, fontsize=7.5,
-             ha="center", va="bottom", rotation=37, rotation_mode="anchor")
-    axA.plot([0, 2.6], [0, 2.6 / 4.4], "-", color=INK, lw=1.0, alpha=.55, zorder=1)
-    axA.text(2.52, 2.6 / 4.4, "4.4$\\times$", color=INK, fontsize=7.5,
-             ha="left", va="center")
-    for lab, pts, col, mk in E7_GROUPS:
-        x = [by[p]["tr"] for p in pts]
-        y = [by[p]["er"] for p in pts]
-        axA.plot(x, y, mk, color=col, ms=6, mew=1.2, mec="white",
-                 label=lab, zorder=3, ls="none")
-    axA.set_xlim(-0.08, 2.75)
-    axA.set_ylim(-0.08, 2.75)
-    axA.set_xlabel("true radius from centre (m)")
-    axA.set_ylabel("estimated radius (m)")
-    axA.set_title("A   Radius collapses toward the centroid", loc="left")
-    axA.legend(frameon=False, loc="upper left", handletextpad=0.3,
-               borderpad=0.2, labelspacing=0.25)
-    tidy(axA)
-
-    # --- B: bearing error. CEN excluded: bearing from a true radius of 0 is
-    # undefined, and the near ring is nearly as ill-conditioned.
-    order = [g for g in E7_GROUPS if g[0] != "centre"]
-    for i, (lab, pts, col, mk) in enumerate(order):
-        vals = [abs(by[p]["dbear"]) for p in pts]
-        axB.plot(vals, [i] * len(vals), mk, color=col, ms=6, mew=1.2,
-                 mec="white", ls="none", zorder=3)
-        axB.plot([np.mean(vals)], [i], "|", color=col, ms=16, mew=2, zorder=4)
-    axB.axvspan(0, 15, color=GREEN, alpha=0.10, lw=0, zorder=1)
-    axB.set_yticks(range(len(order)),
-                   [g[0].split(",")[0] for g in order])
-    axB.set_xlim(0, 185)
-    axB.set_xticks([0, 45, 90, 135, 180])
-    axB.set_ylim(-0.6, len(order) - 0.4)
-    axB.invert_yaxis()
-    axB.set_xlabel("absolute bearing error (deg)")
-    axB.set_title("B   Only the far ring keeps its bearing", loc="left")
-    axB.text(17, 0.34, "far-ring mean 10.6°", color=GREEN, fontsize=7.5,
-             va="center")
-    # The ill-conditioning caveat lives in the caption, not on the axes: it
-    # applies to two whole rows, so a leader line would have to point at
-    # nothing in particular.
-    axB.grid(axis="y", visible=False)
-    tidy(axB)
-
-    fig.tight_layout()
-    fig.savefig(f"{OUT}/E7_polar_2026-09-08.png", bbox_inches="tight")
-    plt.close(fig)
-    print("  E7 figure written")
-
-
-# ---------------------------------------------------------------- E6
-# The controlled contrast: the same handover measured on a tight rig (groups
-# 40-60 cm apart) and a wide one. E1 predicted that the firmware's top-6
-# ESP-NOW view costs accuracy only where groups are close enough that the 7th
-# to 10th neighbours still carry separating information; the wide rig is the
-# null condition where that prediction says the deficit should vanish.
-E6_RIGS = [
-    ("tight rig\n(groups 40-60 cm)", 5.79, 5.61, 0.0922, 0.1559, 0.957),
-    ("wide rig\n(groups >1 m)",      5.98, 5.95, 0.0000, 0.0124, 0.998),
-]
-
-
-def fig_e6():
-    fig, (axA, axB) = plt.subplots(1, 2, figsize=(6.6, 2.6))
-    ys = [1, 0]
-
-    for ax, (i_srv, i_std), lab, title in (
-            (axA, (1, 2), "mean cluster count  (physical truth = 6)",
-             "A   Recovered structure"),
-            (axB, (3, 4), "at-rest instability  (1 $-$ ARI)",
-             "B   Frame-to-frame stability")):
-        for y, rig in zip(ys, E6_RIGS):
-            srv, std = rig[i_srv], rig[i_std]
-            ax.plot([srv, std], [y, y], "-", color=GRID, lw=3, zorder=1,
-                    solid_capstyle="round")
-            ax.plot([srv], [y], "o", color=BLUE, ms=7, mec="white", mew=1.2,
-                    zorder=3, label="server-driven" if y == 1 else None)
-            ax.plot([std], [y], "s", color=VERM, ms=7, mec="white", mew=1.2,
-                    zorder=3, label="standalone" if y == 1 else None)
-            ax.annotate(f"{abs(std - srv):.2f}", xy=((srv + std) / 2, y),
-                        xytext=(0, 9), textcoords="offset points",
-                        ha="center", fontsize=7.5, color=INK)
-        ax.set_yticks(ys, [r[0] for r in E6_RIGS])
-        ax.set_ylim(-0.55, 1.55)
-        ax.set_xlabel(lab)
-        ax.set_title(title, loc="left")
-        ax.grid(axis="y", visible=False)
-        tidy(ax)
-
-    axA.axvline(6.0, color=GREEN, lw=1.2, ls="--", zorder=2)
-    axA.text(6.02, 1.42, "truth", color=GREEN, fontsize=7.5, va="top")
-    axA.set_xlim(5.45, 6.15)
-    axA.legend(frameon=False, loc="lower left", handletextpad=0.3,
-               borderpad=0.2, labelspacing=0.25)
-    axB.set_xlim(-0.012, 0.185)
-
-    fig.tight_layout()
-    fig.savefig(f"{OUT}/E6_handover_2026-09-08.png", bbox_inches="tight")
-    plt.close(fig)
-    print("  E6 figure written")
-
-
-# ---------------------------------------------------------------- F1 (opening)
-# The thesis figure: the swarm has no locomotion, so its topology is authored by
-# the people carrying it. Measured on the 22 July summer-school deployment
-# (23 orbs, 46.7 min). Fleet activity comes from the orbs' accelerometers and
-# cluster count from the RSSI graph -- two independent channels.
-CHURN_RAW = f"{D}/deployment-20260722-telemetry.jsonl"  # optional; see README
-
-
-def _churn_bins(win=5.0, min_orbs=20):
-    T, A, K, N = [], [], [], []
-    t0 = None
-    for line in open(CHURN_RAW):
-        try:
-            d = json.loads(line)
-        except Exception:
-            continue
-        w = d.get("wall")
-        if t0 is None:
-            t0 = w
-        a, k, n = d.get("activity"), d.get("num_clusters"), d.get("num_orbs")
-        if a is None or k is None or not n:
-            continue
-        T.append(w - t0); A.append(float(a)); K.append(float(k)); N.append(n)
-    acc = {}
-    for t, a, k, n in zip(T, A, K, N):
-        acc.setdefault(int(t // win), [[], [], []])
-        acc[int(t // win)][0].append(a)
-        acc[int(t // win)][1].append(k)
-        acc[int(t // win)][2].append(n)
-    rows = []
-    for b in sorted(acc):
-        a, k, n = (st.mean(v) for v in acc[b])
-        rows.append((b * win, a, k, n, n >= min_orbs))
-    return rows
-
-
-def _pearson(x, y):
-    mx, my = st.mean(x), st.mean(y)
-    num = sum((a - mx) * (b - my) for a, b in zip(x, y))
-    den = math.sqrt(sum((a - mx) ** 2 for a in x) * sum((b - my) ** 2 for b in y))
-    return num / den if den else float("nan")
-
-
-def _rank(v):
-    order = sorted(range(len(v)), key=lambda i: v[i])
-    r = [0] * len(v)
-    for i, idx in enumerate(order):
-        r[idx] = i
-    return r
-
-
-def fig_churn():
-    rows = _churn_bins()
-    keep = [r for r in rows if r[4]]
-    ka = [r[1] for r in keep]; kc = [r[2] for r in keep]
-    rho = _pearson(_rank(ka), _rank(kc))
-
-    # Whole session for the time series, with non-qualifying bins masked to
-    # NaN so setup, teardown and dropout gaps break the line rather than being
-    # interpolated across. The gaps are real and we show them as gaps.
-    t0 = rows[0][0]
-    tt = [(r[0] - t0) / 60 for r in rows]
-    aa = [r[1] if r[4] else float("nan") for r in rows]
-    kk = [r[2] if r[4] else float("nan") for r in rows]
-
-    fig = plt.figure(figsize=(7.2, 3.1))
-    gs = fig.add_gridspec(2, 2, width_ratios=[1.7, 1], hspace=0.62, wspace=0.34)
-    axA = fig.add_subplot(gs[0, 0])
-    axB = fig.add_subplot(gs[1, 0], sharex=axA)
-    axC = fig.add_subplot(gs[:, 1])
-
-    axA.plot(tt, aa, "-", color=VERM, lw=1.3)
-    axA.set_ylabel("fleet motion")
-    axA.set_ylim(0, 1.02)
-    axA.set_title("A   People move the swarm", loc="left")
-    axA.tick_params(labelbottom=False)
-    tidy(axA)
-
-    axB.plot(tt, kk, "-", color=BLUE, lw=1.3)
-    axB.set_ylabel("clusters")
-    axB.set_xlabel("session time (min)")
-    first = next(i for i, r in enumerate(rows) if r[4])
-    axB.set_xlim(max(0.0, tt[first] - 1.0), tt[-1])
-    axB.set_ylim(0, 22)
-    axB.set_title("B   and its topology follows", loc="left")
-    tidy(axB)
-
-    axC.plot(ka, kc, "o", color=BLUE, ms=4.5, alpha=.6, mec="white", mew=.6)
-    axC.axhline(21, color=MUTED, lw=1.0, ls="--")
-    axC.text(0.02, 21.4, "every orb alone (23 in play)", color=MUTED, fontsize=7)
-    axC.set_xlabel("fleet motion (accelerometer)")
-    axC.set_ylabel("clusters recovered (RSSI)")
-    axC.set_ylim(0, 24)
-    axC.set_title(f"C   Spearman $\\rho$ = {rho:.2f}", loc="left")
-    tidy(axC)
-
-    fig.savefig(f"{OUT}/F1_topology_churn.png", bbox_inches="tight")
-    plt.close(fig)
-    print(f"  F1 figure written  (rho={rho:.3f}, n={len(keep)} bins)")
+    save(fig, "E3_stability.png")
 
 
 if __name__ == "__main__":
-    try:
-        fig_churn()
-    except FileNotFoundError:
-        print("  (deployment telemetry not present; skipping the topology-churn figure)")
-    fig_e2()
-    fig_e3()
-    fig_e6()
-    fig_e7()
+    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2):
+        try:
+            fn()
+        except FileNotFoundError as e:
+            print(f"  {fn.__name__}: skipped (missing input: {e.filename})")
