@@ -3,7 +3,12 @@
 
 Every figure regenerates from committed run data. Design rationale and the
 rejected alternatives: docs/Frontiers HSI 2026/FIGURE_BRAINSTORM_2026-09-10.md.
-Okabe-Ito palette in the validated order BLUE, GREEN, VERM, PURP.
+Palette derived from the Frontiers logo: each cube face's hue kept, lightness snapped
+into the 0.43-0.77 band in OKLab, chroma preserved where the gamut allows. Core order
+SKY, CORAL, TEAL, PURPLE passes every validator check with no warnings (worst adjacent
+dE 12.2 protan, all >= 3:1 on white). The six-colour raster order adds GREEN and NAVY.
+The old role names (BLUE/VERM/GREEN/PURP) are kept as aliases so figure code reads the
+same; BLUE is the logo sky, VERM the coral, GREEN the teal.
 """
 import csv, gzip, json, math, os, statistics as st
 import numpy as np
@@ -12,8 +17,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-BLUE, GREEN, VERM, PURP = "#0072B2", "#009E73", "#D55E00", "#CC79A7"
-INK, MUTED, GRID = "#1a1a1a", "#5c5c5c", "#d8d8d8"
+SKY, CORAL, TEAL, PURPLE, GREEN6, NAVY, AMBER, CRIMSON = ("#038DB3", "#F35725", "#069585", "#7D37BD",
+                                                      "#509500", "#0059A1", "#AF7B01", "#C81F3F")
+BLUE, VERM, GREEN, PURP = SKY, CORAL, TEAL, PURPLE          # role aliases used throughout
+RASTER6 = [SKY, CORAL, TEAL, PURPLE, GREEN6, NAVY]           # validated adjacent order
+INK, MUTED, GRID = "#1a1a1a", "#6A6A6A", "#d8d8d8"           # MUTED is the logo's wordmark grey
 D = "data/calibration-2026"
 OUT = f"{D}/figs"
 plt.rcParams.update({
@@ -42,7 +50,6 @@ def save(fig, name):
 def churn_bins(win=5.0, min_orbs=20):
     T, A, K, N = [], [], [], []
     t0 = None
-    # optional input; the figure is skipped if the deployment telemetry is not present
     for line in open(f"{D}/deployment-20260722-telemetry.jsonl"):
         try:
             d = json.loads(line)
@@ -269,7 +276,7 @@ def fig_e1_v2():
 
 # ------------------------------------------------------------------ E5 v2
 def fig_e5_v2():
-    f = f"{D}/net_orb_e5dyn.csv"  # per-orb E5 capture; not in the public release, figure skipped
+    f = f"{D}/net_orb_e5dyn.csv"
     rows = list(csv.DictReader(open(f)))
     cols = rows[0].keys()
     tcol = next((c for c in cols if c in ("t_s", "t", "time")), None)
@@ -316,7 +323,8 @@ def fig_e3():
     fig, ax = plt.subplots(figsize=(5.0, 2.15))
     # Sequential single hue, light -> dark, on sqrt to keep the small non-zero
     # cells legible next to the one large one.
-    ax.imshow(np.sqrt(M), cmap="Blues", vmin=0, vmax=math.sqrt(0.25),
+    from matplotlib.colors import LinearSegmentedColormap
+    ax.imshow(np.sqrt(M), cmap=LinearSegmentedColormap.from_list("navy", ["#FFFFFF", NAVY]), vmin=0, vmax=math.sqrt(0.25),
               aspect="auto")
     ax.grid(False)
     for i, s in enumerate(sws):
@@ -347,9 +355,151 @@ def fig_e3():
     fig.tight_layout()
     save(fig, "E3_stability.png")
 
+# ------------------------------------------------------------------ MDS: the stress decomposition
+def fig_mds():
+    """The section's result is not the map; it is where the map's error comes from."""
+    d = json.load(open(f"{D}/E1_runs/mds_smacof.json"))
+    arms = [("classical MDS\non the filled matrix", d["classical_stress1"]),
+            ("SMACOF\non the filled matrix", d["smacof_filled_stress1"]),
+            ("SMACOF on\nmeasured pairs only", d["smacof_measured_stress1"])]
+    means = [a[1]["mean"] for a in arms]
+    err = [[m - a[1]["ci95"][0] for m, a in zip(means, arms)], [a[1]["ci95"][1] - m for m, a in zip(means, arms)]]
+    fig, ax = plt.subplots(figsize=(5.6, 3.4))
+    xs = np.arange(3)
+    ax.bar(xs, means, 0.58, color=[MUTED, BLUE, GREEN], yerr=err, capsize=3, ecolor=INK, error_kw=dict(lw=1))
+    ax.axhline(0.20, color=VERM, lw=1.2, ls="--")
+    ax.text(-0.42, 0.205, "0.20 = Kruskal's ‘poor’", color=VERM, fontsize=8.5, ha="left", va="bottom")
+    for x, m in zip(xs, means):
+        ax.text(x, m + 0.018, f"{m:.2f}", ha="center", va="bottom", fontsize=9.5, fontweight="bold", color=INK)
+    # the two effects, as brackets between bars
+    for (x0, x1, lab, y) in ((0, 1, f"better optimiser\n−{d['optimiser_effect']:.2f}", 0.37),
+                             (1, 2, f"stop inventing distances\n−{d['missing_data_effect']:.2f}", 0.27)):
+        ax.annotate("", xy=(x1 - 0.3, y), xytext=(x0 + 0.3, y), arrowprops=dict(arrowstyle="->", color=INK, lw=1))
+        ax.text((x0 + x1) / 2, y + 0.012, lab, ha="center", va="bottom", fontsize=8.5, color=INK)
+    ax.set_xticks(xs, [a[0] for a in arms])
+    ax.set_ylabel("stress-1 against measured dissimilarities")
+    ax.set_ylim(0, 0.5); ax.grid(axis="x", visible=False)
+    ax.set_title("The layout's error is in the dissimilarity construction, not the optimiser", loc="left")
+    tidy(ax)
+    save(fig, "mds_stress.png")
+
+# ------------------------------------------------------------------ MDS: the map, drawn cleanly
+def fig_mds_embed(frame_index=12):
+    """Same frame, two fits: classical MDS on the geodesic-filled matrix vs SMACOF on
+    measured pairs only. Points coloured by the as-built physical group; hulls per group."""
+    import sys
+    sys.path.insert(0, "visualiser"); sys.path.insert(0, "tools")  # public tree has both
+    import mds_layout as M, mds_smacof as MS
+    truth = json.load(open(f"{D}/E1_runs/truth_E1_4grp_wide_passA.json"))["as_built_serial_to_cluster"]
+    path = f"{D}/topk_1782827542.jsonl"
+    usable = 0; fr = None
+    for f in MS.load_frames(path):
+        orbs = f.get("orbs") or {}
+        if len(orbs) >= 20:
+            usable += 1
+            if usable == frame_index:
+                fr = f; break
+    orbs = fr["orbs"]; edges = MS.symmetric_edges(orbs, fr.get("s2s") or {}); keys = sorted(orbs)
+    S, _ = M.build_symmetric(keys, edges); Dg, _ = M.geodesic_fill(S)
+    W = (S >= 1.0).astype(float); np.fill_diagonal(W, 0.0)
+    Dm = np.where(W > 0, M.STRENGTH_MAX - S, Dg)
+    Xc = M.classical_mds(Dg, 2)[0]
+    Xs = MS.smacof(Dm, W, Xc)
+    Xs = M.procrustes_align(Xs, Xc) if hasattr(M, "procrustes_align") else Xs
+    cols = [BLUE, GREEN, VERM, PURP]
+    try:
+        from scipy.spatial import ConvexHull
+    except Exception:
+        ConvexHull = None
+    fig, axes = plt.subplots(1, 2, figsize=(6.8, 3.4))
+    for ax, X, lab in ((axes[0], Xc, "classical MDS, filled matrix"), (axes[1], Xs, "SMACOF, measured pairs only")):
+        X = X - X.mean(0); X = X / np.abs(X).max()
+        st_ = M._stress(X * 1.0, S) if False else None
+        for g in range(4):
+            idx = [i for i, k in enumerate(keys) if truth.get(k) == g]
+            if not idx: continue
+            P = X[idx]
+            if ConvexHull is not None and len(idx) >= 3:
+                h = ConvexHull(P); poly = P[h.vertices]
+                ax.fill(poly[:, 0], poly[:, 1], color=cols[g], alpha=0.12, lw=0)
+            ax.plot(P[:, 0], P[:, 1], "o", color=cols[g], ms=6.5, mec="white", mew=0.8, zorder=3)
+        ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([]); ax.grid(False)
+        for sp in ax.spines.values(): sp.set_visible(False)
+        ax.set_title(lab, loc="left", fontsize=9.5, fontweight="normal")
+    stress_c = M._stress(Xc, S); stress_s = M._stress(Xs, S)
+    axes[0].text(0.02, 0.02, f"stress-1 = {stress_c:.2f}", transform=axes[0].transAxes, fontsize=9, color=INK)
+    axes[1].text(0.02, 0.02, f"stress-1 = {stress_s:.2f}", transform=axes[1].transAxes, fontsize=9, color=INK)
+    fig.suptitle("Four groups from radio alone; the map tightens when invented distances are dropped",
+                 x=0.01, ha="left", fontsize=10.5, fontweight="bold")
+    axes[0].text(0.0, -0.06, "colour = physical group (as built)", transform=axes[0].transAxes, fontsize=8, color=MUTED)
+    save(fig, "mds_embed.png")
+
+# ------------------------------------------------------------------ E3 as a membership raster
+def fig_e3_raster(cells=((1.5, 100, "τ = 1.5 s, 100 ms"), (1.5, 400, "τ = 1.5 s, 400 ms"), (6.0, 400, "τ = 6 s, 400 ms  (deployed)"))):
+    """What the E3 zeros summarise: cluster membership per orb over time. Flicker is
+    colour change along a row; stability is a solid band. Instability is the paper's
+    metric (mean 1 - ARI between consecutive frames, settling frames dropped)."""
+    import sys
+    sys.path.insert(0, "tools")
+    from e2e3_cis import ari as paper_ari          # the paper's scorer: orbs present in both frames
+    SETTLE_TAUS = 2.0                               # the paper's settle rule: drop the first 2 tau of each cell
+    truth = json.load(open(f"{D}/E1_runs/E2_ground_truth.json"))
+    frames = {}
+    for line in gzip.open(f"{D}/E1_runs/raw/E3_20260908-124617.jsonl.gz", "rt"):
+        d = json.loads(line)
+        if d.get("type") == "frame":
+            frames.setdefault((d["tau"], d["sw_ms"]), []).append(d)
+    orbs = sorted(truth, key=lambda k: (truth[k], k))
+    fig, axes = plt.subplots(len(cells), 1, figsize=(6.6, 4.6), sharex=True,
+                             gridspec_kw=dict(hspace=0.35))
+    for ax, (tau, sw, lab) in zip(axes, cells):
+        fr = frames[(tau, sw)]; t0 = fr[0]["t"]
+        # Colour = membership continuity: each frame's clusters take the colour of the
+        # previous frame's cluster they overlap most, so a colour change along a row is
+        # a real change of membership, not a renumbering of cluster ids.
+        grid = np.full((len(orbs), len(fr)), -1); labels = []; prev_colour = {}; next_colour = 0
+        prev_members = {}
+        for j, f in enumerate(fr):
+            row = [f["cluster"].get(o, -1) for o in orbs]; labels.append(row)
+            members = {}
+            for i, c in enumerate(row): members.setdefault(c, set()).add(i)
+            colour = {}; taken = set()
+            for c, mem in sorted(members.items(), key=lambda kv: -len(kv[1])):
+                best, best_ov = None, 0
+                for pc, pmem in prev_members.items():
+                    ov = len(mem & pmem)
+                    if ov > best_ov and prev_colour[pc] not in taken: best, best_ov = pc, ov
+                if best is not None: colour[c] = prev_colour[best]
+                else: colour[c] = next_colour; next_colour += 1
+                taken.add(colour[c])
+            for i, c in enumerate(row): grid[i, j] = colour[c]
+            prev_members, prev_colour = members, colour
+        ts = [f["t"] - t0 for f in fr]
+        kept = [j for j, f in enumerate(fr) if f["t"] - t0 >= SETTLE_TAUS * tau] or list(range(len(fr)))
+        pairs = [1 - paper_ari(fr[a]["cluster"], fr[b]["cluster"]) for a, b in zip(kept, kept[1:])]
+        inst = float(np.mean([v for v in pairs if v == v]))
+        settle_end = ts[kept[0]]
+        print(f"    tau={tau} sw={sw}: instability {inst:.4f} over {len(pairs)} pairs, {kept[0]} settling frames dropped")
+        # Okabe-Ito, all seven hues, ordered for maximum adjacent separation (validated);
+        # transient singletons beyond seven wrap. Absent orbs are grey.
+        from matplotlib.colors import ListedColormap
+        OI = ListedColormap(RASTER6)
+        ax.imshow(np.where(grid < 0, np.nan, grid % 6), aspect="auto", cmap=OI, interpolation="nearest", vmin=-0.5, vmax=5.5,
+                  extent=[ts[0], ts[-1], len(orbs) - .5, -.5])
+        ax.axvspan(ts[0], settle_end, color="white", alpha=0.6, lw=0)
+        ax.set_yticks([]); ax.grid(False)
+        ax.set_ylabel(f"{lab}\ninstability {inst:.3f}", rotation=0, ha="right", va="center", fontsize=9, labelpad=8)
+        for sp in ax.spines.values(): sp.set_visible(False)
+    axes[0].text(0, -1.1, "shaded: settling (first 2τ, not scored)", fontsize=7.5, color=MUTED, ha="left", va="bottom")
+    axes[-1].set_xlabel("time (s)   —   one row per orb, colour = cluster, rows ordered by physical group")
+    fig.suptitle("Smoothing: τ = 1.5 s flickers and debounce only patches it; from τ = 3 s membership never moves",
+                 x=0.01, ha="left", fontsize=10.5, fontweight="bold")
+    save(fig, "E3_raster.png")
+
+
 
 if __name__ == "__main__":
-    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2):
+    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster):
         try:
             fn()
         except FileNotFoundError as e:
