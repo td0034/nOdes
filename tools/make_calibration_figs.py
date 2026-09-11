@@ -885,8 +885,9 @@ def fig_rigs():
         t = math.pi * (0.1 + 0.8 * i / 5); dots += blob(1.7 * math.cos(t), 1.7 * math.sin(t), n, RASTER8[i])
     panels.append(("near-threshold\n(E2, E3, E6) 0.5 m", dots, []))
     dots = []
-    for i, n in enumerate([8, 7, 5, 3, 2, 1]):
-        r = 0.45 * (1.42 ** i); t = i * 1.95; dots += blob(r * math.cos(t), r * math.sin(t), n, RASTER8[i], spread=0.12)
+    for i, n in enumerate([1, 2, 3, 5, 7, 8]):          # singleton at the centre, groups grow outward
+        r = 0.0 if i == 0 else 0.55 * (1.42 ** (i - 1)); t = i * 1.95
+        dots += blob(r * math.cos(t), r * math.sin(t), n, RASTER8[i], spread=0.12 + 0.02 * (n > 5))
     panels.append(("graduated spiral\n{8,7,5,3,2,1}", dots, []))
     room = json.load(open(f"{D}/E7_room.json")); dots = []; extras = []
     A = [tuple(a["xy"]) for a in room["anchors"]]
