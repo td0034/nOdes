@@ -2,7 +2,7 @@
 """e6_handover.py — E6 analysis: what the fleet does when the server goes silent.
 
 Consumes the sniffer captures written by tools/e6_capture.py and reports the
-measures in data/calibration-2026/E6_HANDOVER_PROTOCOL.md section 4.
+measures in docs/Frontiers HSI 2026/E6_HANDOVER_PROTOCOL.md section 4.
 
     python3 tools/e6_handover.py analyse                 # all runs in E6_runs/raw
     python3 tools/e6_handover.py analyse --run e6_*.jsonl.gz

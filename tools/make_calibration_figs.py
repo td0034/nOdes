@@ -20,7 +20,8 @@ import matplotlib.image as mpimg
 SKY, CORAL, TEAL, PURPLE, GREEN6, NAVY, AMBER, CRIMSON = ("#038DB3", "#F35725", "#069585", "#7D37BD",
                                                       "#509500", "#0059A1", "#AF7B01", "#C81F3F")
 BLUE, VERM, GREEN, PURP = SKY, CORAL, TEAL, PURPLE          # role aliases used throughout
-RASTER6 = [SKY, CORAL, TEAL, PURPLE, GREEN6, NAVY]           # validated adjacent order
+RASTER8 = [SKY, CORAL, TEAL, PURPLE, GREEN6, NAVY, CRIMSON, AMBER]   # all eight logo faces; validated adjacent order, worst dE 8.9
+RASTER6 = RASTER8
 INK, MUTED, GRID = "#1a1a1a", "#6A6A6A", "#d8d8d8"           # MUTED is the logo's wordmark grey
 D = "data/calibration-2026"
 OUT = f"{D}/figs"
@@ -388,7 +389,7 @@ def fig_mds_embed(frame_index=12):
     """Same frame, two fits: classical MDS on the geodesic-filled matrix vs SMACOF on
     measured pairs only. Points coloured by the as-built physical group; hulls per group."""
     import sys
-    sys.path.insert(0, "visualiser"); sys.path.insert(0, "tools")  # public tree has both
+    sys.path.insert(0, "visualiser"); sys.path.insert(0, "tools")
     import mds_layout as M, mds_smacof as MS
     truth = json.load(open(f"{D}/E1_runs/truth_E1_4grp_wide_passA.json"))["as_built_serial_to_cluster"]
     path = f"{D}/topk_1782827542.jsonl"
@@ -483,8 +484,8 @@ def fig_e3_raster(cells=((1.5, 100, "τ = 1.5 s, 100 ms"), (1.5, 400, "τ = 1.5 
         # Okabe-Ito, all seven hues, ordered for maximum adjacent separation (validated);
         # transient singletons beyond seven wrap. Absent orbs are grey.
         from matplotlib.colors import ListedColormap
-        OI = ListedColormap(RASTER6)
-        ax.imshow(np.where(grid < 0, np.nan, grid % 6), aspect="auto", cmap=OI, interpolation="nearest", vmin=-0.5, vmax=5.5,
+        OI = ListedColormap(RASTER8)
+        ax.imshow(np.where(grid < 0, np.nan, grid % 8), aspect="auto", cmap=OI, interpolation="nearest", vmin=-0.5, vmax=7.5,
                   extent=[ts[0], ts[-1], len(orbs) - .5, -.5])
         ax.axvspan(ts[0], settle_end, color="white", alpha=0.6, lw=0)
         ax.set_yticks([]); ax.grid(False)
@@ -497,9 +498,208 @@ def fig_e3_raster(cells=((1.5, 100, "τ = 1.5 s, 100 ms"), (1.5, 400, "τ = 1.5 
     save(fig, "E3_raster.png")
 
 
+# ------------------------------------------------------------------ Endurance: a day in the life of the fleet
+def fig_endurance():
+    """Battery per orb over the 4 July festival day as a raster: one row per orb, 1-min
+    columns, colour = voltage (navy ramp), charging minutes overdrawn in amber. Thresholds
+    are the firmware's: deep sleep below 3.7 V when not charging, BATTERY_MIN 3.1 V."""
+    from matplotlib.colors import LinearSegmentedColormap
+    f = f"{D}/net_orb_festival_20260704.csv"
+    acc = {}; t0 = None
+    with open(f) as fh:
+        for row in csv.DictReader(fh):
+            try:
+                t = float(row["t_s"]); v = float(row["batt_v"]); ch = int(float(row["charging"]))
+            except Exception:
+                continue
+            if row["serial"].strip("0") == "" or v < 2.5: continue          # placeholder slot / no reading
+            t0 = t if t0 is None else t0
+            b = int((t - t0) // 60); e = acc.setdefault(row["serial"], {}).setdefault(b, [0.0, 0, 0])
+            e[0] += v; e[1] += 1; e[2] += ch
+    serials = sorted(acc, key=lambda k: min(acc[k]))          # first-out at the top
+    nb = max(max(d) for d in acc.values()) + 1
+    V = np.full((len(serials), nb), np.nan); C = np.zeros((len(serials), nb), bool)
+    for i, sN in enumerate(serials):
+        for b, (sv, n, sc) in acc[sN].items():
+            V[i, b] = sv / n; C[i, b] = sc / n > 0.5
+    fig, ax = plt.subplots(figsize=(7.2, 4.2))
+    cmap = LinearSegmentedColormap.from_list("batt", [CORAL, "#BFD9EA", NAVY])   # low = coral, full = navy; blank = not heard
+    im = ax.imshow(V, aspect="auto", cmap=cmap, vmin=3.2, vmax=4.2, interpolation="nearest",
+                   extent=[0, nb / 60, len(serials) - .5, -.5])
+    # charging minutes: amber overlay
+    ys, xs = np.where(C)
+    ax.scatter(xs / 60 + 1 / 120, ys, s=6, marker="s", color=AMBER, linewidths=0, zorder=3)
+    low = np.nanmin(V, axis=1)
+    ax.set_yticks(range(len(serials))); ax.set_yticklabels([f"{sN[-4:]}  {lo:.2f} V" for sN, lo in zip(serials, low)], fontsize=6.5)
+    ax.tick_params(axis="y", length=0)
+    ax.set_xlabel("time since first orb out (h)")
+    ax.set_title(f"A festival day: {len(serials)} orbs over {nb/60:.1f} h — blank = not heard (docked or asleep), amber = on charge", loc="left", fontsize=10)
+    cb = fig.colorbar(im, ax=ax, fraction=0.03, pad=0.01); cb.set_label("battery (V)   ·   3.7 V = deep sleep if not charging", fontsize=8); cb.ax.tick_params(labelsize=7)
+    cb.ax.axhline(3.7, color=INK, lw=1.5)
+    ax.grid(False)
+    for sp in ax.spines.values(): sp.set_visible(False)
+    save(fig, "endurance_keynsham.png")
+
+
+# ------------------------------------------------------------------ E4 as a per-orb fairness raster
+def fig_e4_fairness():
+    """Who starves. One row per orb, x = orbs in play as the sweep steps down, colour = that
+    orb's miss rate at that level. Fixed 50 Hz above, adaptive rate below."""
+    from matplotlib.colors import LinearSegmentedColormap
+    arms = [("fixed 50 Hz", "network_testing/captures/net_orb_1782915562_e4_fixed50.csv"),
+            ("adaptive rate", f"{D}/net_orb_e4_autorate.csv")]
+    data = {}
+    for lab, f in arms:
+        acc = {}
+        rows_iter = (row for path in f.split("|") for row in csv.DictReader(open(path)))
+        if True:
+            for row in rows_iter:
+                try:
+                    n = int(row["eligible_orbs"]); m = float(row["missed"])
+                except Exception:
+                    continue
+                if int(float(row.get("eligible", 1))) == 0: continue
+                e = acc.setdefault(row["serial"], {}).setdefault(n, [0.0, 0]); e[0] += m; e[1] += 1
+        data[lab] = acc
+    serials = sorted(set().union(*[set(d) for d in data.values()]))
+    levels = sorted(set().union(*[set(k for d in a.values() for k in d) for a in data.values()]))
+    cmap = LinearSegmentedColormap.from_list("miss", ["#F2F2F2", CORAL])
+    fig, axes = plt.subplots(2, 1, figsize=(7.0, 5.2), sharex=True, gridspec_kw=dict(hspace=0.25))
+    for ax, (lab, _) in zip(axes, arms):
+        acc = data[lab]; M = np.full((len(serials), len(levels)), np.nan)
+        for i, sN in enumerate(serials):
+            for j, n in enumerate(levels):
+                e = acc.get(sN, {}).get(n)
+                if e and e[1] >= 20: M[i, j] = e[0] / e[1]
+        im = ax.imshow(M, aspect="auto", cmap=cmap, vmin=0, vmax=1, interpolation="nearest",
+                       extent=[levels[0] - .5, levels[-1] + .5, len(serials) - .5, -.5])
+        mean = np.nanmean(M, axis=0)
+        ax.set_ylabel(f"{lab}\n({len(serials)} orbs, one row each)", fontsize=9)
+        ax.set_yticks([]); ax.grid(False)
+        for sp in ax.spines.values(): sp.set_visible(False)
+        ax.text(1.01, 0.5, f"mean miss at full fleet {np.nanmax(mean):.2f}", transform=ax.transAxes, fontsize=8, color=INK, va="center", rotation=90)
+    axes[-1].set_xlabel("orbs in play (sweep steps down from the full fleet)")
+    axes[-1].invert_xaxis()
+    cb = fig.colorbar(im, ax=axes, fraction=0.025, pad=0.06); cb.set_label("per-orb packet miss", fontsize=8); cb.ax.tick_params(labelsize=7)
+    fig.suptitle("Who starves: at 50 Hz the same orbs lose their feedback; the adaptive rate keeps every row pale",
+                 x=0.01, ha="left", fontsize=10.5, fontweight="bold")
+    save(fig, "E4_fairness.png")
+
+
+# ------------------------------------------------------------------ E7 as a walk
+def fig_e7_walk():
+    """One carried orb, two circuits of the three stations: strength to each anchor over
+    time, and the strongest anchor as a station strip beneath."""
+    import gzip as _gz
+    f = f"{D}/E7_runs/walks/walk_20260825-1616_0718a0_prox.csv.gz"
+    names = {"006dc4": ("left", SKY), "0069a4": ("right", CORAL), "006740": ("back", TEAL)}
+    series = {k: ([], []) for k in names}
+    for line in _gz.open(f, "rt"):
+        p = line.strip().split(",")
+        if len(p) < 4 or p[1] not in names: continue
+        try: series[p[1]][0].append(float(p[0])); series[p[1]][1].append(float(p[3]))
+        except Exception: pass
+    t0 = min(v[0][0] for v in series.values()); T_END = 230.0      # the two circuits; the orb is set down at "left" after
+    for k in series:
+        keep = [i for i, t in enumerate(series[k][0]) if t - t0 <= T_END]
+        series[k] = ([series[k][0][i] for i in keep], [series[k][1][i] for i in keep])
+    fig, (a, b) = plt.subplots(2, 1, figsize=(7.2, 3.8), sharex=True, gridspec_kw=dict(height_ratios=[3, 1], hspace=0.12))
+    for k, (lab, col) in names.items():
+        t = [x - t0 for x in series[k][0]]; y = series[k][1]
+        a.plot(t, y, "-", color=col, lw=1.4)
+        a.text(t[-1] + 2, y[-1] + {"left": 6, "right": -9, "back": 7}[lab], lab, color=col, fontsize=9, va="center", fontweight="bold")
+    a.axhspan(180, 255, color=GRID, alpha=0.4, lw=0); a.text(1, 246, "at-station band (180–226 in the notes)", fontsize=7.5, color=MUTED, va="top")
+    a.set_ylabel("link strength to each anchor"); a.set_ylim(100, 260)
+    a.set_title("A carried orb, two circuits of three stations: the strongest anchor names the station", loc="left")
+    tidy(a)
+    # station strip: argmax at each common timestamp
+    ts = sorted(set(series["006dc4"][0]) & set(series["0069a4"][0]) & set(series["006740"][0]))
+    look = {k: dict(zip(series[k][0], series[k][1])) for k in names}
+    keys = list(names); best = [max(keys, key=lambda k: look[k][t]) for t in ts]
+    cols = [names[k][1] for k in best]
+    b.bar([t - t0 for t in ts], [1] * len(ts), width=(ts[1] - ts[0]) * 1.05 if len(ts) > 1 else 1, color=cols, linewidth=0)
+    b.set_yticks([]); b.set_ylim(0, 1); b.grid(False)
+    for sp in b.spines.values(): sp.set_visible(False)
+    b.set_ylabel("station\n(argmax)", rotation=0, ha="right", va="center", fontsize=8)
+    b.set_xlabel("time (s)")
+    save(fig, "E7_walk.png")
+
+
+# ------------------------------------------------------------------ E6 as a handover raster
+def fig_e6_raster(run="e6_20260908-130607_c0_to_c3.jsonl.gz"):
+    """The server-loss event per orb: bands under the server, the broadcast gap as blank
+    columns, bands resuming standalone, then every row going dark at the 30 s sleep.
+    Membership reconstructed from the sniffer's per-orb peer views with the shipped
+    selector, exactly as e6_handover.py scores it."""
+    import sys
+    sys.path.insert(0, "tools")
+    import e6_handover as H
+    meta, _, frames = H.load(f"{D}/E6_runs/raw/{run}", exclude=frozenset(H.anchor_serials()))
+    import glob as _glob
+    stem = run.split("_", 2)[2].replace(".jsonl.gz", "")            # e.g. c0_to_c3
+    mfile = sorted(_glob.glob(f"{D}/E6_runs/e6_marks_{stem}_[0-9]*.json"))[-1]   # [0-9] so c0_to_c3 does not match c0_to_c3_wide
+    print(f"    marks from {mfile.split('/')[-1]}")
+    M = json.load(open(mfile)); cap0 = M["capture_started"]
+    mats = H.matrices(frames); parts = H.partitions(mats, floor=meta.get("floor", 200) if isinstance(meta, dict) else 200)
+    t0 = frames[0]["t"]
+    sers = sorted({s for _, ss, _ in mats for s in ss})
+    truth = json.load(open(f"{D}/E1_runs/E2_ground_truth.json"))
+    sers.sort(key=lambda k: (truth.get(k, 9), k))
+    ts = [p[0] - t0 for p in parts]
+    # labels per window: flood() may return dict serial->id or list of sets
+    def as_dict(part):
+        if isinstance(part, dict): return part
+        return {s: i for i, grp in enumerate(part) for s in grp}
+    grid = np.full((len(sers), len(parts)), -1); prev_members = {}; prev_colour = {}; nxt = 0
+    for j, (t, part, thr) in enumerate(parts):
+        lab = as_dict(part); members = {}
+        for i, sN in enumerate(sers):
+            c = lab.get(sN)
+            if c is None: continue
+            members.setdefault(c, set()).add(i)
+        colour = {}; taken = set()
+        for c, mem in sorted(members.items(), key=lambda kv: -len(kv[1])):
+            best, ov = None, 0
+            for pc, pm in prev_members.items():
+                o = len(mem & pm)
+                if o > ov and prev_colour[pc] not in taken: best, ov = pc, o
+            colour[c] = prev_colour[best] if best is not None else nxt
+            if best is None: nxt += 1
+            taken.add(colour[c])
+            for i in mem: grid[i, j] = colour[c]
+        prev_members, prev_colour = members, colour
+    from matplotlib.colors import ListedColormap
+    fig, ax = plt.subplots(figsize=(7.4, 3.6))
+    # draw as per-window columns so gaps in broadcast show as blank, not stretched
+    W = H.WINDOW_S
+    for j, t in enumerate(ts):
+        col = grid[:, j]
+        for i, c in enumerate(col):
+            if c >= 0:
+                ax.add_patch(plt.Rectangle((t, i - .5), W, 1, color=RASTER8[c % 8], lw=0))
+    t_end = M["finished"] - t0
+    ax.set_xlim(-2, t_end + 2); ax.set_ylim(len(sers) - .5, -.5)
+    ax.set_yticks([]); ax.grid(False)
+    for sp in ax.spines.values(): sp.set_visible(False)
+    events = [("C1_departure_SIGSTOP", "server stopped"), ("C3_return_SIGCONT", "server returned"), ("finished", "end")]
+    for key, lab in events:
+        mt = M[key] - t0
+        ax.axvline(mt, color=INK, lw=1, ls=":")
+        ax.text(mt + 1.5, -0.6, lab, fontsize=8, color=INK, va="bottom")
+    t_stop = M["C1_departure_SIGSTOP"] - t0; last_heard = ts[-1] + W
+    ax.annotate(f"fleet asleep from {last_heard - t_stop:.0f} s after the stop —\nand still asleep when the server returned",
+                xy=(last_heard + 2, len(sers) / 2), xytext=(t_stop + 80, len(sers) / 2), fontsize=8.5, color=INK, va="center",
+                arrowprops=dict(arrowstyle="->", color=MUTED, lw=.9))
+    ax.annotate("handover gap 0.96 s", xy=(t_stop + 0.5, 0.5), xytext=(t_stop + 8, 2.6), fontsize=8, color=INK,
+                arrowprops=dict(arrowstyle="->", color=MUTED, lw=.9))
+
+    ax.set_xlabel("time (s)   —   one row per orb, colour = cluster; blank = no broadcast heard")
+    ax.set_title("Server loss, per orb: a one-second gap, 30 s of standalone clustering, then the fleet sleeps and stays asleep", loc="left", fontsize=10, pad=18)
+    save(fig, "E6_raster.png")
+
 
 if __name__ == "__main__":
-    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster):
+    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster, fig_endurance, fig_e4_fairness, fig_e7_walk, fig_e6_raster):
         try:
             fn()
         except FileNotFoundError as e:
