@@ -546,7 +546,7 @@ def fig_e4_fairness():
     """Who starves. One row per orb, x = orbs in play as the sweep steps down, colour = that
     orb's miss rate at that level. Fixed 50 Hz above, adaptive rate below."""
     from matplotlib.colors import LinearSegmentedColormap
-    arms = [("fixed 50 Hz", "network_testing/captures/net_orb_1782915562_e4_fixed50.csv"),
+    arms = [("fixed 50 Hz", f"{D}/net_orb_e4_fixed50.csv"),
             ("adaptive rate", f"{D}/net_orb_e4_autorate.csv")]
     data = {}
     for lab, f in arms:
@@ -697,9 +697,99 @@ def fig_e6_raster(run="e6_20260908-130607_c0_to_c3.jsonl.gz"):
     ax.set_title("Server loss, per orb: a one-second gap, 30 s of standalone clustering, then the fleet sleeps and stays asleep", loc="left", fontsize=10, pad=18)
     save(fig, "E6_raster.png")
 
+# ------------------------------------------------------------------ Cross-regime parity (referee 2.2)
+def fig_parity():
+    """Same selector, same parameters, different INPUT: the server clusters its top-10
+    uplink; the firmware clusters a top-6 ESP-NOW view. For every server frame in the E2
+    sweeps, rebuild the firmware-side partition from the concurrent sniffer with the floor
+    the server had in force at that instant, and score agreement."""
+    import sys, bisect
+    sys.path.insert(0, "tools")
+    import e6_handover as H
+    from e2e3_cis import ari as paper_ari
+    truth = json.load(open(f"{D}/E1_runs/E2_ground_truth.json"))
+    # server frames from both E2 sweeps
+    srv = []
+    for fn_ in ("E2_20260908-122228.jsonl.gz", "E2_20260908-123956.jsonl.gz"):
+        for line in gzip.open(f"{D}/E1_runs/raw/{fn_}", "rt"):
+            d = json.loads(line)
+            if d.get("type") == "frame" and d.get("cluster") and d.get("thr") is not None:
+                srv.append(d)
+    srv.sort(key=lambda d: d["t"])
+    # firmware-side matrices from the sniffer (0.5 s windows)
+    meta, _, frames = H.load(f"{D}/E6_runs/raw/e6_20260908-122436_e2_concurrent.jsonl.gz", exclude=frozenset(H.anchor_serials()))
+    mats = H.matrices(frames); wt = [m[0] for m in mats]
+    from mutual_knn_eval import adaptive_gap_thr
+    from sat_ari_truth import flood
+    def as_dict(part):
+        return part if isinstance(part, dict) else {sN: i for i, g in enumerate(part) for sN in g}
+    orbs = sorted(truth, key=lambda k: (truth[k], k))
+    rows = []   # (t, thr, ari, {orb: agree})
+    for d in srv:
+        j = bisect.bisect_right(wt, d["t"]) - 1
+        if j < 0 or d["t"] - wt[j] > 1.0: continue
+        t_, sers, sym = mats[j]
+        fw = as_dict(flood(sers, sym, adaptive_gap_thr(sym, floor=d["thr"])))
+        sv = d["cluster"]
+        common = [o for o in orbs if o in fw and o in sv]
+        if len(common) < 4: continue
+        a = paper_ari({o: sv[o] for o in common}, {o: fw[o] for o in common})
+        agree = {}
+        for o in common:
+            mates_s = {q for q in common if sv[q] == sv[o]}; mates_f = {q for q in common if fw[q] == fw[o]}
+            agree[o] = mates_s == mates_f
+        rows.append((d["t"], d["thr"], a, agree))
+    if not rows:
+        raise FileNotFoundError("no overlapping frames")
+    # split rows into the two sweeps (a >60 s gap in server frames separates them)
+    sweeps = [[rows[0]]]
+    for r in rows[1:]:
+        (sweeps[-1] if r[0] - sweeps[-1][-1][0] < 60 else sweeps.append([r]) or sweeps[-1]).append(r) if False else None
+        if r[0] - sweeps[-1][-1][0] < 60: sweeps[-1].append(r)
+        else: sweeps.append([r])
+    aris_all = [r[2] for r in rows]
+    A_all = []
+    for sw in sweeps:
+        for (_, _, _, ag) in sw:
+            A_all.extend([1.0 if ag[o] else 0.0 for o in orbs if o in ag])
+    agree_pct = np.mean(A_all) * 100
+    print(f"    parity: {len(rows)} frames in {len(sweeps)} sweeps, mean ARI {np.nanmean(aris_all):.3f}, frames with ARI=1: {np.mean([a >= 0.999 for a in aris_all])*100:.0f}%, per-orb agreement {agree_pct:.1f}%")
+    by_thr = {}
+    for (_, thr, a, _) in rows: by_thr.setdefault(thr, []).append(a)
+    print("    by floor:", " ".join(f"{k}:{np.mean(v):.2f}" for k, v in sorted(by_thr.items())))
+    per_orb = {o: np.mean([1.0 if r[3][o] else 0.0 for r in rows if o in r[3]]) for o in orbs if any(o in r[3] for r in rows)}
+    print("    agreement by physical group:", " ".join(f"g{g}:{np.mean([per_orb[o] for o in per_orb if truth[o]==g])*100:.0f}%" for g in sorted(set(truth.values()))))
+    durs = [sw[-1][0] - sw[0][0] + 1 for sw in sweeps]
+    fig = plt.figure(figsize=(7.6, 4.8))
+    gs = fig.add_gridspec(2, len(sweeps), width_ratios=durs, height_ratios=[2.2, 1], hspace=0.12, wspace=0.04)
+    for k, sw in enumerate(sweeps):
+        t0 = sw[0][0]; a1 = fig.add_subplot(gs[0, k]); a2 = fig.add_subplot(gs[1, k], sharex=a1)
+        dts = np.diff([r[0] for r in sw]); w = float(np.median(dts)) if len(dts) else 1.0
+        for (t, thr, a, ag) in sw:
+            for i, o in enumerate(orbs):
+                if o in ag:
+                    a1.add_patch(plt.Rectangle((t - t0, i - .5), w, 1, color=TEAL if ag[o] else CORAL, lw=0))
+        a1.set_xlim(0, sw[-1][0] - t0 + w); a1.set_ylim(len(orbs) - .5, -.5); a1.set_yticks([]); a1.grid(False)
+        for sp in a1.spines.values(): sp.set_visible(False)
+        last = None
+        for (t, thr, _, _) in sw:
+            if thr != last:
+                a1.axvline(t - t0, color="white", lw=0.8); a1.text(t - t0 + 0.8, -0.7, str(thr), fontsize=6.5, color=MUTED, va="bottom"); last = thr
+        a2.plot([r[0] - t0 for r in sw], [r[2] for r in sw], "-", color=INK, lw=1.0)
+        a2.set_ylim(-0.02, 1.05); a2.axhline(1, color=GRID, lw=1); tidy(a2)
+        a2.set_xlabel(f"time (s), {'coarse' if k == 0 else 'fine'} sweep")
+        if k == 0:
+            a1.set_ylabel("one row per orb\nteal = same cluster-mates in both regimes"); a2.set_ylabel("ARI, server vs\nfirmware-side")
+            a1.text(0, -1.9, "server floor in force:", fontsize=7, color=MUTED, va="bottom")
+        else:
+            a2.set_yticklabels([])
+    fig.suptitle(f"Same selector, different input: top-10 uplink vs top-6 peer view agree on {agree_pct:.0f}% of orb-frames (mean ARI {np.nanmean(aris_all):.2f})",
+                 x=0.01, ha="left", fontsize=10.5, fontweight="bold")
+    save(fig, "parity.png")
+
 
 if __name__ == "__main__":
-    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster, fig_endurance, fig_e4_fairness, fig_e7_walk, fig_e6_raster):
+    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster, fig_endurance, fig_e4_fairness, fig_e7_walk, fig_e6_raster, fig_parity):
         try:
             fn()
         except FileNotFoundError as e:
