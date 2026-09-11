@@ -916,7 +916,7 @@ def fig_rigs():
         ax.set_title(title.replace("\n", " — "), fontsize=8, pad=3)
         xb, yb = cx - W / 2 + 0.25, cy - H / 2 + 0.3
         ax.plot([xb, xb + 1.0], [yb, yb], "-", color=INK, lw=1.6); ax.text(xb + 0.5, yb + 0.1, "1 m", ha="center", va="bottom", fontsize=7)
-    ph = cells[5]; ph.imshow(mpimg.imread(f"{OUT}/rig_photo_studio.jpg")); ph.axis("off"); ph.set_title("a rig taped out in the studio (not to scale)", fontsize=8, pad=3)
+    cells[5].axis("off")
     fig.suptitle("The rigs, to one scale — each dot an orb, colour its physical group; E7 from measured coordinates, the rest schematic", x=0.01, ha="left", fontsize=8.5, fontweight="bold")
     save(fig, "rigs.png")
 
