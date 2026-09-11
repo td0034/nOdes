@@ -787,9 +787,143 @@ def fig_parity():
                  x=0.01, ha="left", fontsize=10.5, fontweight="bold")
     save(fig, "parity.png")
 
+# ------------------------------------------------------------------ Methods figures
+def fig_architecture():
+    """Two regimes, one radio. Left: infrastructure mode; right: ad-hoc mode."""
+    import matplotlib.patches as mp
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.6, 3.5), gridspec_kw=dict(width_ratios=[1.45, 1]))
+    def ring(ax, cx, cy, r=1.25, nr=0.24):
+        pts = [(cx + r * math.cos(t), cy + r * math.sin(t)) for t in np.linspace(0, 2 * math.pi, 7)[:-1]]
+        for i, (x, y) in enumerate(pts):
+            for (x2, y2) in pts[i + 1:]:
+                ax.plot([x, x2], [y, y2], "-", color=TEAL, lw=0.9, alpha=0.5, zorder=1)
+        for (x, y) in pts:
+            ax.add_patch(mp.Circle((x, y), nr, fc="white", ec=INK, lw=1.2, zorder=3))
+    for ax in (a, b):
+        ax.set_xlim(0, 10); ax.set_ylim(0, 5.5); ax.set_aspect("equal"); ax.axis("off")
+    # ---- A: infrastructure mode
+    a.add_patch(mp.FancyBboxPatch((0.3, 1.0), 2.4, 3.0, boxstyle="round,pad=0.06", fc="#F2F7FA", ec=SKY, lw=1.4, zorder=2))
+    a.text(1.5, 4.35, "central plane", ha="center", va="bottom", fontsize=8.5, fontweight="bold", color=INK)
+    for y, t in ((3.35, "50 Hz loop\nSCHED_FIFO"), (2.45, "telemetry export\ncapture · replay"), (1.55, "OTA · hot-reload\nauthoring")):
+        a.text(1.5, y, t, ha="center", va="center", fontsize=7.2, color=INK)
+    a.add_patch(mp.FancyBboxPatch((3.45, 2.1), 1.15, 0.8, boxstyle="round,pad=0.04", fc="white", ec=INK, lw=1.0, zorder=2))
+    a.text(4.025, 2.5, "AP", ha="center", va="center", fontsize=8.5, fontweight="bold")
+    a.annotate("", xy=(3.43, 2.5), xytext=(2.72, 2.5), arrowprops=dict(arrowstyle="<->", color=MUTED, lw=1.1, mutation_scale=10))
+    ring(a, 7.3, 2.3, r=1.1)
+    a.annotate("", xy=(6.15, 2.85), xytext=(4.62, 2.78), arrowprops=dict(arrowstyle="-|>", color=SKY, lw=2, mutation_scale=12))
+    a.text(4.05, 3.02, "multicast 50 Hz\ncolour per slot", fontsize=7.0, color=SKY, ha="center", va="bottom")
+    a.annotate("", xy=(4.62, 2.22), xytext=(6.15, 1.75), arrowprops=dict(arrowstyle="-|>", color=CORAL, lw=2, mutation_scale=12))
+    a.text(4.35, 0.85, "unicast reply per orb:\nmotion · battery · top-N peers", fontsize=7.0, color=CORAL, ha="left", va="top")
+    a.text(7.3, 4.9, "peer sensing over ESP-NOW (RSSI)", ha="center", fontsize=8, color=TEAL, fontweight="bold")
+    a.text(7.3, 4.55, "each orb broadcasts its top-N view\n2 ms after every multicast frame", ha="center", va="top", fontsize=6.8, color=MUTED)
+    a.set_title("A   Infrastructure mode", loc="left", fontsize=9.5)
+    # ---- B: ad-hoc mode
+    ring(b, 5.0, 2.55, r=1.05)
+    b.text(5.0, 4.9, "the same clusterer, on every orb", ha="center", fontsize=8, color=TEAL, fontweight="bold")
+    b.text(5.0, 4.55, "standalone pacer 50 Hz, armed\n10 × 100 ms after the last frame", ha="center", va="top", fontsize=6.8, color=MUTED)
+    b.text(5.0, 0.62, "no server, no access point\nlight and sound from cluster id\nstationary fleet sleeps after 30 s", ha="center", va="center", fontsize=7.0, color=INK)
+    b.set_title("B   Ad-hoc mode (what ships)", loc="left", fontsize=9.5)
+    save(fig, "architecture.png")
+
+
+def fig_timeline():
+    """Design history as swim-lanes, from the commit record (see paper 3.3)."""
+    import datetime as dt
+    d = lambda x: dt.date.fromisoformat(x)
+    lanes = ["central plane first", "individual + central\n(orientation → colour)", "movement clustering\n(abandoned)",
+             "acoustic echolocation\n(abandoned)", "ESP-NOW RSSI proximity\n(shipped)", "calibration E1–E7"]
+    cols = [SKY, PURPLE, AMBER, CRIMSON, TEAL, NAVY]
+    ev = [(0, "2025-07-23", "2025-08-06", "sender · return path · slots · OTA · telemetry"),
+          (1, "2025-08-15", "2026-02-10", "v0.9 → v1.0: icosahedron colour, a note per change"),
+          (2, "2026-02-20", "2026-03-31", "k-means on accel/gyro energy — landed 3 Mar"),
+          (3, "2026-02-13", "2026-03-31", "v2.4 TDMA chirp + mic · v2.5 hybrid trial"),
+          (4, "2026-02-13", "2026-09-10", "v2.4 logged · v3.1 substrate · v3.9 standalone · v3.13/17 in firmware"),
+          (5, "2026-06-20", "2026-09-10", "E1 → E7")]
+    marks = [("2025-08-15", "v0.9", 0), ("2026-02-13", "v2.4", 0), ("2026-03-03", "3 Mar", 1), ("2026-03-31", "v3.1", 0),
+             ("2026-04-20", "workshop", 1), ("2026-07-04", "festival", 0), ("2026-07-22", "23-orb workshop", 1)]
+    fig, ax = plt.subplots(figsize=(7.6, 3.4))
+    for lane, s0, s1, lab in ev:
+        x0, x1 = d(s0), d(s1); days = (x1 - x0).days
+        ax.barh(lane, days, left=x0, height=0.56, color=cols[lane], alpha=0.9, linewidth=0)
+        if days >= 200 or lane == 5:
+            ax.text(x0 + dt.timedelta(days=4), lane, lab, va="center", fontsize=6.6, color="white" if lane != 2 else INK, clip_on=True)
+        else:
+            ax.text(x1 + dt.timedelta(days=4), lane, lab, va="center", fontsize=6.6, color=INK)
+    for s0, lab, row in marks:
+        ax.axvline(d(s0), color=GRID, lw=0.8, zorder=0)
+        ax.text(d(s0), -0.75 - 0.42 * row, lab, fontsize=6.4, color=MUTED, ha="center", va="bottom")
+    ax.set_yticks(range(len(lanes)), lanes, fontsize=7.5); ax.set_ylim(5.6, -1.6)
+    ax.set_xlim(d("2025-07-15"), d("2026-09-25")); ax.grid(axis="y", visible=False)
+    ax.xaxis.set_major_locator(matplotlib.dates.MonthLocator(bymonth=[8, 10, 12, 2, 4, 6, 8]))
+    ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%b\n%Y")); ax.tick_params(axis="x", labelsize=7)
+    ax.set_title("How proximity became the substrate: two abandoned routes, one that shipped", loc="left", pad=4)
+    tidy(ax)
+    save(fig, "timeline.png")
+
+
+def fig_rigs():
+    """The calibration rigs to one scale. Schematic where only sizes and separations were
+    recorded; measured coordinates where they exist (E7)."""
+    import matplotlib.patches as mp
+    def blob(cx, cy, n, col, spread=0.13):
+        out = []
+        for k in range(n):
+            t = 2 * math.pi * k / max(n, 1) + 0.4 * (k // 6); r = spread * (1.0 if n > 1 else 0) * (1.35 if k >= 6 else 1.0)
+            out.append((cx + r * math.cos(t), cy + r * math.sin(t), col))
+        return out
+    panels = []
+    dots = []; x = 0
+    for i, (n, gap) in enumerate([(4, 0.5), (7, 2.0), (10, 0.5), (5, 0)]):
+        dots += blob(x, 0, n, RASTER8[i]); x += 0.45 + gap
+    panels.append(("E1 near\n4 groups, 0.5 m pairs", dots, []))
+    dots = []
+    for (cx, cy, n, i) in [(0, 0, 9, 0), (2, 0, 8, 1), (2, 4, 4, 2), (-1, 4, 6, 3)]:
+        dots += blob(cx, cy, n, RASTER8[i], spread=0.22)
+    panels.append(("E1 wide\ngaps ≥ 2 m", dots, []))
+    dots = []
+    for i, n in enumerate([6, 5, 4, 3, 2, 1]):
+        t = math.pi * (0.1 + 0.8 * i / 5); dots += blob(1.7 * math.cos(t), 1.7 * math.sin(t), n, RASTER8[i])
+    panels.append(("near-threshold\n(E2, E3, E6) 0.5 m", dots, []))
+    dots = []
+    for i, n in enumerate([8, 7, 5, 3, 2, 1]):
+        r = 0.45 * (1.42 ** i); t = i * 1.95; dots += blob(r * math.cos(t), r * math.sin(t), n, RASTER8[i], spread=0.12)
+    panels.append(("graduated spiral\n{8,7,5,3,2,1}", dots, []))
+    room = json.load(open(f"{D}/E7_room.json")); dots = []; extras = []
+    A = [tuple(a["xy"]) for a in room["anchors"]]
+    for xy in A: extras.append(("anchor", xy))
+    extras.append(("tri", A + [A[0]]))
+    pts = room.get("grid", {}); pts = pts.get("points", pts) if isinstance(pts, dict) else {}
+    for k, v in (pts.items() if isinstance(pts, dict) else []):
+        xy = v.get("xy") if isinstance(v, dict) else (v if isinstance(v, (list, tuple)) and len(v) == 2 else None)
+        if xy and k in ("CEN", "NL", "NR", "NB", "BL", "BR", "BB", "XLB", "XLR", "XRB"): dots.append((xy[0], xy[1], TEAL))
+    panels.append((f"E7\n3 anchors, 3.25 m", dots, extras))
+    # common scale: every rig cell gets the same height in metres; widths follow x-extent
+    geo = []
+    for _, dts, ex in panels:
+        xs = [p[0] for p in dts] + [e[1][0] for e in ex if e[0] == "anchor"]; ys = [p[1] for p in dts] + [e[1][1] for e in ex if e[0] == "anchor"]
+        geo.append((min(xs) - 0.4, max(xs) + 0.4, min(ys) - 0.4, max(ys) + 0.4))
+    H = max(g[3] - g[2] for g in geo) + 1.0
+    W = max(max(g[1] - g[0] for g in geo), H * 1.15)          # every cell the same width too, so the grid is regular
+    fig, axes = plt.subplots(2, 3, figsize=(7.6, 5.6), gridspec_kw=dict(wspace=0.06, hspace=0.22))
+    cells = list(axes.flat)
+    for ax, (title, dts, ex), g in zip(cells[:5], panels, geo):
+        cx, cy = (g[0] + g[1]) / 2, (g[2] + g[3]) / 2
+        ax.set_xlim(cx - W / 2, cx + W / 2); ax.set_ylim(cy - H / 2, cy + H / 2); ax.set_aspect("equal"); ax.axis("off")
+        for (x, y, c) in dts: ax.add_patch(mp.Circle((x, y), 0.07, fc=c, ec="white", lw=0.4))
+        for e in ex:
+            if e[0] == "anchor": ax.add_patch(mp.Rectangle((e[1][0] - 0.13, e[1][1] - 0.13), 0.26, 0.26, fc=INK, ec="none"))
+            if e[0] == "tri": ax.plot([p[0] for p in e[1]], [p[1] for p in e[1]], "-", color=INK, lw=0.7, alpha=0.4)
+        ax.set_title(title.replace("\n", " — "), fontsize=8, pad=3)
+        xb, yb = cx - W / 2 + 0.25, cy - H / 2 + 0.3
+        ax.plot([xb, xb + 1.0], [yb, yb], "-", color=INK, lw=1.6); ax.text(xb + 0.5, yb + 0.1, "1 m", ha="center", va="bottom", fontsize=7)
+    ph = cells[5]; ph.imshow(mpimg.imread(f"{OUT}/rig_photo_studio.jpg")); ph.axis("off"); ph.set_title("a rig taped out in the studio (not to scale)", fontsize=8, pad=3)
+    fig.suptitle("The rigs, to one scale — each dot an orb, colour its physical group; E7 from measured coordinates, the rest schematic", x=0.01, ha="left", fontsize=8.5, fontweight="bold")
+    save(fig, "rigs.png")
+
+
 
 if __name__ == "__main__":
-    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster, fig_endurance, fig_e4_fairness, fig_e7_walk, fig_e6_raster, fig_parity):
+    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster, fig_endurance, fig_e4_fairness, fig_e7_walk, fig_e6_raster, fig_parity, fig_architecture, fig_timeline, fig_rigs):
         try:
             fn()
         except FileNotFoundError as e:
