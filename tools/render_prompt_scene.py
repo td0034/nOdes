@@ -9,7 +9,7 @@ would show. Default scene: the THREES prompt with five triples and two straggler
 Usage:  python3 tools/render_prompt_scene.py --out docs/.../figs/scene_threes.png
 """
 import argparse, gzip, json, math, os, random, subprocess, sys, tempfile, time
-sys.path.insert(0, os.path.dirname(__file__))   # fake_orb_data.py lives in tools/ here
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "pi_server"))
 import fake_orb_data as F
 
 SERIALS = ["0718a4","0718a0","00662c","036030","006944","036054","036018","006624","07188c",
@@ -17,13 +17,13 @@ SERIALS = ["0718a4","0718a0","00662c","036030","006944","036054","036018","00662
 
 def scene_threes(seed=7):
     rng = random.Random(seed)
-    centres = [(-2.4, 1.6), (2.2, 1.9), (-2.0, -1.9), (2.5, -1.5), (0.1, 0.3)]
+    centres = [(-1.9, 1.3), (1.7, 1.5), (-1.6, -1.5), (1.9, -1.2), (0.1, 0.2)]
     pos, cid = [], []
     for g, (cx, cy) in enumerate(centres):
         for k in range(3):
             t = 2 * math.pi * k / 3 + rng.uniform(-0.3, 0.3); r = 0.22 + rng.uniform(-0.03, 0.05)
             pos.append((cx + r * math.cos(t), cy + r * math.sin(t))); cid.append(g)
-    for g, (x, y) in enumerate([(-0.3, 2.6), (1.1, -2.7)], start=len(centres)):   # stragglers
+    for g, (x, y) in enumerate([(-0.2, 2.4), (0.9, -2.5)], start=len(centres)):   # stragglers
         pos.append((x, y)); cid.append(g)
     return pos, cid
 
@@ -37,12 +37,18 @@ def build_state(pos, cid, prompt_idx, prompt_label, compliance):
                          "charging": False, "eligible": True}
     rng = random.Random(11)
     def strength(a, b):
-        # fw 3.23 saturated mapping, as measured: same group reads ~245-255; other groups at room
-        # scale read 130-180 with weak distance dependence; a straggler is ~140 to everyone.
+        # fw 3.23 saturated mapping, as measured: same group reads ~245-255; other groups read
+        # ~185 at a metre falling to ~110 across the room (walk notes: 132-211 over 0.65-2.7 m).
         if cid[a] == cid[b]: return int(rng.uniform(244, 255))
         d = math.dist(pos[a], pos[b])
-        return int(max(120, min(185, 185 - 14 * d + rng.uniform(-8, 8))))
-    pm = {str(a): {str(b): (0 if a == b else strength(a, b)) for b in range(n)} for a in range(n)}
+        st = 200 - 28 * d + rng.uniform(-6, 6)
+        return int(st) if st >= 115 else 0          # beyond ~3 m the link is not reported at all
+    # Real orbs report only their TOP-N strongest peers, so distant pairs have NO entry: the
+    # matrix is sparse, far-apart clusters are unlinked, and the layout separates them. A full
+    # matrix links every pair and turns the picture into a mesh with arbitrary cluster placement.
+    full = [[0 if a == b else strength(a, b) for b in range(n)] for a in range(n)]
+    keep = [set(sorted(range(n), key=lambda b: -full[a][b])[:F.PROX_TOP_N]) - {a} for a in range(n)]
+    pm = {str(a): {str(b): (full[a][b] if (b in keep[a] or a in keep[b]) and a != b else 0) for b in range(n)} for a in range(n)}
     j["proximity_matrix"] = pm
     for a in range(n):
         peers = sorted(((pm[str(a)][str(b)], b) for b in range(n) if b != a), reverse=True)
@@ -54,7 +60,7 @@ def build_state(pos, cid, prompt_idx, prompt_label, compliance):
               "compliance_mean": compliance, "compliance_raw": compliance, "framing": "COLLECTIVE", "study_block": None,
               "prompt_just_topped": False, "prompt_topped": False, "eligible_orbs": n, "num_clusters": len(set(cid)),
               "cluster_threshold": 220, "num_prompts": 1, "prompts": [prompt_label], "topped_thresh_eff": 0.85,
-              "viz_radius_min": 0.15, "viz_radius_max": 0.45,
+              "viz_radius_min": 0.10, "viz_radius_max": 0.40,   # the live values (from a real capture)
               "network_stats": {"miss_ratio": 0.02, "total_missed_pkts": 3, "num_orbs": n, "frame_num": 12345, "rate_hz": 50.0, "activity": 0.05}})
     return j
 
