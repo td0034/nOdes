@@ -1,0 +1,960 @@
+<title>Silicone Orb Designer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root{
+    --ink:#12161B; --deep:#0D1115; --panel:#191F26; --panel2:#1F2630;
+    --line:#2B343E; --text:#E4EAEF; --mute:#8D9AA6; --accent:#E8A13C;
+    --good:#74C08F; --warn:#E0705C;
+    --ui:"Archivo",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--deep);color:var(--text);font-family:var(--ui);
+       font-size:14px;overflow:hidden}
+  #app{display:flex;height:100vh}
+
+  /* ---- control rail ---- */
+  #rail{width:304px;flex:0 0 304px;background:var(--ink);border-right:1px solid var(--line);
+        overflow-y:auto;padding:0 0 24px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  #rail header{padding:18px 18px 14px;border-bottom:1px solid var(--line);
+        position:sticky;top:0;background:var(--ink);z-index:2}
+  #rail h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.01em}
+  #rail h1 em{color:var(--accent);font-style:normal}
+  #rail header p{margin:4px 0 0;color:var(--mute);font-size:12px}
+  .group{border-bottom:1px solid var(--line);padding:14px 18px 16px}
+  .group>h2{margin:0 0 10px;font-size:11px;font-weight:600;color:var(--mute);
+        text-transform:uppercase;letter-spacing:.09em}
+  .row{display:flex;align-items:center;gap:10px;margin:9px 0}
+  .row label{flex:1;color:var(--text);font-size:13px}
+  .row output{font-family:var(--mono);font-size:12px;color:var(--accent);
+        min-width:62px;text-align:right;font-variant-numeric:tabular-nums}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;
+        background:transparent;margin:0 0 2px;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;
+        background:var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+        border-radius:50%;background:var(--text);margin-top:-5.5px;border:none}
+  input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+  input[type=range]:disabled::-webkit-slider-thumb{background:var(--line)}
+  input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(--line)}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+        background:var(--text);border:none}
+  .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:7px;
+        overflow:hidden}
+  .seg button{flex:1;padding:7px 4px;background:none;border:none;color:var(--mute);
+        font-family:var(--ui);font-size:12px;font-weight:500;cursor:pointer}
+  .seg button[aria-pressed=true]{background:var(--panel2);color:var(--text);
+        box-shadow:inset 0 -2px 0 var(--accent)}
+  .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .check{display:flex;align-items:center;gap:9px;margin:9px 0;font-size:13px;cursor:pointer}
+  .check input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+  select{background:var(--panel);color:var(--text);border:1px solid var(--line);
+        border-radius:6px;padding:6px 8px;font-family:var(--ui);font-size:12.5px;width:100%}
+  .btn{display:block;width:100%;padding:9px 10px;margin-top:10px;background:var(--panel2);
+        color:var(--text);border:1px solid var(--line);border-radius:7px;
+        font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
+  .btn:hover{border-color:var(--accent)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .hint{color:var(--mute);font-size:11.5px;margin:6px 0 0;line-height:1.45}
+  .row input.num{width:66px;background:var(--panel);border:1px solid var(--line);
+        border-radius:5px;color:var(--accent);font-family:var(--mono);font-size:12px;
+        text-align:right;padding:3px 6px;font-variant-numeric:tabular-nums;
+        -moz-appearance:textfield}
+  .row input.num::-webkit-outer-spin-button,.row input.num::-webkit-inner-spin-button{
+        -webkit-appearance:none;margin:0}
+  .row input.num:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .row input.num:disabled{color:var(--mute)}
+  .row .unit{color:var(--mute);font-size:10.5px;min-width:22px}
+
+  /* ---- viewport ---- */
+  #view{flex:1;position:relative;min-width:0}
+  #canvas{display:block;width:100%;height:100%}
+  #status{position:absolute;top:14px;right:16px;font-family:var(--mono);font-size:12px;
+        color:var(--mute);background:rgba(18,22,27,.82);border:1px solid var(--line);
+        border-radius:7px;padding:6px 11px;transition:color .2s}
+  #status.busy{color:var(--accent)}
+  #readouts{position:absolute;left:14px;right:14px;bottom:12px;display:flex;flex-wrap:wrap;
+        gap:7px;pointer-events:none}
+  .chip{font-family:var(--mono);font-size:11.5px;color:var(--text);background:rgba(18,22,27,.85);
+        border:1px solid var(--line);border-radius:6px;padding:5px 9px;
+        font-variant-numeric:tabular-nums}
+  .chip b{font-weight:600;color:var(--mute);margin-right:5px}
+  .chip.warn{color:var(--warn);border-color:var(--warn)}
+  @media (max-width:760px){
+    #app{flex-direction:column}
+    #rail{width:100%;flex:0 0 44%;border-right:none;border-bottom:1px solid var(--line)}
+  }
+</style>
+
+<div id="app">
+  <div id="rail">
+    <header>
+      <h1>Silicone <em>Orb</em> Designer</h1>
+      <p>Goldberg lattice · membrane fill preview</p>
+    </header>
+
+    <div class="group">
+      <h2>Lattice</h2>
+      <div class="row"><label for="freq">Frequency</label><output id="freqO"></output></div>
+      <input type="range" id="freq" min="3" max="12" step="1" value="4">
+      <div class="row"><label for="rib">Rib width</label><output id="ribO"></output></div>
+      <input type="range" id="rib" min="1" max="3" step="0.05" value="1.6">
+      <div class="row"><label for="depth">Radial depth</label><output id="depthO"></output></div>
+      <input type="range" id="depth" min="3" max="10" step="0.5" value="6">
+      <div class="row"><label for="innerD">Inner diameter</label><output id="innerDO"></output></div>
+      <input type="range" id="innerD" min="50" max="80" step="1" value="68">
+      <div class="row"><label for="rot">Spin about Z</label><output id="rotO"></output></div>
+      <input type="range" id="rot" min="-36" max="36" step="0.5" value="0">
+    </div>
+
+    <div class="group">
+      <h2>Membrane</h2>
+      <div class="seg" id="memMode" role="group" aria-label="Membrane position">
+        <button data-v="0">None</button><button data-v="1" aria-pressed="true">Internal</button><button data-v="2">External</button>
+      </div>
+      <div class="row"><label for="memT">Thickness</label><output id="memTO"></output></div>
+      <input type="range" id="memT" min="0.6" max="2" step="0.1" value="1">
+      <div class="row"><label for="memFillet">Membrane fillet</label><output id="memFilletO"></output></div>
+      <input type="range" id="memFillet" min="0" max="6" step="0.1" value="1.2">
+      <p class="hint">The fillet blends the membrane into every rib wall — the “silicone pooled in the cells” look.</p>
+    </div>
+
+    <div class="group">
+      <h2>Edge fillets</h2>
+      <div class="row"><label for="edgeFillet">Outer edges</label><output id="edgeFilletO"></output></div>
+      <input type="range" id="edgeFillet" min="0" max="2" step="0.1" value="0.6">
+      <div class="row"><label for="apFillet">Cell corners</label><output id="apFilletO"></output></div>
+      <input type="range" id="apFillet" min="0" max="3" step="0.1" value="0.8">
+    </div>
+
+    <div class="group">
+      <h2>Connector</h2>
+      <div class="row"><label for="connD">Boss diameter (0 = none)</label><output id="connDO"></output></div>
+      <input type="range" id="connD" min="0" max="16" step="0.5" value="12">
+      <div class="row"><label for="connT">Boss depth</label><output id="connTO"></output></div>
+      <input type="range" id="connT" min="4" max="12" step="0.5" value="8">
+      <div class="row"><label for="holeD">Hole Ø (through)</label><output id="holeDO"></output></div>
+      <input type="range" id="holeD" min="6" max="9" step="0.1" value="8">
+      <div class="row"><label for="cbD">Counterbore Ø (entry)</label><output id="cbDO"></output></div>
+      <input type="range" id="cbD" min="9" max="12" step="0.1" value="10.3">
+      <div class="row"><label for="neck">Neck (outer face → shoulder)</label><output id="neckO"></output></div>
+      <input type="range" id="neck" min="2" max="6" step="0.1" value="2">
+      <p class="hint">Connector goes in from the inside: Ø10 flange seats on the shoulder
+      (can’t pull out), resin packs the entry bore (can’t push in).</p>
+      <div class="row" style="margin-bottom:4px"><label for="connBand">Position (3-fold axis)</label></div>
+      <select id="connBand">
+        <option value="0" selected>Bottom ring · polar 142.6°</option>
+        <option value="1">Lower equator · polar 100.8°</option>
+        <option value="2">Upper equator · polar 79.2°</option>
+        <option value="3">Top ring · polar 37.4°</option>
+      </select>
+      <div class="row"><label for="connK">Which of the 5</label><output id="connKO"></output></div>
+      <input type="range" id="connK" min="0" max="4" step="1" value="0">
+    </div>
+
+    <div class="group">
+      <h2>PCB rim</h2>
+      <div class="row"><label for="rimP">Protrude depth</label><output id="rimPO"></output></div>
+      <input type="range" id="rimP" min="0" max="5" step="0.25" value="2">
+      <div class="row"><label for="pcbD">PCB diameter</label><output id="pcbDO"></output></div>
+      <input type="range" id="pcbD" min="58" max="70" step="0.5" value="68.5">
+      <div class="row"><label for="pcbT">PCB thickness</label><output id="pcbTO"></output></div>
+      <input type="range" id="pcbT" min="0.8" max="4" step="0.1" value="3">
+      <div class="row"><label for="rimT">Rim thickness</label><output id="rimTO"></output></div>
+      <input type="range" id="rimT" min="0.8" max="3" step="0.1" value="1.5">
+      <div class="row"><label for="rimF">Rim–membrane fillet</label><output id="rimFO"></output></div>
+      <input type="range" id="rimF" min="0" max="1.5" step="0.1" value="0.8">
+      <div class="row"><label for="barb">Barb depth</label><output id="barbO"></output></div>
+      <input type="range" id="barb" min="0.5" max="2.5" step="0.05" value="1">
+      <p class="hint">Harpoon clip: each half keeps a full support ring on its side of the
+      board and a short ramped barb on the other — the PCB snaps past the barbs and locks
+      when the halves close. Barbs show in split view. Protrude 0 = no rim.</p>
+    </div>
+
+    <div class="group">
+      <h2>Equator split</h2>
+      <label class="check"><input type="checkbox" id="split" checked>Split into two halves</label>
+      <label class="check"><input type="checkbox" id="seamAuto" checked>Seam rib auto (2 × rib + gap)</label>
+      <div class="row"><label for="seamRib">Seam rib width</label><output id="seamRibO"></output></div>
+      <input type="range" id="seamRib" min="2" max="7" step="0.05" value="3.35" disabled>
+      <div class="row"><label for="gap">Clearance gap</label><output id="gapO"></output></div>
+      <input type="range" id="gap" min="0" max="0.6" step="0.05" value="0.15">
+      <div class="row"><label for="explode">Explode view</label><output id="explodeO"></output></div>
+      <input type="range" id="explode" min="0" max="30" step="1" value="24">
+    </div>
+
+    <div class="group">
+      <h2>View</h2>
+      <div class="row" style="margin-bottom:4px"><label for="res">Preview resolution</label></div>
+      <select id="res">
+        <option value="96">Fast · 96³</option>
+        <option value="128">Standard · 128³</option>
+        <option value="160">Fine · 160³</option>
+        <option value="200" selected>Ultra · 200³ (slow)</option>
+      </select>
+      <label class="check"><input type="checkbox" id="section">Section view (cut at X)</label>
+      <label class="check"><input type="checkbox" id="autorot">Auto-rotate</label>
+      <button class="btn" id="stl">Export STL (per half when split)</button>
+      <button class="btn" id="copySet">Copy settings</button>
+      <p class="hint" id="stlHint" hidden>Browsers can’t save files from this hosted page — open the local copy
+      (<span style="font-family:var(--mono)">gyroid-orb/silicone_designer.html</span>) and export from there.</p>
+      <p class="hint">Preview geometry only — the Fusion scripts build the real
+      solid. Drag to orbit, scroll to zoom.</p>
+    </div>
+  </div>
+
+  <div id="view">
+    <canvas id="canvas"></canvas>
+    <div id="status">ready</div>
+    <div id="readouts"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// silicone_core.js — geometry + SDF + mesher for the Silicone Orb Designer.
+// Pure JS, no DOM: runs in the browser (inlined into the HTML app) and in
+// Node for headless smoke tests. All lengths in mm.
+"use strict";
+
+// ---------- vector helpers --------------------------------------------------
+function vnorm(p){const n=Math.hypot(p[0],p[1],p[2]);return[p[0]/n,p[1]/n,p[2]/n];}
+function vsub(a,b){return[a[0]-b[0],a[1]-b[1],a[2]-b[2]];}
+function vcross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+function vdot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+function vdist(a,b){return Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);}
+
+// ---------- Goldberg net (same construction as the Fusion scripts) ----------
+function rotZ(p,deg){
+  if(!deg)return p;
+  const c=Math.cos(deg*Math.PI/180),s=Math.sin(deg*Math.PI/180);
+  return[c*p[0]-s*p[1],s*p[0]+c*p[1],p[2]];
+}
+
+function icosa(rotDeg){
+  const phi=(1+Math.sqrt(5))/2;
+  let raw=[];
+  for(const s1 of[-1,1])for(const s2 of[-1,1])
+    raw.push([0,s1,s2*phi],[s1,s2*phi,0],[s1*phi,0,s2]);
+  const seen={},v=[];
+  for(const q of raw){const u=vnorm(q),k=u.map(x=>x.toFixed(5)).join(",");
+    if(!seen[k]){seen[k]=1;v.push(u);}}
+  let e=1e9;
+  for(let i=0;i<12;i++)for(let j=i+1;j<12;j++)e=Math.min(e,vdist(v[i],v[j]));
+  // orient: vertex on +Z, one neighbour at azimuth 0, then spin about Z
+  let top=v[0];for(const q of v)if(q[2]>top[2])top=q;
+  let adj=null;
+  for(const q of v)if(Math.abs(vdist(q,top)-e)<1e-4&&(adj===null||q[0]>adj[0]))adj=q;
+  const zx=top;
+  const xr=vsub(adj,[zx[0]*vdot(adj,zx),zx[1]*vdot(adj,zx),zx[2]*vdot(adj,zx)]);
+  const xx=vnorm(xr),yx=vcross(zx,xx);
+  const vv=v.map(q=>rotZ([vdot(q,xx),vdot(q,yx),vdot(q,zx)],rotDeg));
+  const f=[];
+  for(let i=0;i<12;i++)for(let j=i+1;j<12;j++){
+    if(Math.abs(vdist(vv[i],vv[j])-e)>1e-4)continue;
+    for(let k=j+1;k<12;k++)
+      if(Math.abs(vdist(vv[i],vv[k])-e)<1e-4&&Math.abs(vdist(vv[j],vv[k])-e)<1e-4)
+        f.push([i,j,k]);
+  }
+  return{v:vv,faces:f};
+}
+
+// cells: unit cell-centre vectors (subdivision vertices; 12 pentagons)
+// ribs: {a,b,p,q} rib from node a to node b, separating cells p and q
+function goldbergNet(freq,rotDeg){
+  const{v,faces}=icosa(rotDeg||0);
+  const verts=[],key2idx={},tris=[];
+  function idx(p){
+    const q=vnorm(p),k=q.map(x=>x.toFixed(5)).join(",");
+    if(!(k in key2idx)){key2idx[k]=verts.length;verts.push(q);}
+    return key2idx[k];
+  }
+  for(const[a,b,c]of faces){
+    const A=v[a],B=v[b],C=v[c],grid=[];
+    for(let i=0;i<=freq;i++){
+      const row=[];
+      for(let j=0;j<=freq-i;j++){
+        const k=freq-i-j;
+        row.push(idx([i*A[0]+j*B[0]+k*C[0],i*A[1]+j*B[1]+k*C[1],i*A[2]+j*B[2]+k*C[2]]));
+      }
+      grid.push(row);
+    }
+    for(let i=0;i<freq;i++)for(let j=0;j<freq-i;j++){
+      tris.push([grid[i][j],grid[i][j+1],grid[i+1][j]]);
+      if(j<freq-i-1)tris.push([grid[i][j+1],grid[i+1][j+1],grid[i+1][j]]);
+    }
+  }
+  const cc=tris.map(([a,b,c])=>{
+    const A=verts[a],B=verts[b],C=verts[c];
+    let n=vnorm(vcross(vsub(B,A),vsub(C,A)));
+    if(vdot(n,A)<0)n=[-n[0],-n[1],-n[2]];
+    return n;
+  });
+  const emap={},ribs=[];
+  tris.forEach(([a,b,c],t)=>{
+    for(const[p,q]of[[a,b],[b,c],[c,a]]){
+      const k=Math.min(p,q)+"_"+Math.max(p,q);
+      if(k in emap)ribs.push({a:cc[emap[k]],b:cc[t],p,q});
+      else emap[k]=t;
+    }
+  });
+  return{cells:verts,ribs};
+}
+
+// alternate the equatorial cell ring as interlocking teeth (even freq)
+function equatorSplit(cells,ribs){
+  const side=cells.map(c=>c[2]>0);
+  const ring=[];
+  cells.forEach((c,i)=>{if(Math.abs(c[2])<1e-6)ring.push(i);});
+  ring.sort((i,j)=>Math.atan2(cells[i][1],cells[i][0])-Math.atan2(cells[j][1],cells[j][0]));
+  ring.forEach((ci,n)=>{side[ci]=n%2===0;});
+  const seam=[];
+  ribs.forEach((r,k)=>{if(side[r.p]!==side[r.q])seam.push(k);});
+  return{side,seam,ring};
+}
+
+// icosahedron face centre nearest (polarDeg, azDeg): the connector axis
+const BANDS=[
+  {label:"Bottom ring",polar:142.6,az0:0},
+  {label:"Lower equator",polar:100.8,az0:0},
+  {label:"Upper equator",polar:79.2,az0:36},
+  {label:"Top ring",polar:37.4,az0:36},
+];
+function connectorAxis(band,k,rotDeg){
+  const{v,faces}=icosa(rotDeg||0);
+  const th=BANDS[band].polar*Math.PI/180,ph=(BANDS[band].az0+72*k)*Math.PI/180;
+  const want=[Math.sin(th)*Math.cos(ph),Math.sin(th)*Math.sin(ph),Math.cos(th)];
+  let best=null,bang=-2;
+  for(const[a,b,c]of faces){
+    const ctr=vnorm([v[a][0]+v[b][0]+v[c][0],v[a][1]+v[b][1]+v[c][1],v[a][2]+v[b][2]+v[c][2]]);
+    const d=vdot(ctr,want);
+    if(d>bang){bang=d;best=ctr;}
+  }
+  return best;
+}
+
+// ---------- SDF model -------------------------------------------------------
+// P: {freq, rib, depth, innerD, rot, memMode(0none/1internal/2external),
+//     memT, memFillet, edgeFillet, apFillet, connD, connT, connBand, connK,
+//     split, seamRib, gap}
+function smin(a,b,k){
+  if(k<=0)return Math.min(a,b);
+  const h=Math.max(k-Math.abs(a-b),0)/k;
+  return Math.min(a,b)-h*h*k*0.25;
+}
+function smax(a,b,k){return -smin(-a,-b,k);}
+
+function buildModel(P){
+  const Rin=P.innerD/2,Rout=Rin+P.depth,rMid=(Rin+Rout)/2;
+  const net=goldbergNet(P.freq,P.rot);
+  const{cells,ribs}=net;
+  let side=null,seamSet=null,ring=[],teeth=null;
+  if(P.split){
+    const sp=equatorSplit(cells,ribs);
+    side=sp.side;seamSet=new Set(sp.seam);ring=sp.ring;
+    // tooth pyramids: plane normals per straddling ring cell
+    const cellRibs={};
+    ribs.forEach((r,k)=>{(cellRibs[r.p]=cellRibs[r.p]||[]).push(k);
+                         (cellRibs[r.q]=cellRibs[r.q]||[]).push(k);});
+    teeth={add:[],sub:[]};
+    for(const ci of ring){
+      const planes=cellRibs[ci].map(k=>{
+        let n=vnorm(vcross(ribs[k].a,ribs[k].b));
+        if(vdot(n,cells[ci])<0)n=[-n[0],-n[1],-n[2]];
+        return n;
+      });
+      (side[ci]?teeth.add:teeth.sub).push(planes);
+    }
+  }
+  // rib segments at mid radius, with per-rib half-width
+  const seamHalf=P.split?P.seamRib/2:0;
+  const segs=ribs.map((r,k)=>({
+    A:[r.a[0]*rMid,r.a[1]*rMid,r.a[2]*rMid],
+    B:[r.b[0]*rMid,r.b[1]*rMid,r.b[2]*rMid],
+    hw:(seamSet&&seamSet.has(k))?seamHalf:P.rib/2,
+  }));
+  // spatial hash over the bounding cube
+  const H=Rout+3,inflate=Math.max(P.rib,P.seamRib||0)/2+P.apFillet+2.5;
+  let maxLen=0;for(const s of segs)maxLen=Math.max(maxLen,vdist(s.A,s.B));
+  const cs=Math.max(maxLen+2*inflate,6),ng=Math.max(2,Math.ceil(2*H/cs));
+  const buckets=new Array(ng*ng*ng);
+  const bi=x=>Math.min(ng-1,Math.max(0,Math.floor((x+H)/(2*H)*ng)));
+  segs.forEach((s,k)=>{
+    const lo=[0,1,2].map(i=>bi(Math.min(s.A[i],s.B[i])-inflate));
+    const hi=[0,1,2].map(i=>bi(Math.max(s.A[i],s.B[i])+inflate));
+    for(let x=lo[0];x<=hi[0];x++)for(let y=lo[1];y<=hi[1];y++)for(let z=lo[2];z<=hi[2];z++){
+      const j=(x*ng+y)*ng+z;
+      (buckets[j]=buckets[j]||[]).push(k);
+    }
+  });
+  // connector entry (boss + Ø-hole + counterbore), on a 3-fold axis
+  const ax=P.connD>0?connectorAxis(P.connBand,P.connK,P.rot):null;
+
+  const maxK=Math.max(P.edgeFillet,P.apFillet,P.memFillet,0.5);
+  const rimOn=(P.rimP||0)>0;
+  let inThresh=maxK+2.0;
+  if(rimOn)inThresh=Math.max(inThresh,P.rimP+2.5);
+  if(ax)inThresh=Math.max(inThresh,(P.connT-P.depth)+2.5);
+
+  // signed distance of the (whole, un-split) solid at point p
+  function fSolid(px,py,pz){
+    const rlen=Math.hypot(px,py,pz);
+    const fOut=rlen-Rout,fIn=Rin-rlen;
+    const fBand=Math.max(fOut,fIn);
+    if(fOut>maxK+2.0)return fOut;         // far outside the sphere
+    if(fIn>inThresh)return fIn;           // deep inside, beyond any rim
+    // nearest ribs
+    const j=(bi(px)*ng+bi(py))*ng+bi(pz);
+    const list=buckets[j];
+    let d=1e6;
+    const ir=rlen>1e-9?1/rlen:0,rx=px*ir,ry=py*ir,rz=pz*ir;
+    if(list)for(const k of list){
+      const s=segs[k];
+      const abx=s.B[0]-s.A[0],aby=s.B[1]-s.A[1],abz=s.B[2]-s.A[2];
+      const apx=px-s.A[0],apy=py-s.A[1],apz=pz-s.A[2];
+      let t=(apx*abx+apy*aby+apz*abz)/(abx*abx+aby*aby+abz*abz);
+      t=t<0?0:t>1?1:t;
+      let ex=apx-t*abx,ey=apy-t*aby,ez=apz-t*abz;
+      const er=ex*rx+ey*ry+ez*rz;         // strip: ignore the radial component
+      ex-=er*rx;ey-=er*ry;ez-=er*rz;
+      const dk=Math.hypot(ex,ey,ez)-s.hw;
+      d=smin(d,dk,P.apFillet);
+    }
+    // lattice = ribs ∩ shell band; outer edge rounded, inner edge sharp
+    let lat=smax(d,fOut,P.edgeFillet);
+    lat=Math.max(lat,fIn);
+    let solid=lat;
+    // membrane
+    if(P.memMode===1){
+      const mem=Math.max(rlen-(Rin+P.memT),fIn);
+      solid=smin(solid,mem,P.memFillet);
+    }else if(P.memMode===2){
+      const mem=Math.max(fOut,(Rout-P.memT)-rlen);
+      solid=smin(solid,mem,P.memFillet);
+    }
+    // final trim to the exact spherical shell (as in the Fusion build):
+    // smooth unions dip past the spheres by fillet/4, so clamp last
+    solid=Math.max(solid,fBand);
+    // connector: boss (may protrude inside the inner sphere), then the
+    // Ø-hole to the outside and the counterbore from the inside -- the
+    // shoulder between them is what the flange pulls against
+    if(ax){
+      const s=px*ax[0]+py*ax[1]+pz*ax[2];
+      const rho=Math.sqrt(Math.max(rlen*rlen-s*s,0));
+      const boss=Math.max(rho-P.connD/2,Math.max((Rout-P.connT)-s,fOut));
+      solid=smin(solid,boss,0.6);
+      const shoulder=Rout-P.neck;
+      const hole=Math.max(rho-P.holeD/2,shoulder-s);
+      const cb=Math.max(rho-P.cbD/2,
+                        Math.max(s-shoulder,(Rout-P.connT-2.0)-s));
+      solid=Math.max(solid,-Math.min(hole,cb));
+    }
+    return solid;
+  }
+
+  // teeth only influence a band around the equator
+  let zTeeth=0;
+  if(teeth){
+    for(const ci of ring)for(const r of ribs)
+      if(r.p===ci||r.q===ci)zTeeth=Math.max(zTeeth,Math.abs(r.a[2]),Math.abs(r.b[2]));
+    zTeeth=zTeeth*Rout*1.2+1;
+  }
+
+  // "top region" field: negative above the castellated cut surface
+  function fCut(px,py,pz){
+    let T=-pz;
+    if(teeth&&Math.abs(pz)<=zTeeth){
+      for(const planes of teeth.add){
+        let pd=-1e6;
+        for(const n of planes){const v=-(px*n[0]+py*n[1]+pz*n[2]);if(v>pd)pd=v;}
+        if(pd<T)T=pd;
+      }
+      for(const planes of teeth.sub){
+        let pd=-1e6;
+        for(const n of planes){const v=-(px*n[0]+py*n[1]+pz*n[2]);if(v>pd)pd=v;}
+        if(-pd>T)T=-pd;
+      }
+    }
+    return T;
+  }
+
+  // PCB retention, half-aware. Per half: a full-depth support ring on its
+  // own side of the board, and a short ramped barb on the other side (flat
+  // locking face toward the PCB) so the board snaps in -- a harpoon clip.
+  // mode: 0 = whole orb (both deep rings, display only), +1 top half,
+  // -1 bottom half. Large positive when rims are off.
+  const bh=1.5*(P.barb||0)+0.5;                  // barb ramp height
+  const bslope=(P.barb||0)/bh,bnorm=Math.sqrt(1+bslope*bslope);
+  // rims reach outward only to the membrane's outer surface (or 1.2 mm into
+  // the ribs when there is no internal membrane) so nothing pokes through
+  const rimRlim=P.memMode===1?Rin+0.4*P.memT:Rin+1.2;
+  function fRim(px,py,pz,mode){
+    if(!rimOn)return 1e6;
+    const rho=Math.hypot(px,py),z0=P.pcbT/2;
+    const wall=Math.hypot(px,py,pz)-rimRlim;
+    function deep(z){                            // support ring on the +z side
+      return Math.max(Math.max(z0-z,z-(z0+P.rimT)),
+                      Math.max((Rin-P.rimP)-rho,wall));
+    }
+    function barb(z){                            // barb on the +z side
+      return Math.max(Math.max(z0-z,((Rin-P.barb)+bslope*(z-z0)-rho)/bnorm),
+                      wall);
+    }
+    if(mode===0)return Math.min(deep(pz),deep(-pz));
+    if(mode>0)return Math.min(deep(pz),barb(-pz));
+    return Math.min(deep(-pz),barb(pz));
+  }
+
+  return{fSolid,fCut,fRim,Rin,Rout,rMid,cells,ribs,ring,H,
+         nCells:cells.length,nRibs:ribs.length,
+         teethCount:ring.length};
+}
+
+// ---------- surface nets mesher --------------------------------------------
+// field: f(x,y,z) -> signed distance. Returns {positions:Float32Array,
+// indices:Uint32Array, volume:mm^3(from voxel count), nVerts, nTris}
+function sampleField(f,H,N){
+  const step=2*H/(N-1),o=-H;
+  const nodes=new Float32Array(N*N*N);
+  let i=0;
+  for(let x=0;x<N;x++){const px=o+x*step;
+    for(let y=0;y<N;y++){const py=o+y*step;
+      for(let z=0;z<N;z++)nodes[i++]=f(px,py,o+z*step);
+    }
+  }
+  return nodes;
+}
+
+function meshFromNodes(nodes,H,N){
+  const step=2*H/(N-1),o=-H;
+  let inside=0;
+  for(let i=0;i<nodes.length;i++)if(nodes[i]<0)inside++;
+  const nid=(x,y,z)=>(x*N+y)*N+z;
+  const cellVert=new Int32Array((N-1)*(N-1)*(N-1)).fill(-1);
+  const cid=(x,y,z)=>(x*(N-1)+y)*(N-1)+z;
+  const positions=[];
+  const EDGES=[[0,0,0,1,0,0],[0,1,0,1,1,0],[0,0,1,1,0,1],[0,1,1,1,1,1],
+               [0,0,0,0,1,0],[1,0,0,1,1,0],[0,0,1,0,1,1],[1,0,1,1,1,1],
+               [0,0,0,0,0,1],[1,0,0,1,0,1],[0,1,0,0,1,1],[1,1,0,1,1,1]];
+  function makeVert(x,y,z){
+    const c=cid(x,y,z);
+    if(cellVert[c]>=0)return cellVert[c];
+    let sx=0,sy=0,sz=0,n=0;
+    for(const[ax,ay,az,bx,by,bz]of EDGES){
+      const va=nodes[nid(x+ax,y+ay,z+az)],vb=nodes[nid(x+bx,y+by,z+bz)];
+      if((va<0)!==(vb<0)){
+        const t=va/(va-vb);
+        sx+=x+ax+(bx-ax)*t;sy+=y+ay+(by-ay)*t;sz+=z+az+(bz-az)*t;n++;
+      }
+    }
+    if(n===0){sx=x+0.5;sy=y+0.5;sz=z+0.5;n=1;}
+    const idx=positions.length/3;
+    positions.push(o+sx/n*step,o+sy/n*step,o+sz/n*step);
+    cellVert[c]=idx;
+    return idx;
+  }
+  const indices=[];
+  // for each grid edge with a sign change, quad over the 4 adjacent cells
+  for(let x=0;x<N-1;x++)for(let y=0;y<N-1;y++)for(let z=0;z<N-1;z++){
+    const v0=nodes[nid(x,y,z)];
+    // +x edge
+    if(y>0&&z>0){
+      const v1=nodes[nid(x+1,y,z)];
+      if((v0<0)!==(v1<0)){
+        const q=[makeVert(x,y,z),makeVert(x,y-1,z),makeVert(x,y-1,z-1),makeVert(x,y,z-1)];
+        if(v0<0)q.reverse();
+        indices.push(q[0],q[1],q[2],q[0],q[2],q[3]);
+      }
+    }
+    // +y edge
+    if(x>0&&z>0){
+      const v1=nodes[nid(x,y+1,z)];
+      if((v0<0)!==(v1<0)){
+        const q=[makeVert(x,y,z),makeVert(x,y,z-1),makeVert(x-1,y,z-1),makeVert(x-1,y,z)];
+        if(v0<0)q.reverse();
+        indices.push(q[0],q[1],q[2],q[0],q[2],q[3]);
+      }
+    }
+    // +z edge
+    if(x>0&&y>0){
+      const v1=nodes[nid(x,y,z+1)];
+      if((v0<0)!==(v1<0)){
+        const q=[makeVert(x,y,z),makeVert(x-1,y,z),makeVert(x-1,y-1,z),makeVert(x,y-1,z)];
+        if(v0<0)q.reverse();
+        indices.push(q[0],q[1],q[2],q[0],q[2],q[3]);
+      }
+    }
+  }
+  return{positions:new Float32Array(positions),
+         indices:new Uint32Array(indices),
+         volume:inside*step*step*step,
+         nVerts:positions.length/3,nTris:indices.length/3};
+}
+
+// mesh signed volume from triangles (sanity check / readout refinement)
+function meshField(f,H,N){
+  return meshFromNodes(sampleField(f,H,N),H,N);
+}
+
+function meshVolume(positions,indices){
+  let v=0;
+  for(let i=0;i<indices.length;i+=3){
+    const a=indices[i]*3,b=indices[i+1]*3,c=indices[i+2]*3;
+    v+=(positions[a]*(positions[b+1]*positions[c+2]-positions[b+2]*positions[c+1])
+       -positions[a+1]*(positions[b]*positions[c+2]-positions[b+2]*positions[c])
+       +positions[a+2]*(positions[b]*positions[c+1]-positions[b+1]*positions[c]))/6;
+  }
+  return Math.abs(v);
+}
+
+
+</script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const sliders=["freq","rib","depth","innerD","rot","memT","memFillet","edgeFillet",
+               "apFillet","connD","connT","holeD","cbD","neck","connK","rimP","pcbD","pcbT","rimT","rimF","barb",
+               "seamRib","gap","explode"];
+const UNITS={freq:"",rot:"deg",connK:"",innerD:"Ø mm",connD:"Ø mm",holeD:"Ø mm",
+  cbD:"Ø mm",pcbD:"Ø mm"};
+let memMode=1;
+// swap each slider's readout for a typed number field, synced both ways
+function makeNumFields(){
+  for(const id of sliders){
+    const o=$(id+"O"),r=$(id);
+    const inp=document.createElement("input");
+    inp.type="number";inp.className="num";inp.id=id+"O";
+    inp.min=r.min;inp.max=r.max;inp.step=r.step;
+    inp.setAttribute("aria-label",id+" value");
+    o.replaceWith(inp);
+    const unit=document.createElement("span");
+    unit.className="unit";
+    unit.textContent=(id in UNITS)?UNITS[id]:"mm";
+    inp.after(unit);
+    inp.addEventListener("change",()=>{
+      let v=parseFloat(inp.value);
+      if(isNaN(v)){labels();return;}
+      v=Math.min(parseFloat(r.max),Math.max(parseFloat(r.min),v));
+      r.value=v;
+      labels();persist();
+      if(id==="explode")applyExplode();else schedule();
+    });
+  }
+}
+
+
+function params(){
+  const g=id=>parseFloat($(id).value);
+  const P={freq:g("freq"),rib:g("rib"),depth:g("depth"),innerD:g("innerD"),
+    rot:g("rot"),memMode,memT:g("memT"),memFillet:g("memFillet"),
+    edgeFillet:g("edgeFillet"),apFillet:g("apFillet"),connD:g("connD"),
+    connT:g("connT"),connBand:parseInt($("connBand").value),connK:g("connK"),
+    rimP:g("rimP"),pcbD:g("pcbD"),pcbT:g("pcbT"),rimT:g("rimT"),rimF:g("rimF"),barb:g("barb"),
+    holeD:g("holeD"),cbD:g("cbD"),neck:g("neck"),
+    split:$("split").checked,gap:g("gap"),seamRib:g("seamRib")};
+  if($("seamAuto").checked){
+    P.seamRib=Math.max(2*P.rib,2)+P.gap;
+    $("seamRib").value=P.seamRib;
+    if(document.activeElement!==$("seamRibO"))
+      $("seamRibO").value=String(+P.seamRib.toFixed(2));
+  }
+  return P;
+}
+function labels(){
+  for(const id of sliders){
+    const o=$(id+"O");
+    if(document.activeElement===o)continue;      // don't clobber while typing
+    o.value=String(+parseFloat($(id).value).toFixed(2));
+  }
+}
+
+// ---------- three.js scene ----------
+const canvas=$("canvas");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.localClippingEnabled=true;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0d1115);
+const camera=new THREE.PerspectiveCamera(38,1,1,2000);
+let camTheta=0.6,camPhi=1.15,camDist=185;
+function placeCam(){
+  camera.position.set(camDist*Math.sin(camPhi)*Math.cos(camTheta),
+                      camDist*Math.sin(camPhi)*Math.sin(camTheta),
+                      camDist*Math.cos(camPhi));
+  camera.up.set(0,0,1);
+  camera.lookAt(0,0,0);
+}
+scene.add(new THREE.HemisphereLight(0xcfd8e0,0x1b2026,0.75));
+const key=new THREE.DirectionalLight(0xffe8cf,0.9);key.position.set(1.2,0.6,1.4);scene.add(key);
+const rim=new THREE.DirectionalLight(0x9fb6c9,0.45);rim.position.set(-1.4,-0.8,-0.6);scene.add(rim);
+
+const clipPlane=new THREE.Plane(new THREE.Vector3(-1,0,0),0);
+function makeMat(color){
+  return new THREE.MeshStandardMaterial({color,roughness:0.55,metalness:0.06,
+    side:THREE.DoubleSide,clippingPlanes:$("section").checked?[clipPlane]:[]});
+}
+let meshes=[];
+function clearMeshes(){
+  for(const m of meshes){scene.remove(m);m.geometry.dispose();m.material.dispose();}
+  meshes=[];
+}
+function addMesh(data,color,zoff){
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(data.positions,3));
+  geo.setIndex(new THREE.BufferAttribute(data.indices,1));
+  geo.computeVertexNormals();
+  const m=new THREE.Mesh(geo,makeMat(color));
+  m.position.z=zoff||0;
+  m.userData.zbase=zoff||0;
+  scene.add(m);meshes.push(m);
+  return m;
+}
+
+// ---------- build pipeline ----------
+let lastBuild={P:null,meshData:null};
+let building=false,pending=false;
+function setStatus(t,busy){$("status").textContent=t;$("status").classList.toggle("busy",!!busy);}
+
+function rebuild(){
+  if(building){pending=true;return;}
+  building=true;
+  const P=params();
+  setStatus("building…",true);
+  requestAnimationFrame(()=>setTimeout(()=>{
+    const t0=performance.now();
+    let out;
+    try{out=buildAll(P);}catch(e){setStatus("error: "+e.message,false);building=false;return;}
+    clearMeshes();
+    if(out.top){
+      addMesh(out.top,0xd8d4ca,0);
+      addMesh(out.bottom,0xb9beb9,0);
+    }else{
+      addMesh(out.whole,0xd8d4ca,0);
+    }
+    applyExplode();
+    const ms=performance.now()-t0;
+    readouts(P,out,ms);
+    setStatus((ms/1000).toFixed(1)+" s @ "+$("res").value+"³",false);
+    building=false;
+    if(pending){pending=false;rebuild();}
+  },25));
+}
+
+function buildAll(P){
+  const M=buildModel(P);
+  const N=parseInt($("res").value);
+  const S=sampleField((x,y,z)=>M.fSolid(x,y,z),M.H,N);
+  const rimOn=P.rimP>0;
+  if(!P.split){
+    let nodes=S;
+    if(rimOn){
+      const rk=Math.max(P.rimF,0.3);
+      const R0=sampleField((x,y,z)=>M.fRim(x,y,z,0),M.H,N);
+      nodes=new Float32Array(S.length);
+      for(let i=0;i<S.length;i++)nodes[i]=smin(S[i],R0[i],rk);
+    }
+    const whole=meshFromNodes(nodes,M.H,N);
+    return{whole,M,volume:whole.volume};
+  }
+  const Cut=sampleField((x,y,z)=>M.fCut(x,y,z),M.H,N);
+  const RT=rimOn?sampleField((x,y,z)=>M.fRim(x,y,z,1),M.H,N):null;
+  const RB=rimOn?sampleField((x,y,z)=>M.fRim(x,y,z,-1),M.H,N):null;
+  const g2=P.gap/2,rk=Math.max(P.rimF,0.3);
+  const T=new Float32Array(S.length),B=new Float32Array(S.length);
+  for(let i=0;i<S.length;i++){
+    const st=rimOn?smin(S[i],RT[i],rk):S[i];
+    const sb=rimOn?smin(S[i],RB[i],rk):S[i];
+    T[i]=Math.max(st,Cut[i]+g2);
+    B[i]=Math.max(sb,-Cut[i]+g2);
+  }
+  const top=meshFromNodes(T,M.H,N),bottom=meshFromNodes(B,M.H,N);
+  return{top,bottom,M,volume:top.volume+bottom.volume};
+}
+
+function readouts(P,out,ms){
+  const M=out.M;
+  const Rout=M.Rout,pitch=2*Math.PI*M.rMid/(Math.sqrt(M.nCells)*1.9);
+  const chips=[];
+  const add=(k,v,warn)=>chips.push(`<span class="chip${warn?" warn":""}"><b>${k}</b>${v}</span>`);
+  add("cells",M.nCells+" · 12 pent");
+  add("OD",(2*Rout).toFixed(0)+" mm");
+  add("pitch","≈"+pitch.toFixed(1)+" mm");
+  const vol=out.volume/1000;
+  add("volume",vol.toFixed(1)+" cm³ · "+(vol*1.01).toFixed(0)+" g PA12");
+  const band=4/3*Math.PI*(Math.pow(Rout,3)-Math.pow(M.Rin,3))/1000;
+  add("solid",(100*vol/band).toFixed(0)+"% of band");
+  if(P.split){
+    const half=(P.seamRib-P.gap)/2;
+    add("seam",M.teethCount+" teeth · "+half.toFixed(2)+" mm/half",half<1);
+    if(P.freq%2)add("odd freq","no tooth ring — use even",true);
+  }
+  if(P.rimP>0){
+    const grip=P.pcbD/2-(P.innerD/2-P.rimP);
+    const bgrip=P.pcbD/2-(P.innerD/2-P.barb);
+    const edge=P.innerD/2-P.pcbD/2;
+    add("ring grip",grip.toFixed(2)+" mm · wall gap "+edge.toFixed(1)+" mm",grip<0.5||edge<0);
+    add("barb grip",bgrip.toFixed(2)+" mm",bgrip<0.1);
+  }
+  if(P.connD>0){
+    const wall=(P.connD-P.cbD)/2;
+    add("conn",`Ø${P.holeD}↕ · bore Ø${P.cbD} · wall ${wall.toFixed(1)} mm`,wall<1||P.cbD<=P.holeD);
+    if(P.neck+1.4>P.connT)add("conn depth","boss too shallow for flange",true);
+  }
+  if(P.rib<1)add("rib","< 1.0 mm JLC min",true);
+  if(P.memMode&&P.memT<1)add("membrane","< 1.0 mm JLC min",true);
+  const nt=out.whole?out.whole.nTris:out.top.nTris+out.bottom.nTris;
+  add("mesh",(nt/1000).toFixed(0)+"k tris");
+  $("readouts").innerHTML=chips.join("");
+}
+
+function applyExplode(){
+  const e=parseFloat($("explode").value);
+  if(meshes.length===2){
+    meshes[0].position.z=e/2;
+    meshes[1].position.z=-e/2;
+  }
+}
+
+// ---------- interaction ----------
+let dragging=false,px=0,py=0;
+canvas.addEventListener("pointerdown",e=>{dragging=true;px=e.clientX;py=e.clientY;
+  canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener("pointermove",e=>{
+  if(!dragging)return;
+  camTheta-=(e.clientX-px)*0.008;
+  camPhi=Math.min(Math.PI-0.05,Math.max(0.05,camPhi-(e.clientY-py)*0.008));
+  px=e.clientX;py=e.clientY;
+});
+canvas.addEventListener("pointerup",()=>dragging=false);
+canvas.addEventListener("wheel",e=>{e.preventDefault();
+  camDist=Math.min(500,Math.max(70,camDist*(1+e.deltaY*0.001)));},{passive:false});
+
+function resize(){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(canvas.width!==w*renderer.getPixelRatio()){
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+}
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(reduceMotion)$("autorot").checked=false;
+function tick(){
+  resize();
+  if($("autorot").checked&&!dragging)camTheta+=0.0022;
+  placeCam();
+  renderer.render(scene,camera);
+  requestAnimationFrame(tick);
+}
+
+// ---------- STL export (preview only) ----------
+function stlBuffer(m){
+  const nt=m.geometry.index.count/3;
+  const buf=new ArrayBuffer(84+nt*50),dv=new DataView(buf);
+  dv.setUint32(80,nt,true);
+  let off=84;
+  {
+    const pos=m.geometry.attributes.position.array,idx=m.geometry.index.array;
+    for(let i=0;i<idx.length;i+=3){
+      const a=idx[i]*3,b=idx[i+1]*3,c=idx[i+2]*3;
+      const ux=pos[b]-pos[a],uy=pos[b+1]-pos[a+1],uz=pos[b+2]-pos[a+2];
+      const vx=pos[c]-pos[a],vy=pos[c+1]-pos[a+1],vz=pos[c+2]-pos[a+2];
+      let nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;
+      const nl=Math.hypot(nx,ny,nz)||1;nx/=nl;ny/=nl;nz/=nl;
+      dv.setFloat32(off,nx,true);dv.setFloat32(off+4,ny,true);dv.setFloat32(off+8,nz,true);
+      for(const j of[a,b,c]){
+        off+=12;
+        dv.setFloat32(off,pos[j],true);
+        dv.setFloat32(off+4,pos[j+1],true);
+        dv.setFloat32(off+8,pos[j+2],true);
+      }
+      off+=14;dv.setUint16(off-2,0,true);
+    }
+  }
+  return buf;
+}
+function exportSTL(){
+  if(!meshes.length)return;
+  let hosted=false;
+  try{hosted=!!(window.claude&&window.claude.use);}catch(e){}
+  if(hosted){
+    $("stlHint").hidden=false;
+    setStatus("STL export needs the local copy",false);
+    return;
+  }
+  const P=params();
+  const base=`silicone_orb_f${P.freq}_rib${P.rib}_d${P.depth}`;
+  const names=meshes.length===2?[base+"_top.stl",base+"_bottom.stl"]:[base+"_preview.stl"];
+  meshes.forEach((m,i)=>{
+    setTimeout(()=>{
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(new Blob([stlBuffer(m)],{type:"model/stl"}));
+      a.download=names[i];a.click();
+    },i*400);
+  });
+  setStatus("exported "+names.join(" + "),false);
+}
+
+// ---------- wiring ----------
+let timer=null;
+function schedule(){labels();clearTimeout(timer);timer=setTimeout(rebuild,380);}
+for(const id of sliders)$(id).addEventListener("input",schedule);
+for(const id of["connBand","res"])$(id).addEventListener("change",schedule);
+$("split").addEventListener("change",schedule);
+$("seamAuto").addEventListener("change",()=>{$("seamRib").disabled=$("seamAuto").checked;
+  $("seamRibO").disabled=$("seamAuto").checked;schedule();});
+$("section").addEventListener("change",()=>{
+  for(const m of meshes)m.material.clippingPlanes=$("section").checked?[clipPlane]:[];
+});
+$("explode").addEventListener("input",()=>{labels();applyExplode();});
+$("memMode").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  memMode=parseInt(b.dataset.v);
+  for(const x of $("memMode").children)x.setAttribute("aria-pressed",x===b);
+  schedule();
+});
+$("stl").addEventListener("click",exportSTL);
+
+// ---------- settings persistence ----------
+const SKEY="siliconeOrbSettings.v1";
+function snapshot(){
+  const o={memMode};
+  for(const id of sliders)o[id]=$(id).value;
+  for(const id of["connBand","res"])o[id]=$(id).value;
+  for(const id of["split","seamAuto","section","autorot"])o[id]=$(id).checked;
+  return o;
+}
+function restore(){
+  let o=null;
+  try{o=JSON.parse(localStorage.getItem(SKEY));}catch(e){}
+  if(!o)return;
+  for(const id of sliders)if(id in o)$(id).value=o[id];
+  for(const id of["connBand","res"])if(id in o)$(id).value=o[id];
+  for(const id of["split","seamAuto","section"])if(id in o)$(id).checked=o[id];
+  if("memMode" in o){
+    memMode=parseInt(o.memMode)||0;
+    [...$("memMode").children].forEach(b=>b.setAttribute("aria-pressed",parseInt(b.dataset.v)===memMode));
+  }
+  $("seamRib").disabled=$("seamAuto").checked;
+  $("seamRibO").disabled=$("seamAuto").checked;
+}
+function persist(){
+  try{localStorage.setItem(SKEY,JSON.stringify(snapshot()));}catch(e){}
+}
+document.getElementById("rail").addEventListener("input",persist);
+document.getElementById("rail").addEventListener("click",persist);
+$("copySet").addEventListener("click",async()=>{
+  const txt=JSON.stringify(snapshot());
+  try{await navigator.clipboard.writeText(txt);setStatus("settings copied to clipboard",false);}
+  catch(e){prompt("Copy the settings:",txt);}
+});
+
+makeNumFields();
+restore();
+labels();
+$("seamRibO").disabled=$("seamAuto").checked;
+tick();
+rebuild();
+</script>
