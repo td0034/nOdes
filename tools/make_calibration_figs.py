@@ -808,11 +808,13 @@ def fig_architecture():
         for (x, y) in pts:
             ax.add_patch(mp.Circle((x, y), nr, fc="white", ec=INK, lw=1.2, zorder=3))
     for ax in (a, b):
-        ax.set_xlim(0, 10); ax.set_ylim(0, 5.5); ax.set_aspect("equal"); ax.axis("off")
+        ax.set_ylim(0, 5.5); ax.set_aspect("equal"); ax.axis("off")
         # Equal aspect shrinks each axes box to the data ratio and CENTRES it in its
         # gridspec slot, so the narrower right panel sits lower and its "B" title
         # drops below "A". Anchor both to the top so the titles share a line.
         ax.set_anchor("N")
+    a.set_xlim(0, 10)
+    b.set_xlim(5.0 - 10 / 1.45 / 2, 5.0 + 10 / 1.45 / 2)
     # ---- A: infrastructure mode
     a.add_patch(mp.FancyBboxPatch((0.3, 1.0), 2.4, 3.0, boxstyle="round,pad=0.06", fc="#F2F7FA", ec=SKY, lw=1.4, zorder=2))
     a.text(1.5, 4.35, "central plane", ha="center", va="bottom", fontsize=8.5, fontweight="bold", color=INK)
@@ -830,8 +832,7 @@ def fig_architecture():
     a.text(7.3, 4.55, "each orb broadcasts its top-N view\n2 ms after every multicast frame", ha="center", va="top", fontsize=6.8, color=MUTED)
     a.set_title("A   Infrastructure mode", loc="left", fontsize=9.5)
     # ---- B: ad-hoc mode
-    ring(b, 5.0, 2.55, r=1.05)
-    b.text(5.0, 4.9, "the same clusterer, on every orb", ha="center", fontsize=8, color=TEAL, fontweight="bold")
+    ring(b, 5.0, 2.3, r=1.1)          # same radius as panel A, now at the same scale
     b.text(5.0, 4.55, "standalone pacer 50 Hz, armed\n10 × 100 ms after the last frame", ha="center", va="top", fontsize=6.8, color=MUTED)
     b.text(5.0, 0.62, "no server, no access point\nlight and sound from cluster id\nstationary fleet sleeps after 30 s", ha="center", va="center", fontsize=7.0, color=INK)
     b.set_title("B   Ad-hoc mode (what ships)", loc="left", fontsize=9.5)
@@ -843,13 +844,13 @@ def fig_timeline():
     import datetime as dt
     d = lambda x: dt.date.fromisoformat(x)
     lanes = ["central plane first", "individual + central\n(orientation → colour)", "movement clustering\n(abandoned)",
-             "acoustic echolocation\n(abandoned)", "ESP-NOW RSSI proximity\n(shipped)", "calibration E1–E7"]
+             "acoustic echolocation\n(abandoned)", "ESP-NOW RSSI proximity\n(shipped)", "calibration\nexperiments E1–E7"]
     cols = [SKY, PURPLE, AMBER, CRIMSON, TEAL, NAVY]
     ev = [(0, "2025-07-23", "2025-08-06", "sender · return path · slots · OTA · telemetry"),
           (1, "2025-08-15", "2026-02-10", "v0.9 → v1.0: icosahedron colour, a note per change"),
           (2, "2026-02-20", "2026-03-31", "k-means on accel/gyro energy — landed 3 Mar"),
           (3, "2026-02-13", "2026-03-31", "v2.4 TDMA chirp + mic · v2.5 hybrid trial"),
-          (4, "2026-02-13", "2026-09-10", "v2.4 logged · v3.1 substrate · v3.9 standalone · v3.13/17 in firmware"),
+          (4, "2026-02-13", "2026-09-10", "v2.4 logged · v3.1 substrate · v3.9 standalone · v3.13 fw"),
           (5, "2026-06-20", "2026-09-10", "E1 → E7")]
     marks = [("2025-08-15", "v0.9", 0), ("2026-02-13", "v2.4", 0), ("2026-03-03", "3 Mar", 1), ("2026-03-31", "v3.1", 0),
              ("2026-04-20", "workshop", 1), ("2026-07-04", "festival", 0), ("2026-07-22", "23-orb workshop", 1)]
@@ -868,7 +869,7 @@ def fig_timeline():
     ax.set_xlim(d("2025-07-15"), d("2026-09-25")); ax.grid(axis="y", visible=False)
     ax.xaxis.set_major_locator(matplotlib.dates.MonthLocator(bymonth=[8, 10, 12, 2, 4, 6, 8]))
     ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%b\n%Y")); ax.tick_params(axis="x", labelsize=7)
-    ax.set_title("How proximity became the substrate: two abandoned routes, one that shipped", loc="left", pad=4)
+    ax.set_title("Development timeline: two sensing routes abandoned, one shipped", loc="left", pad=4)
     tidy(ax)
     save(fig, "timeline.png")
 
