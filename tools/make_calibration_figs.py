@@ -173,8 +173,11 @@ def fig_e7_v2():
     ax = fig.add_subplot(111, projection="polar")
     ax.set_theta_zero_location("E"); ax.set_theta_direction(1)
     ax.set_rlim(0, 2.7); ax.set_rticks([1, 2]); ax.set_rlabel_position(200)
-    ax.set_xticklabels([]); ax.set_yticklabels(["1 m", "2 m"])
-    ax.grid(color=GRID, lw=.6)
+    ax.set_xticklabels([]); ax.set_yticklabels([])
+    # Range rings competed with the data and their labels sat on top of it; the
+    # claim is about direction kept and radius compressed, not absolute range.
+    ax.yaxis.grid(False)
+    ax.xaxis.grid(True, color=GRID, lw=.6, alpha=.55)
     for lab, pts, col in GROUPS:
         bold = lab.startswith("far")
         al, lw, ms_t, ms_e = (1.0, 2.4, 9, 7) if bold else (0.38, 1.2, 7, 5)
@@ -205,8 +208,8 @@ def fig_e7_v2():
     ax.plot([], [], "o", color=INK, ms=6, label="estimate")
     ax.plot([], [], "s", color=INK, ms=8, label="anchor")
     ax.legend(loc="lower left", bbox_to_anchor=(-0.12, -0.12), frameon=False, fontsize=8)
-    ax.set_title("Estimates slide toward the centre along their own bearing", loc="left", fontsize=11, pad=18)
-    ax.text(0.0, 1.06, "bold: far ring — direction kept, distance ≈ 4.4× short.  faded: near ring and between-anchor points",
+    ax.set_title("Weighted-centroid estimates against true positions", loc="left", fontsize=11, pad=26)
+    ax.text(0.0, 1.045, "bold: far ring.  faded: near ring and between-anchor points.  outer edge 2.7 m",
             transform=ax.transAxes, fontsize=8, color=MUTED, ha="left")
     save(fig, "E7_polar.png")
 
