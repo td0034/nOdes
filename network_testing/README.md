@@ -11,6 +11,17 @@ plots in `plots/`. Capture/analysis tools live in the repo `tools/`
 2. **It's a servicing cap, not congestion.** Round-trip latency stays ~18 ms and
    jitter flat (~9 ms p95) across the whole range. Orbs that *are* serviced are
    fine; the server just can't round-trip more than ~12 per 50 Hz frame.
+
+   **Superseded 2026-09-16.** "~12 per 50 Hz frame" implies a budget of ~600
+   round-trips/s. Measured directly by sweeping the RATE at fixed fleet size and
+   crossing it against the count sweeps, the budget is **~420 rt/s** at the 10%
+   miss line (21 orbs x 20 Hz = 420, miss 0.084; 22 x 20 = 440, miss 0.122). The
+   ~600 figure was inferred from a single 50 Hz operating point and is about 40%
+   optimistic. Per-orb miss is set by total demand, orbs x rate, not by either
+   alone: 8 orbs at 50 Hz misses 0.115 while 21 at 20 Hz misses 0.084, near
+   identical demand across a 6.6x difference in rate per orb. A small residual
+   remains: the 50 Hz families sit ~0.04 above the rate sweeps at matched demand,
+   slightly beyond the 0.030 repeat noise.
 3. **Misses are NOT shared fairly.** At 20–22 orbs, per-orb miss spans 41–83%
    (effective 8.5–30 Hz), correlated with RSSI: weak-signal orbs starve first
    (CoV 0.17). Signal isn't the bottleneck at low count, but it decides *who*
