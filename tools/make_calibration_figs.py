@@ -801,6 +801,10 @@ def fig_architecture():
             ax.add_patch(mp.Circle((x, y), nr, fc="white", ec=INK, lw=1.2, zorder=3))
     for ax in (a, b):
         ax.set_xlim(0, 10); ax.set_ylim(0, 5.5); ax.set_aspect("equal"); ax.axis("off")
+        # Equal aspect shrinks each axes box to the data ratio and CENTRES it in its
+        # gridspec slot, so the narrower right panel sits lower and its "B" title
+        # drops below "A". Anchor both to the top so the titles share a line.
+        ax.set_anchor("N")
     # ---- A: infrastructure mode
     a.add_patch(mp.FancyBboxPatch((0.3, 1.0), 2.4, 3.0, boxstyle="round,pad=0.06", fc="#F2F7FA", ec=SKY, lw=1.4, zorder=2))
     a.text(1.5, 4.35, "central plane", ha="center", va="bottom", fontsize=8.5, fontweight="bold", color=INK)
