@@ -118,8 +118,10 @@ def fig_e2_v2():
     ax.axvspan(218, 238, color=GREEN, alpha=0.14, lw=0)
     ax.axvspan(238, 256, color=VERM, alpha=0.12, lw=0)
     ax.text(125, 1.10, "below the adaptive cut —\nfloor is not in use", ha="center", va="bottom", fontsize=8.5, color=MUTED)
-    ax.text(228, 1.08, "binds &\nresolves", ha="center", va="bottom", fontsize=8.5, color=GREEN, fontweight="bold")
-    ax.text(255, 1.26, "too high: breaks", ha="right", va="bottom", fontsize=8.5, color=VERM, fontweight="bold")
+    ax.text(229, 1.02, "binds &\nresolves", ha="center", va="bottom", fontsize=8, color=GREEN, fontweight="bold")
+    ax.annotate("too high:\nbreaks", xy=(243, 0.70), xytext=(248, 1.24),
+                ha="center", va="bottom", fontsize=8, color=VERM, fontweight="bold",
+                arrowprops=dict(arrowstyle="->", color=VERM, lw=1.1, shrinkA=2, shrinkB=2))
     ax.axvline(217.7, color=INK, lw=1.1, ls=":")
     ax.text(216, 0.08, "adaptive cut 217.7", rotation=90, ha="right", va="bottom", fontsize=8, color=INK)
     ax.fill_between(t, lo, hi, color=BLUE, alpha=0.2, lw=0)
