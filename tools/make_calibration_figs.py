@@ -278,7 +278,7 @@ def fig_e1_v2():
     ax.text(6.15, (d["wide"]["ari"]["6"] + d["merged"]["ari"]["6"]) / 2, "gap at 6", fontsize=8.5, color=MUTED, va="center")
     ax.set_xlim(-0.5, 10.5); ax.set_ylim(0.2, 1.03)
     ax.set_xlabel("neighbours reported per orb (k)"); ax.set_ylabel("ARI vs top-10 reference")
-    ax.set_title("Six neighbours suffice when groups are apart; near the limit you need eight", loc="left")
+    ax.set_title("Clustering fidelity against neighbours reported, at two group separations", loc="left")
     tidy(ax)
     save(fig, "E1_headtohead.png")
 
