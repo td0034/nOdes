@@ -140,6 +140,7 @@ def main():
     bt = best_global_threshold(frames, truth)
     print("--- threshold / single-linkage family (physically the right tool on clean similarity) ---")
     run("adaptive-gap floodfill (floor 200)", lambda s, sym: flood(s, sym, adaptive_gap_thr(sym, 200)))
+    run("adaptive-gap floodfill (floor 220)", lambda s, sym: flood(s, sym, adaptive_gap_thr(sym, 220)))  # deployed floor
     run(f"floodfill @ best global thr ({bt})", lambda s, sym: flood(s, sym, bt))
     run("single-linkage->k=6 [= truth gen]", lambda s, sym: single_linkage_k(s, sym, 6))
     print("--- mutual-kNN (the proposal) ---")

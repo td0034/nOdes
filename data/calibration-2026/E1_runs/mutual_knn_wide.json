@@ -1,0 +1,198 @@
+{
+ "rig": "E1 4grp-wide, square, all gaps >=2 m, 27 orbs, fw 3.18 (pre-renumber)",
+ "K": 4,
+ "size_candidates": {
+  "tag 8/8/4/6": [
+   8,
+   8,
+   6,
+   4
+  ],
+  "truth 9/8/4/6": [
+   9,
+   8,
+   6,
+   4
+  ]
+ },
+ "ari_note": "consensus truth is single-linkage-derived; biased toward the threshold family",
+ "passes": {
+  "passA": {
+   "best_fixed_thr": 198,
+   "arms": {
+    "adaptive-gap floodfill (floor 200)": {
+     "mean_k": 4,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 100.0
+    },
+    "adaptive-gap floodfill (floor 220)": {
+     "mean_k": 4.01,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 99.3
+    },
+    "floodfill @ best fixed thr (198)": {
+     "mean_k": 4,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 100.0
+    },
+    "single-linkage -> k=4": {
+     "mean_k": 4,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 100.0
+    },
+    "mutual-kNN k=3": {
+     "mean_k": 6.83,
+     "ari_consensus": 0.823,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 0.0
+    },
+    "mutual-kNN k=4": {
+     "mean_k": 5.0,
+     "ari_consensus": 0.936,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 0.3
+    },
+    "mutual-kNN k=5": {
+     "mean_k": 4.94,
+     "ari_consensus": 0.939,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 5.7
+    },
+    "mutual-kNN k=6": {
+     "mean_k": 3,
+     "ari_consensus": 0.83,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 0.0
+    },
+    "mutual-kNN + modularity {3..6}": {
+     "mean_k": 3,
+     "ari_consensus": 0.83,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 0.0
+    }
+   }
+  },
+  "passB": {
+   "best_fixed_thr": 200,
+   "arms": {
+    "adaptive-gap floodfill (floor 200)": {
+     "mean_k": 4,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 100.0
+    },
+    "adaptive-gap floodfill (floor 220)": {
+     "mean_k": 4.39,
+     "ari_consensus": 0.975,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 61.4
+    },
+    "floodfill @ best fixed thr (200)": {
+     "mean_k": 4,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 100.0
+    },
+    "single-linkage -> k=4": {
+     "mean_k": 4,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 100.0
+    },
+    "mutual-kNN k=3": {
+     "mean_k": 6.63,
+     "ari_consensus": 0.848,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 0.0
+    },
+    "mutual-kNN k=4": {
+     "mean_k": 4.92,
+     "ari_consensus": 0.941,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 8.4
+    },
+    "mutual-kNN k=5": {
+     "mean_k": 4.43,
+     "ari_consensus": 0.972,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 56.6
+    },
+    "mutual-kNN k=6": {
+     "mean_k": 2.95,
+     "ari_consensus": 0.811,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 0.0
+    },
+    "mutual-kNN + modularity {3..6}": {
+     "mean_k": 3.07,
+     "ari_consensus": 0.838,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 3.2
+    }
+   }
+  },
+  "passC": {
+   "best_fixed_thr": 202,
+   "arms": {
+    "adaptive-gap floodfill (floor 200)": {
+     "mean_k": 4.0,
+     "ari_consensus": 0.999,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 99.7
+    },
+    "adaptive-gap floodfill (floor 220)": {
+     "mean_k": 4.02,
+     "ari_consensus": 0.999,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 97.8
+    },
+    "floodfill @ best fixed thr (202)": {
+     "mean_k": 4,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 100.0
+    },
+    "single-linkage -> k=4": {
+     "mean_k": 4,
+     "ari_consensus": 1.0,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 100.0
+    },
+    "mutual-kNN k=3": {
+     "mean_k": 6.05,
+     "ari_consensus": 0.89,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 0.0
+    },
+    "mutual-kNN k=4": {
+     "mean_k": 4.72,
+     "ari_consensus": 0.954,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 28.0
+    },
+    "mutual-kNN k=5": {
+     "mean_k": 4.01,
+     "ari_consensus": 0.986,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 87.7
+    },
+    "mutual-kNN k=6": {
+     "mean_k": 2.81,
+     "ari_consensus": 0.759,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 0.0
+    },
+    "mutual-kNN + modularity {3..6}": {
+     "mean_k": 3.17,
+     "ari_consensus": 0.859,
+     "size_match_tag 8/8/4/6": 0.0,
+     "size_match_truth 9/8/4/6": 16.7
+    }
+   }
+  }
+ }
+}

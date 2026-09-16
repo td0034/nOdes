@@ -202,5 +202,102 @@
    "miss": 0.841,
    "frames": 12
   }
+ },
+ "fixed20": {
+  "4": {
+   "rate_hz": 20.0,
+   "miss": 0.019,
+   "frames": 467
+  },
+  "5": {
+   "rate_hz": 20.0,
+   "miss": 0.018,
+   "frames": 468
+  },
+  "6": {
+   "rate_hz": 20.0,
+   "miss": 0.016,
+   "frames": 469
+  },
+  "7": {
+   "rate_hz": 20.0,
+   "miss": 0.017,
+   "frames": 468
+  },
+  "8": {
+   "rate_hz": 20.0,
+   "miss": 0.013,
+   "frames": 468
+  },
+  "9": {
+   "rate_hz": 20.0,
+   "miss": 0.016,
+   "frames": 468
+  },
+  "10": {
+   "rate_hz": 20.0,
+   "miss": 0.02,
+   "frames": 469
+  },
+  "11": {
+   "rate_hz": 20.0,
+   "miss": 0.015,
+   "frames": 468
+  },
+  "12": {
+   "rate_hz": 20.0,
+   "miss": 0.021,
+   "frames": 468
+  },
+  "13": {
+   "rate_hz": 20.0,
+   "miss": 0.023,
+   "frames": 468
+  },
+  "14": {
+   "rate_hz": 20.0,
+   "miss": 0.03,
+   "frames": 469
+  },
+  "15": {
+   "rate_hz": 20.0,
+   "miss": 0.028,
+   "frames": 468
+  },
+  "16": {
+   "rate_hz": 20.0,
+   "miss": 0.031,
+   "frames": 467
+  },
+  "17": {
+   "rate_hz": 20.0,
+   "miss": 0.041,
+   "frames": 470
+  },
+  "18": {
+   "rate_hz": 20.0,
+   "miss": 0.054,
+   "frames": 468
+  },
+  "19": {
+   "rate_hz": 20.0,
+   "miss": 0.053,
+   "frames": 468
+  },
+  "20": {
+   "rate_hz": 20.0,
+   "miss": 0.086,
+   "frames": 488
+  },
+  "21": {
+   "rate_hz": 20.0,
+   "miss": 0.084,
+   "frames": 601
+  },
+  "22": {
+   "rate_hz": 20.0,
+   "miss": 0.122,
+   "frames": 81
+  }
  }
 }

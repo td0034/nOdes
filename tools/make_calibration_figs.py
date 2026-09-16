@@ -67,7 +67,7 @@ def churn_bins(win=5.0, min_orbs=20):
         acc.setdefault(int(t // win), [[], [], []])
         for i, v in enumerate((a, k, n)):
             acc[int(t // win)][i].append(v)
-    return [(st.mean(v[0]), st.mean(v[1])) for b, v in sorted(acc.items()) if st.mean(v[2]) >= min_orbs]
+    return [(st.mean(v[0]), st.mean(v[1]), st.mean(v[2])) for b, v in sorted(acc.items()) if st.mean(v[2]) >= min_orbs]
 
 
 def spearman(x, y):
@@ -87,8 +87,9 @@ def fig_churn_v2():
     pts = churn_bins()
     x = [p[0] for p in pts]; y = [p[1] for p in pts]
     rho = spearman(x, y)
+    nbar = st.mean(p[2] for p in pts)          # orbs in play, averaged over the plotted bins
     fig, ax = plt.subplots(figsize=(5.2, 3.6))
-    ax.axhline(21, color=MUTED, lw=1, ls="--")
+    ax.axhline(nbar, color=MUTED, lw=1, ls="--")
     ax.plot(x, y, "o", color=BLUE, ms=6, alpha=.55, mec="white", mew=.7)
     ax.annotate("fleet set down:\none or two groups", xy=(0.06, 2.2), xytext=(0.28, 4.5),
                 fontsize=9, color=INK, ha="left",
@@ -96,11 +97,11 @@ def fig_churn_v2():
     ax.annotate("fleet carried:\nevery orb on its own", xy=(0.8, 20), xytext=(0.52, 13.5),
                 fontsize=9, color=INK, ha="left",
                 arrowprops=dict(arrowstyle="->", color=MUTED, lw=.9))
-    ax.text(0.99, 21.4, "one cluster per orb (23 in play)", color=MUTED, fontsize=8, ha="right", va="bottom")
+    ax.text(0.99, nbar + 0.4, f"one cluster per orb ({nbar:.1f} in play, mean over bins)", color=MUTED, fontsize=8, ha="right", va="bottom")
     ax.set_xlabel("fleet motion  (accelerometers, 5 s bins)")
     ax.set_ylabel("clusters recovered  (RSSI graph)")
     ax.set_xlim(0, 1.0); ax.set_ylim(0, 24)
-    ax.set_title(f"When people move, the swarm fragments   (Spearman ρ = {rho:.2f})", loc="left")
+    ax.set_title(f"Recovered cluster count against fleet motion   (Spearman ρ = {rho:.2f})", loc="left")
     tidy(ax)
     save(fig, "F1_topology_churn.png")
 
@@ -117,8 +118,12 @@ def fig_e2_v2():
     ax.axvspan(32, 218, color="#000000", alpha=0.05, lw=0)
     ax.axvspan(218, 238, color=GREEN, alpha=0.14, lw=0)
     ax.axvspan(238, 256, color=VERM, alpha=0.12, lw=0)
-    ax.text(125, 1.10, "below the adaptive cut —\nfloor is not in use", ha="center", va="bottom", fontsize=8.5, color=MUTED)
+    ax.text(125, 1.10, "below the adaptive cut:\nfloor is not in use", ha="center", va="bottom", fontsize=8.5, color=MUTED)
+    # "binds & resolves" sat with its left edge on the 217.7 dotted line; shifted
+    # right into the green band so the line reads clear of it.
     ax.text(229, 1.02, "binds &\nresolves", ha="center", va="bottom", fontsize=8, color=GREEN, fontweight="bold")
+    # "too high: breaks" was ha="right" from x=255, so it ran back across the green
+    # band and the grey. Now it sits inside the orange band and points at the knee.
     ax.annotate("too high:\nbreaks", xy=(243, 0.70), xytext=(248, 1.24),
                 ha="center", va="bottom", fontsize=8, color=VERM, fontweight="bold",
                 arrowprops=dict(arrowstyle="->", color=VERM, lw=1.1, shrinkA=2, shrinkB=2))
@@ -127,12 +132,16 @@ def fig_e2_v2():
     ax.fill_between(t, lo, hi, color=BLUE, alpha=0.2, lw=0)
     ax.plot(t, m, "o-", color=BLUE, lw=1.8, ms=4)
     ax.plot([200], [pts[200]["ari_mean"]], marker="*", ms=13, color=INK, zorder=5)
-    ax.text(200, 0.86, "deployed\ndefault", ha="center", va="top", fontsize=8, color=INK)
+    ax.text(200, 0.86, "code default\n(200)", ha="center", va="top", fontsize=8, color=INK)
+    # the fleet has run at 220 since June 2026 (server/prompt_settings.csv); it sits just
+    # above the adaptive cut, inside the band where the floor binds
+    ax.axvline(220, color=GREEN, lw=1.4, ls="--", zorder=4)
+    ax.text(221.5, 0.05, "deployed floor 220", rotation=90, ha="left", va="bottom", fontsize=8, color=GREEN, fontweight="bold")
     ax.set_xlim(32, 256); ax.set_ylim(0, 1.4)
     ax.set_yticks([0, .25, .5, .75, 1.0])
     ax.set_xlabel("cluster_min_thresh: floor on 8-bit link strength (0–255)")
     ax.set_ylabel("ARI vs physical truth")
-    ax.set_title("The threshold floor only matters between 218 and 236", loc="left")
+    ax.set_title("Clustering accuracy against the configured threshold floor", loc="left")
     tidy(ax)
     save(fig, "E2_threshold.png")
 
@@ -176,8 +185,10 @@ def fig_e7_v2():
     ax.set_theta_zero_location("E"); ax.set_theta_direction(1)
     ax.set_rlim(0, 2.7); ax.set_rticks([1, 2]); ax.set_rlabel_position(200)
     ax.set_xticklabels([]); ax.set_yticklabels([])
-    # Range rings competed with the data and their labels sat on top of it; the
-    # claim is about direction kept and radius compressed, not absolute range.
+    # The concentric range rings competed with the data and their labels sat on
+    # top of it, while the claim here is about DIRECTION being kept and radius
+    # being compressed, not about absolute range. Keep the angular spokes, which
+    # support the direction reading, drop the rings. Scale is in the caption.
     # No range rings, no angular spokes and no outer circle: the anchor triangle
     # is the only spatial reference the reader needs, and the rest competed with
     # the estimates.
@@ -255,12 +266,13 @@ def fig_sat_v2():
     ax.set_yticks([0, .5, 1.0])
     ax.axhline(0, color=MUTED, lw=.8)
     ax.set_xlabel("cluster threshold (8-bit link strength, 0–255)"); ax.set_ylabel("agreement with true grouping (ARI)")
-    # Label what a LOW and a HIGH cut do wrong, so the hump reads without the caption.
+    # Label what a LOW and a HIGH cut actually do wrong, so the hump reads without
+    # the caption: too low merges separate groups, too high splits real ones.
     ax.annotate("cut too low:\nseparate groups\nmerge into one", xy=(152, 0.06), xytext=(152, 0.30),
                 fontsize=7.2, color=MUTED, ha="left", va="bottom", linespacing=1.35)
     ax.annotate("cut too high:\nreal groups\nsplit apart", xy=(258, 0.06), xytext=(258, 0.30),
                 fontsize=7.2, color=MUTED, ha="right", va="bottom", linespacing=1.35)
-    ax.set_title("Saturation turns a bounded correct window into an open-ended one", loc="left")
+    ax.set_title("Correct-threshold window under the saturated and de-saturated mappings", loc="left")
     tidy(ax)
     save(fig, "sat_ari_truth.png")
 
@@ -505,8 +517,8 @@ def fig_e3_raster(cells=((1.5, 100, "τ = 1.5 s, 100 ms"), (1.5, 400, "τ = 1.5 
         ax.set_ylabel(f"{lab}\ninstability {inst:.3f}", rotation=0, ha="right", va="center", fontsize=9, labelpad=8)
         for sp in ax.spines.values(): sp.set_visible(False)
     axes[0].text(0, -1.1, "shaded: settling (first 2τ, not scored)", fontsize=7.5, color=MUTED, ha="left", va="bottom")
-    axes[-1].set_xlabel("time (s)   —   one row per orb, colour = cluster, rows ordered by physical group")
-    fig.suptitle("Smoothing: τ = 1.5 s flickers and debounce only patches it; from τ = 3 s membership never moves",
+    axes[-1].set_xlabel("time (s);  one row per orb, colour = cluster, rows ordered by physical group")
+    fig.suptitle("Cluster membership over time, at three smoothing time constants",
                  x=0.01, ha="left", fontsize=10.5, fontweight="bold")
     save(fig, "E3_raster.png")
 
@@ -546,7 +558,7 @@ def fig_endurance():
     ax.set_yticks(range(len(serials))); ax.set_yticklabels([f"{sN[-4:]}  {lo:.2f} V" for sN, lo in zip(serials, low)], fontsize=6.5)
     ax.tick_params(axis="y", length=0)
     ax.set_xlabel("time since first orb out (h)")
-    ax.set_title(f"A festival day: {len(serials)} orbs over {nb/60:.1f} h — blank = not heard (docked or asleep), amber = on charge", loc="left", fontsize=10)
+    ax.set_title(f"A festival day: {len(serials)} orbs over {nb/60:.1f} h: blank = not heard (docked or asleep), amber = on charge", loc="left", fontsize=10)
     cb = fig.colorbar(im, ax=ax, fraction=0.03, pad=0.01); cb.set_label("battery (V)   ·   3.7 V = deep sleep if not charging", fontsize=8); cb.ax.tick_params(labelsize=7)
     cb.ax.axhline(3.7, color=INK, lw=1.5)
     ax.grid(False)
@@ -559,8 +571,8 @@ def fig_e4_fairness():
     """Who starves. One row per orb, x = orbs in play as the sweep steps down, colour = that
     orb's miss rate at that level. Fixed 50 Hz above, adaptive rate below."""
     from matplotlib.colors import LinearSegmentedColormap
-    arms = [("fixed 50 Hz", f"{D}/net_orb_e4_fixed50.csv"),
-            ("adaptive rate", f"{D}/net_orb_e4_autorate.csv")]
+    arms = [("fixed 50 Hz", "network_testing/captures/net_orb_1782915562_e4_fixed50.csv"),
+            ("adaptive rate", "network_testing/captures/net_orb_1782914460_e4_autorate.csv|network_testing/captures/net_orb_1782914870_e4_autorate.csv")]
     data = {}
     for lab, f in arms:
         acc = {}
@@ -682,7 +694,11 @@ def fig_e6_raster(run="e6_20260908-130607_c0_to_c3.jsonl.gz"):
             for i in mem: grid[i, j] = colour[c]
         prev_members, prev_colour = members, colour
     from matplotlib.colors import ListedColormap
-    fig, ax = plt.subplots(figsize=(7.4, 3.6))
+    # Second panel: frame-to-frame agreement. The raster shows membership, but a
+    # reader cannot tell from colour alone whether the handover costs MORE than
+    # ordinary frame-to-frame churn. It does not, and this makes that visible.
+    fig, (ax, axa) = plt.subplots(2, 1, figsize=(7.4, 4.6), sharex=True,
+                                  gridspec_kw=dict(height_ratios=[3, 1], hspace=0.12))
     # draw as per-window columns so gaps in broadcast show as blank, not stretched
     W = H.WINDOW_S
     for j, t in enumerate(ts):
@@ -691,23 +707,63 @@ def fig_e6_raster(run="e6_20260908-130607_c0_to_c3.jsonl.gz"):
             if c >= 0:
                 ax.add_patch(plt.Rectangle((t, i - .5), W, 1, color=RASTER8[c % 8], lw=0))
     t_end = M["finished"] - t0
-    ax.set_xlim(-2, t_end + 2); ax.set_ylim(len(sers) - .5, -.5)
+    # Everything this figure has to say happens in the first ~95 s: server, gap,
+    # standalone, sleep. Plotting out to the 425 s finish left three quarters of
+    # the panel blank, and the blank was doing the talking -- it read as "orbs
+    # sleep" rather than "clustering survives the handover". Crop to the data and
+    # state the server's return in text instead.
+    last_heard_ = ts[-1] + W
+    ax.set_xlim(-2, last_heard_ + 30); ax.set_ylim(len(sers) - .5, -.5)
     ax.set_yticks([]); ax.grid(False)
     for sp in ax.spines.values(): sp.set_visible(False)
-    events = [("C1_departure_SIGSTOP", "server stopped"), ("C3_return_SIGCONT", "server returned"), ("finished", "end")]
-    for key, lab in events:
-        mt = M[key] - t0
-        ax.axvline(mt, color=INK, lw=1, ls=":")
-        ax.text(mt + 1.5, -0.6, lab, fontsize=8, color=INK, va="bottom")
     t_stop = M["C1_departure_SIGSTOP"] - t0; last_heard = ts[-1] + W
-    ax.annotate(f"fleet asleep from {last_heard - t_stop:.0f} s after the stop —\nand still asleep when the server returned",
-                xy=(last_heard + 2, len(sers) / 2), xytext=(t_stop + 80, len(sers) / 2), fontsize=8.5, color=INK, va="center",
+    ax.axvline(t_stop, color=INK, lw=1, ls=":")
+    # Phase spans across the top, so the reader sees what each region IS.
+    yb = -0.95
+    for x0, x1, lab in ((0, t_stop, "clustered under the server"),
+                        (t_stop, last_heard, "clustered standalone, no server")):
+        ax.annotate("", xy=(x0, yb), xytext=(x1, yb),
+                    arrowprops=dict(arrowstyle="<->", color=MUTED, lw=.9), annotation_clip=False)
+        ax.text((x0 + x1) / 2, yb - 0.35, lab, fontsize=8, color=INK, ha="center", va="bottom",
+                clip_on=False)
+    ax.annotate("handover gap 0.96 s", xy=(t_stop + 0.5, 0.5), xytext=(last_heard + 2, 1.2), fontsize=8, color=INK, va="center",
                 arrowprops=dict(arrowstyle="->", color=MUTED, lw=.9))
-    ax.annotate("handover gap 0.96 s", xy=(t_stop + 0.5, 0.5), xytext=(t_stop + 8, 2.6), fontsize=8, color=INK,
-                arrowprops=dict(arrowstyle="->", color=MUTED, lw=.9))
+    ax.axvline(last_heard, color=MUTED, lw=1, ls=":")
+    ax.text(last_heard + 2, len(sers) / 2,
+            f"stationary fleet sleeps\n{last_heard - t_stop:.0f} s after the stop.\nServer returned at "
+            f"{M['C3_return_SIGCONT'] - t0:.0f} s;\nfleet still asleep, so\nnothing to show beyond here.",
+            fontsize=7.6, color=MUTED, va="center", ha="left", linespacing=1.4)
 
-    ax.set_xlabel("time (s)   —   one row per orb, colour = cluster; blank = no broadcast heard")
-    ax.set_title("Server loss, per orb: a one-second gap, 30 s of standalone clustering, then the fleet sleeps and stays asleep", loc="left", fontsize=10, pad=18)
+    # --- agreement trace ---
+    import sys as _sys
+    _sys.path.insert(0, "tools")
+    from sat_ari_truth import ari as _ari
+    labs = [as_dict(p) for _, p, _ in parts]
+    xs, ys = [], []
+    for i in range(len(labs) - 1):
+        xs.append(ts[i + 1]); ys.append(_ari(labs[i], labs[i + 1]))
+    axa.plot(xs, ys, "-", color=BLUE, lw=1.1)
+    axa.axvline(t_stop, color=INK, lw=1, ls=":")
+    # Mark the interval that ACTUALLY straddles the stop (ts[i] < t_stop <= ts[i+1]),
+    # not merely the nearest one -- the nearest is the last fully-pre-stop interval
+    # and still reads 1.00, which would misreport the handover as free.
+    gap_i = next(i for i in range(len(labs) - 1) if ts[i] < t_stop <= ts[i + 1])
+    axa.plot([xs[gap_i]], [ys[gap_i]], "o", color=VERM, ms=6, zorder=5)
+    # when does it come back? first interval at/after the gap reaching 0.98
+    rec = next((xs[i] for i in range(gap_i, len(xs)) if ys[i] >= 0.98), None)
+    if rec is not None:
+        axa.axvspan(t_stop, rec, color=VERM, alpha=0.10, lw=0)
+        axa.annotate(f"membership scrambles at the handover (ARI {ys[gap_i]:.2f})\n"
+                     f"and re-settles within {rec - t_stop:.1f} s",
+                     xy=(xs[gap_i], ys[gap_i]), xytext=(t_stop + 8, 0.30),
+                     fontsize=7.2, color=VERM,
+                     arrowprops=dict(arrowstyle="->", color=VERM, lw=.9))
+    axa.set_ylim(0, 1.05); axa.set_ylabel("frame-to-frame\nagreement (ARI)", fontsize=8)
+    axa.tick_params(labelsize=8); axa.grid(alpha=0.25)
+    for sp in ("top", "right"): axa.spines[sp].set_visible(False)
+
+    axa.set_xlabel("time (s);  top: one row per orb, colour = cluster; blank = no broadcast heard")
+    ax.set_title("Cluster membership and frame-to-frame agreement across the server handover", loc="left", fontsize=10, pad=26)
     save(fig, "E6_raster.png")
 
 # ------------------------------------------------------------------ Cross-regime parity (referee 2.2)
@@ -772,31 +828,71 @@ def fig_parity():
     print("    by floor:", " ".join(f"{k}:{np.mean(v):.2f}" for k, v in sorted(by_thr.items())))
     per_orb = {o: np.mean([1.0 if r[3][o] else 0.0 for r in rows if o in r[3]]) for o in orbs if any(o in r[3] for r in rows)}
     print("    agreement by physical group:", " ".join(f"g{g}:{np.mean([per_orb[o] for o in per_orb if truth[o]==g])*100:.0f}%" for g in sorted(set(truth.values()))))
-    durs = [sw[-1][0] - sw[0][0] + 1 for sw in sweeps]
-    fig = plt.figure(figsize=(7.6, 4.8))
-    gs = fig.add_gridspec(2, len(sweeps), width_ratios=durs, height_ratios=[2.2, 1], hspace=0.12, wspace=0.04)
-    for k, sw in enumerate(sweeps):
-        t0 = sw[0][0]; a1 = fig.add_subplot(gs[0, k]); a2 = fig.add_subplot(gs[1, k], sharex=a1)
-        dts = np.diff([r[0] for r in sw]); w = float(np.median(dts)) if len(dts) else 1.0
-        for (t, thr, a, ag) in sw:
-            for i, o in enumerate(orbs):
-                if o in ag:
-                    a1.add_patch(plt.Rectangle((t - t0, i - .5), w, 1, color=TEAL if ag[o] else CORAL, lw=0))
-        a1.set_xlim(0, sw[-1][0] - t0 + w); a1.set_ylim(len(orbs) - .5, -.5); a1.set_yticks([]); a1.grid(False)
-        for sp in a1.spines.values(): sp.set_visible(False)
-        last = None
-        for (t, thr, _, _) in sw:
-            if thr != last:
-                a1.axvline(t - t0, color="white", lw=0.8); a1.text(t - t0 + 0.8, -0.7, str(thr), fontsize=6.5, color=MUTED, va="bottom"); last = thr
-        a2.plot([r[0] - t0 for r in sw], [r[2] for r in sw], "-", color=INK, lw=1.0)
-        a2.set_ylim(-0.02, 1.05); a2.axhline(1, color=GRID, lw=1); tidy(a2)
-        a2.set_xlabel(f"time (s), {'coarse' if k == 0 else 'fine'} sweep")
-        if k == 0:
-            a1.set_ylabel("one row per orb\nteal = same cluster-mates in both regimes"); a2.set_ylabel("ARI, server vs\nfirmware-side")
-            a1.text(0, -1.9, "server floor in force:", fontsize=7, color=MUTED, va="bottom")
-        else:
-            a2.set_yticklabels([])
-    fig.suptitle(f"Same selector, different input: top-10 uplink vs top-6 peer view agree on {agree_pct:.0f}% of orb-frames (mean ARI {np.nanmean(aris_all):.2f})",
+    # ---- replotted 2026-09-16 ----
+    # Was a time-axis raster: the reader had to map time -> floor through small
+    # numbers along the top, when both findings are about the FLOOR and about
+    # WHICH orbs disagree. Plot those two directly instead.
+    per_thr_ari, per_thr_pct = {}, {}
+    for (_, thr, a, ag) in rows:
+        per_thr_ari.setdefault(thr, []).append(a)
+        per_thr_pct.setdefault(thr, []).extend([1.0 if ag[o] else 0.0 for o in orbs if o in ag])
+    thrs = sorted(per_thr_ari)
+    ari_by = [float(np.nanmean(per_thr_ari[k])) for k in thrs]
+    pct_by = [float(np.mean(per_thr_pct[k])) for k in thrs]
+
+    # Full page width, and tall enough that both panels are read rather than
+    # squinted at: a 3:1 strip wastes the page it is given.
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(7.6, 4.3),
+                                   gridspec_kw=dict(width_ratios=[1.3, 1], wspace=0.26))
+
+    # --- left: agreement against the server floor ---
+    perfect = [k for k, v in zip(thrs, ari_by) if v >= 0.999]
+    if perfect:
+        axL.axvspan(min(perfect) - 2, max(perfect) + 2, color=GREEN, alpha=0.12, lw=0)
+        axL.text((min(perfect) + max(perfect)) / 2, 0.06, f"{min(perfect)}–{max(perfect)}\nidentical",
+                 ha="center", va="bottom", fontsize=8.5, color=GREEN, fontweight="bold")
+    axL.plot(thrs, ari_by, "o-", color=INK, lw=1.6, ms=4, label="mean ARI")
+    axL.plot(thrs, pct_by, "s--", color=TEAL, lw=1.2, ms=3.5, alpha=0.9, label="orb-frames agreeing")
+    for k, v in zip(thrs, ari_by):
+        if v < 0.9:
+            axL.annotate(f"{v:.2f}", (k, v), textcoords="offset points", xytext=(13, 4),
+                         ha="left", fontsize=8, color=CORAL, fontweight="bold")
+    axL.set_ylim(0, 1.06); axL.set_xlabel("server floor in force (8-bit link strength)")
+    axL.set_ylabel("agreement between regimes")
+    axL.legend(fontsize=8.5, loc="lower left", framealpha=0.95)
+    tidy(axL)
+
+    # --- right: which orbs disagree, grouped by physical group ---
+    order = sorted(per_orb, key=lambda o: (truth[o], -per_orb[o]))
+    vals = [per_orb[o] * 100 for o in order]
+    cols = [RASTER8[truth[o] % 8] for o in order]
+    axR.bar(range(len(order)), vals, color=cols, width=0.82, lw=0)
+    axR.set_ylim(0, 150); axR.set_xticks([])
+    axR.set_ylabel("orb-frames agreeing (%)")
+    axR.set_xlabel("one bar per orb, by physical group")
+    # Label each group with its mean above its own bars: that makes the 78 vs
+    # 86-99 comparison immediate without an annotation lying across the bars.
+    gmean = {g: np.mean([per_orb[o] for o in per_orb if truth[o] == g]) * 100
+             for g in sorted(set(truth[o] for o in per_orb))}
+    worst = min(gmean, key=gmean.get)
+    # The two smallest groups are 1-2 bars wide, narrower than their own labels,
+    # so alternate label heights rather than let them collide.
+    for n, g in enumerate(sorted(gmean)):
+        idx = [i for i, o in enumerate(order) if truth[o] == g]
+        if not idx: continue
+        xc = float(np.mean(idx)); bad = (g == worst)
+        y = 106 if n % 2 == 0 else 118
+        axR.text(xc, y, f"{gmean[g]:.0f}%", ha="center", va="bottom", fontsize=8.5,
+                 color=CORAL if bad else MUTED, fontweight="bold" if bad else "normal")
+        axR.annotate("", xy=(idx[0] - 0.45, y - 3), xytext=(idx[-1] + 0.45, y - 3),
+                     arrowprops=dict(arrowstyle="-", color=CORAL if bad else GRID,
+                                     lw=1.2 if bad else 0.9))
+    axR.text(float(np.mean([i for i, o in enumerate(order) if truth[o] == worst])), 131,
+             "one physical group carries\nthe disagreement", ha="center", va="bottom",
+             fontsize=8, color=CORAL, linespacing=1.3)
+    tidy(axR)
+
+    fig.suptitle(f"Agreement between the server and firmware-side partitions ({agree_pct:.0f}% of orb-frames)",
                  x=0.01, ha="left", fontsize=10.5, fontweight="bold")
     save(fig, "parity.png")
 
@@ -814,10 +910,14 @@ def fig_architecture():
             ax.add_patch(mp.Circle((x, y), nr, fc="white", ec=INK, lw=1.2, zorder=3))
     for ax in (a, b):
         ax.set_ylim(0, 5.5); ax.set_aspect("equal"); ax.axis("off")
-        # Equal aspect shrinks each axes box to the data ratio and CENTRES it in its
-        # gridspec slot, so the narrower right panel sits lower and its "B" title
-        # drops below "A". Anchor both to the top so the titles share a line.
+        # Equal aspect shrinks each axes box to the data ratio and CENTRES the
+        # result in its gridspec slot, so the narrower right panel ends up
+        # shorter and lower -- which put the "B" title well below "A". Anchor
+        # both boxes to the top of their slots so the two titles share a line.
         ax.set_anchor("N")
+    # Panel A is 1.45x wider in the gridspec. With the same x-range on both,
+    # equal-aspect shrank B's box and an identical r drew a visibly smaller ring.
+    # Narrowing B's x-range by the same 1.45 matches the two scales.
     a.set_xlim(0, 10)
     b.set_xlim(5.0 - 10 / 1.45 / 2, 5.0 + 10 / 1.45 / 2)
     # ---- A: infrastructure mode
@@ -840,7 +940,7 @@ def fig_architecture():
     ring(b, 5.0, 2.3, r=1.1)          # same radius as panel A, now at the same scale
     b.text(5.0, 4.55, "standalone pacer 50 Hz, armed\n10 × 100 ms after the last frame", ha="center", va="top", fontsize=6.8, color=MUTED)
     b.text(5.0, 0.62, "no server, no access point\nlight and sound from cluster id\nstationary fleet sleeps after 30 s", ha="center", va="center", fontsize=7.0, color=INK)
-    b.set_title("B   Ad-hoc mode (what ships)", loc="left", fontsize=9.5)
+    b.set_title("B   Ad-hoc mode", loc="left", fontsize=9.5)
     save(fig, "architecture.png")
 
 
@@ -853,7 +953,7 @@ def fig_timeline():
     cols = [SKY, PURPLE, AMBER, CRIMSON, TEAL, NAVY]
     ev = [(0, "2025-07-23", "2025-08-06", "sender · return path · slots · OTA · telemetry"),
           (1, "2025-08-15", "2026-02-10", "v0.9 → v1.0: icosahedron colour, a note per change"),
-          (2, "2026-02-20", "2026-03-31", "k-means on accel/gyro energy — landed 3 Mar"),
+          (2, "2026-02-20", "2026-03-31", "k-means on accel/gyro energy, landed 3 Mar"),
           (3, "2026-02-13", "2026-03-31", "v2.4 TDMA chirp + mic · v2.5 hybrid trial"),
           (4, "2026-02-13", "2026-09-10", "v2.4 logged · v3.1 substrate · v3.9 standalone · v3.13 fw"),
           (5, "2026-06-20", "2026-09-10", "E1 → E7")]
@@ -893,20 +993,20 @@ def fig_rigs():
     dots = []; x = 0
     for i, (n, gap) in enumerate([(4, 0.5), (7, 2.0), (10, 0.5), (5, 0)]):
         dots += blob(x, 0, n, RASTER8[i]); x += 0.45 + gap
-    panels.append(("E1 near\n4 groups, 0.5 m pairs", dots, []))
+    panels.append(("E1 near\n4 groups, 0.5 m within pairs", dots, []))
     dots = []
     for (cx, cy, n, i) in [(0, 0, 9, 0), (2, 0, 8, 1), (2, 4, 4, 2), (-1, 4, 6, 3)]:
         dots += blob(cx, cy, n, RASTER8[i], spread=0.22)
-    panels.append(("E1 wide\ngaps ≥ 2 m", dots, []))
+    panels.append(("E1 wide\n4 groups, gaps ≥ 2 m", dots, []))
     dots = []
     for i, n in enumerate([6, 5, 4, 3, 2, 1]):
         t = math.pi * (0.1 + 0.8 * i / 5); dots += blob(1.7 * math.cos(t), 1.7 * math.sin(t), n, RASTER8[i])
-    panels.append(("near-threshold\n(E2, E3, E6) 0.5 m", dots, []))
+    panels.append(("uniform spiral (E2, E3, E6)\n6 groups, gaps 0.4–0.6 m", dots, []))
     dots = []
     for i, n in enumerate([1, 2, 3, 5, 7, 8]):          # singleton at the centre, groups grow outward
         r = 0.0 if i == 0 else 0.55 * (1.42 ** (i - 1)); t = i * 1.95
         dots += blob(r * math.cos(t), r * math.sin(t), n, RASTER8[i], spread=0.12 + 0.02 * (n > 5))
-    panels.append(("graduated spiral\n{8,7,5,3,2,1}", dots, []))
+    panels.append(("graduated spiral (saturation, selector)\n{8,7,5,3,2,1}, opening out", dots, []))
     room = json.load(open(f"{D}/E7_room.json")); dots = []; extras = []
     A = [tuple(a["xy"]) for a in room["anchors"]]
     for xy in A: extras.append(("anchor", xy))
@@ -915,7 +1015,7 @@ def fig_rigs():
     for k, v in (pts.items() if isinstance(pts, dict) else []):
         xy = v.get("xy") if isinstance(v, dict) else (v if isinstance(v, (list, tuple)) and len(v) == 2 else None)
         if xy and k in ("CEN", "NL", "NR", "NB", "BL", "BR", "BB", "XLB", "XLR", "XRB"): dots.append((xy[0], xy[1], TEAL))
-    panels.append((f"E7\n3 anchors, 3.25 m", dots, extras))
+    panels.append(("E7\n3 anchors, 3.25 m apart", dots, extras))
     # common scale: every rig cell gets the same height in metres; widths follow x-extent
     geo = []
     for _, dts, ex in panels:
@@ -923,7 +1023,7 @@ def fig_rigs():
         geo.append((min(xs) - 0.4, max(xs) + 0.4, min(ys) - 0.4, max(ys) + 0.4))
     H = max(g[3] - g[2] for g in geo) + 1.0
     W = max(max(g[1] - g[0] for g in geo), H * 1.15)          # every cell the same width too, so the grid is regular
-    fig, axes = plt.subplots(2, 3, figsize=(7.6, 5.6), gridspec_kw=dict(wspace=0.06, hspace=0.22))
+    fig, axes = plt.subplots(2, 3, figsize=(7.6, 5.6), gridspec_kw=dict(wspace=0.06, hspace=0.30))
     cells = list(axes.flat)
     for ax, (title, dts, ex), g in zip(cells[:5], panels, geo):
         cx, cy = (g[0] + g[1]) / 2, (g[2] + g[3]) / 2
@@ -932,17 +1032,84 @@ def fig_rigs():
         for e in ex:
             if e[0] == "anchor": ax.add_patch(mp.Rectangle((e[1][0] - 0.13, e[1][1] - 0.13), 0.26, 0.26, fc=INK, ec="none"))
             if e[0] == "tri": ax.plot([p[0] for p in e[1]], [p[1] for p in e[1]], "-", color=INK, lw=0.7, alpha=0.4)
-        ax.set_title(title.replace("\n", " — "), fontsize=8, pad=3)
+        ax.set_title(title, fontsize=8, pad=3)
         xb, yb = cx - W / 2 + 0.25, cy - H / 2 + 0.3
         ax.plot([xb, xb + 1.0], [yb, yb], "-", color=INK, lw=1.6); ax.text(xb + 0.5, yb + 0.1, "1 m", ha="center", va="bottom", fontsize=7)
     cells[5].axis("off")
-    fig.suptitle("The rigs, to one scale — each dot an orb, colour its physical group; E7 from measured coordinates, the rest schematic", x=0.01, ha="left", fontsize=8.5, fontweight="bold")
+    fig.suptitle("Calibration rigs to one scale: each dot an orb, coloured by physical group (E7 measured, others schematic)", x=0.01, ha="left", fontsize=8.5, fontweight="bold")
     save(fig, "rigs.png")
+
+def fig_selector_grid():
+    """A1/A2 in one view: every selector arm on every rig it was scored on. Rows are rigs,
+    columns the arms; the cell carries ARI against that rig's truth (colour + number) and the
+    mean number of clusters recovered (small, under it). Read across a row to compare arms on
+    one layout; read down a column to see whether an arm's behaviour survives a change of rig."""
+    from matplotlib.colors import LinearSegmentedColormap
+    e2 = json.load(open(f"{D}/E1_runs/selector_rescore_e2.json"))["captures"]["E2_pooled"]
+    gs = json.load(open(f"{D}/E1_runs/mutual_knn_eval.json"))["arms"]
+    wd = json.load(open(f"{D}/E1_runs/mutual_knn_wide.json"))["passes"]
+
+    def pick(arms, prefix, ak, kk="mean_k"):
+        k = next(n for n in arms if n.startswith(prefix))
+        thr = k[k.rfind("(") + 1:-1] if "thr" in k else None
+        return arms[k][ak], arms[k][kk], thr
+
+    cols = [("adaptive-gap floodfill (floor 220)", "adaptive-gap\nfloor 220\n(deployed)"),
+            ("adaptive-gap floodfill (floor 200)", "adaptive-gap\nfloor 200"),
+            ("floodfill @ best", "fixed threshold\nbest single value"),
+            ("mutual-kNN k=3", "mutual-kNN\nk = 3"), ("mutual-kNN k=4", "k = 4"),
+            ("mutual-kNN k=5", "k = 5"), ("mutual-kNN k=6", "k = 6"),
+            ("mutual-kNN + modularity", "mutual-kNN\nk by modularity")]
+    rows = [("uniform spiral\n21 orbs, 6 groups, gaps 0.4–0.6 m\nsaturated map; taped truth; 630 frames",
+             [pick(e2, c[0], "ari_physical") for c in cols]),
+            ("graduated spiral\n26 orbs, 6 groups, opening outward\nde-saturated map; consensus truth; 812 frames",
+             [pick(gs, c[0], "ari_consensus") for c in cols]),
+            ("wide rig\n27 orbs, 4 groups, gaps ≥ 2 m\nsaturated map; consensus truth\n3 passes: median, range beneath",
+             [])]
+    # wide rig: median across the three passes, with the pass range kept for the cell text
+    wcells = []
+    for c in cols:
+        a, k, t = zip(*[pick(wd[p]["arms"], c[0], "ari_consensus") for p in wd])
+        wcells.append((st.median(a), st.median(k), t[0], min(a), max(a)))
+    rows[2] = (rows[2][0], wcells)
+
+    A = np.array([[c[0] for c in r[1]] for r in rows])
+    cmap = LinearSegmentedColormap.from_list("ari", ["#f4f4f4", "#bfe3dc", TEAL])
+    fig, ax = plt.subplots(figsize=(9.0, 4.4))
+    ax.imshow(A, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    for i, (_, cells) in enumerate(rows):
+        for j, c in enumerate(cells):
+            a, k = c[0], c[1]
+            fc = "white" if a > 0.62 else INK
+            rng = f"{c[3]:.2f}\u2013{c[4]:.2f}" if len(c) == 5 and c[4] - c[3] >= 0.01 else ""
+            sub = f"{k:.1f} clusters" + (f"\nthreshold {c[2]}" if j == 2 and c[2] else "")
+            ax.text(j, i - 0.24, f"{a:.2f}", ha="center", va="center", fontsize=10, color=fc, fontweight="bold")
+            if rng: ax.text(j, i - 0.02, rng, ha="center", va="center", fontsize=6, color=fc)
+            ax.text(j, i + 0.24, sub, ha="center", va="center", fontsize=7, color=fc, linespacing=1.1)
+    # outline the best mutual-kNN k on each rig: it is a different k every time
+    for i, (_, cells) in enumerate(rows):
+        jbest = 3 + int(np.argmax([cells[j][0] for j in range(3, 7)]))
+        ax.add_patch(plt.Rectangle((jbest - 0.5, i - 0.5), 1, 1, fill=False, ec=INK, lw=1.6))
+    ax.set_xticks(range(len(cols))); ax.set_xticklabels([c[1] for c in cols], fontsize=7.5)
+    ax.set_yticks(range(len(rows))); ax.set_yticklabels([r[0] for r in rows], fontsize=7.5)
+    ax.tick_params(length=0)
+    for sp in ax.spines.values(): sp.set_visible(False)
+    ax.set_xticks(np.arange(-0.5, len(cols)), minor=True); ax.set_yticks(np.arange(-0.5, len(rows)), minor=True)
+    ax.grid(which="minor", color="white", lw=2)
+    # family brackets above the columns
+    for x0, x1, lab in [(0, 2, "threshold family (what the server and firmware run)"), (3, 7, "mutual-kNN family (the textbook remedy)")]:
+        ax.annotate("", xy=(x0 - 0.45, -0.62), xytext=(x1 + 0.45, -0.62), xycoords="data",
+                    arrowprops=dict(arrowstyle="-", color=MUTED, lw=1), annotation_clip=False)
+        ax.text((x0 + x1) / 2, -0.70, lab, ha="center", va="bottom", fontsize=8, color=MUTED, clip_on=False)
+    ax.text(-0.5, len(rows) - 0.5 + 0.55, "boxed cell: the best mutual-kNN k on that rig", ha="left", va="top", fontsize=7, color=MUTED, clip_on=False)
+    ax.set_title("Cluster recovery by selector and rig (ARI against each rig's grouping; clusters recovered beneath)",
+                 fontsize=9.5, fontweight="bold", pad=26)
+    save(fig, "selector_grid.png")
 
 
 
 if __name__ == "__main__":
-    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster, fig_endurance, fig_e4_fairness, fig_e7_walk, fig_e6_raster, fig_parity, fig_architecture, fig_timeline, fig_rigs):
+    for fn in (fig_churn_v2, fig_e2_v2, fig_e3, fig_e6_v2, fig_e7_v2, fig_e4_v2, fig_sat_v2, fig_e1_v2, fig_e5_v2, fig_mds, fig_mds_embed, fig_e3_raster, fig_endurance, fig_e4_fairness, fig_e7_walk, fig_e6_raster, fig_parity, fig_architecture, fig_timeline, fig_rigs, fig_selector_grid):
         try:
             fn()
         except FileNotFoundError as e:

@@ -1,0 +1,187 @@
+{
+ "truth": {
+  "source": "E2_ground_truth.json",
+  "n_orbs": 21,
+  "sizes": [
+   6,
+   5,
+   4,
+   3,
+   2,
+   1
+  ],
+  "kind": "independent taped placements"
+ },
+ "deployed_floor": 220,
+ "best_global_thr": 226,
+ "captures": {
+  "E2_coarse": {
+   "adaptive-gap floodfill (floor 220)": {
+    "ari_physical": 0.98,
+    "mean_k": 6,
+    "size_match_pct": 93.8,
+    "n_frames": 450
+   },
+   "adaptive-gap floodfill (floor 200)": {
+    "ari_physical": 0.956,
+    "mean_k": 5.89,
+    "size_match_pct": 88.2,
+    "n_frames": 450
+   },
+   "floodfill @ best global thr (226)": {
+    "ari_physical": 0.99,
+    "mean_k": 5.99,
+    "size_match_pct": 96.4,
+    "n_frames": 450
+   },
+   "single-linkage -> k=6": {
+    "ari_physical": 0.988,
+    "mean_k": 6,
+    "size_match_pct": 96.4,
+    "n_frames": 450
+   },
+   "mutual-kNN k=3": {
+    "ari_physical": 0.935,
+    "mean_k": 4.82,
+    "size_match_pct": 0.0,
+    "n_frames": 450
+   },
+   "mutual-kNN k=4": {
+    "ari_physical": 0.592,
+    "mean_k": 3.12,
+    "size_match_pct": 0.0,
+    "n_frames": 450
+   },
+   "mutual-kNN k=5": {
+    "ari_physical": 0.254,
+    "mean_k": 1.99,
+    "size_match_pct": 0.0,
+    "n_frames": 450
+   },
+   "mutual-kNN k=6": {
+    "ari_physical": 0.0,
+    "mean_k": 1.02,
+    "size_match_pct": 0.0,
+    "n_frames": 450
+   },
+   "mutual-kNN + modularity-select {3..6}": {
+    "ari_physical": 0.537,
+    "mean_k": 2.92,
+    "size_match_pct": 0.0,
+    "n_frames": 450
+   }
+  },
+  "E2_fine": {
+   "adaptive-gap floodfill (floor 220)": {
+    "ari_physical": 0.997,
+    "mean_k": 5.99,
+    "size_match_pct": 98.9,
+    "n_frames": 180
+   },
+   "adaptive-gap floodfill (floor 200)": {
+    "ari_physical": 0.925,
+    "mean_k": 5.63,
+    "size_match_pct": 88.3,
+    "n_frames": 180
+   },
+   "floodfill @ best global thr (226)": {
+    "ari_physical": 1.0,
+    "mean_k": 6,
+    "size_match_pct": 100.0,
+    "n_frames": 180
+   },
+   "single-linkage -> k=6": {
+    "ari_physical": 1.0,
+    "mean_k": 6,
+    "size_match_pct": 100.0,
+    "n_frames": 180
+   },
+   "mutual-kNN k=3": {
+    "ari_physical": 0.917,
+    "mean_k": 4.63,
+    "size_match_pct": 0.0,
+    "n_frames": 180
+   },
+   "mutual-kNN k=4": {
+    "ari_physical": 0.579,
+    "mean_k": 3.03,
+    "size_match_pct": 0.0,
+    "n_frames": 180
+   },
+   "mutual-kNN k=5": {
+    "ari_physical": 0.261,
+    "mean_k": 2,
+    "size_match_pct": 0.0,
+    "n_frames": 180
+   },
+   "mutual-kNN k=6": {
+    "ari_physical": 0.0,
+    "mean_k": 1,
+    "size_match_pct": 0.0,
+    "n_frames": 180
+   },
+   "mutual-kNN + modularity-select {3..6}": {
+    "ari_physical": 0.561,
+    "mean_k": 2.97,
+    "size_match_pct": 0.0,
+    "n_frames": 180
+   }
+  },
+  "E2_pooled": {
+   "adaptive-gap floodfill (floor 220)": {
+    "ari_physical": 0.985,
+    "mean_k": 6.0,
+    "size_match_pct": 95.2,
+    "n_frames": 630
+   },
+   "adaptive-gap floodfill (floor 200)": {
+    "ari_physical": 0.947,
+    "mean_k": 5.82,
+    "size_match_pct": 88.3,
+    "n_frames": 630
+   },
+   "floodfill @ best global thr (226)": {
+    "ari_physical": 0.993,
+    "mean_k": 5.99,
+    "size_match_pct": 97.5,
+    "n_frames": 630
+   },
+   "single-linkage -> k=6": {
+    "ari_physical": 0.992,
+    "mean_k": 6,
+    "size_match_pct": 97.5,
+    "n_frames": 630
+   },
+   "mutual-kNN k=3": {
+    "ari_physical": 0.93,
+    "mean_k": 4.77,
+    "size_match_pct": 0.0,
+    "n_frames": 630
+   },
+   "mutual-kNN k=4": {
+    "ari_physical": 0.588,
+    "mean_k": 3.1,
+    "size_match_pct": 0.0,
+    "n_frames": 630
+   },
+   "mutual-kNN k=5": {
+    "ari_physical": 0.256,
+    "mean_k": 1.99,
+    "size_match_pct": 0.0,
+    "n_frames": 630
+   },
+   "mutual-kNN k=6": {
+    "ari_physical": 0.0,
+    "mean_k": 1.01,
+    "size_match_pct": 0.0,
+    "n_frames": 630
+   },
+   "mutual-kNN + modularity-select {3..6}": {
+    "ari_physical": 0.544,
+    "mean_k": 2.93,
+    "size_match_pct": 0.0,
+    "n_frames": 630
+   }
+  }
+ }
+}

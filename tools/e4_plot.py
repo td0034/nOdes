@@ -33,7 +33,16 @@ def load(label):
     return byn
 
 def main():
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print(__doc__); return
     labels = sys.argv[1:] or ["autorate"]
+    # Refuse to write if any requested arm has no captures. Otherwise a typo'd
+    # label silently replaces the published figure with a partial one.
+    missing = [l for l in labels if not load(l)]
+    if missing:
+        sys.exit(f"! no captures for label(s): {', '.join(missing)}\n"
+                 f"  looked in {CAP}/net_agg_*_<label>.csv\n"
+                 f"  nothing written; fix the label or the capture and re-run.")
     fig, (axr, axm) = plt.subplots(1, 2, figsize=(11, 4.4))
     colors = {"autorate": "#1a7f37", "fixed50": "#b03a2e", "fixed20": "#8a6d1a"}
     summary = {}
@@ -45,21 +54,29 @@ def main():
         rate = [st.mean(byn[n]["rate"]) for n in ns]
         miss = [st.mean(byn[n]["miss"]) for n in ns]
         c = colors.get(lab, None)
+        # Sent rate is what the server emits; what an orb actually receives is
+        # rate x (1 - miss). At 50 Hz the two diverge hard, and the EFFECTIVE
+        # rate is the one a participant feels, so plot both.
+        eff = [r * (1 - m) for r, m in zip(rate, miss)]
         axr.plot(ns, rate, "o-", color=c, label=lab, ms=4)
+        axr.plot(ns, eff, "--", color=c, lw=1.3, alpha=0.85)   # title explains dashed
         axm.plot(ns, miss, "o-", color=c, label=lab, ms=4)
         summary[lab] = {n: {"rate_hz": round(st.mean(byn[n]["rate"]), 1),
                             "miss": round(st.mean(byn[n]["miss"]), 3),
                             "frames": len(byn[n]["rate"])} for n in ns}
         print(f"{lab}: {len(ns)} levels, {ns[0]}..{ns[-1]} orbs, "
               f"rate {rate[0]:.0f}->{rate[-1]:.0f}Hz, miss {min(miss):.3f}-{max(miss):.3f}")
-    axr.axhline(CEIL, ls=":", color="gray", lw=1); axr.text(axr.get_xlim()[1], CEIL, " 50Hz ceiling", va="bottom", ha="right", fontsize=8, color="gray")
+    axr.axhline(CEIL, ls=":", color="gray", lw=1, label="autorate limits (10 and 50 Hz)")
     axr.axhline(FLOOR, ls=":", color="gray", lw=1)
-    axr.set_xlabel("in-play orbs (eligible)"); axr.set_ylabel("achieved send rate (Hz)")
-    axr.set_title("Adaptive rate vs fleet size"); axr.grid(alpha=0.25); axr.legend(fontsize=9); axr.invert_xaxis()
+    axr.set_xlabel("in-play orbs (eligible)"); axr.set_ylabel("send rate (Hz)")
+    axr.set_title("Send rate vs fleet size\n(solid = sent, dashed = effective per orb)", fontsize=10); axr.grid(alpha=0.25); axr.invert_xaxis()
     axm.set_xlabel("in-play orbs (eligible)"); axm.set_ylabel("aggregate per-orb miss ratio")
-    axm.set_title("Delivery vs fleet size"); axm.grid(alpha=0.25); axm.legend(fontsize=9); axm.invert_xaxis()
-    fig.suptitle("E4 — adaptive send-rate holds per-orb delivery as the fleet scales", weight="bold")
-    plt.tight_layout()
+    axm.set_title("Delivery vs fleet size"); axm.grid(alpha=0.25); axm.invert_xaxis()
+    # one legend for both panels, below them, so no box sits on a curve
+    h, l = axr.get_legend_handles_labels()
+    fig.legend(h, l, ncol=4, fontsize=9, loc="lower center", frameon=False)
+    fig.suptitle("E4: send rate and per-orb delivery against fleet size", weight="bold")
+    plt.tight_layout(rect=[0, 0.07, 1, 1])
     p = f"{OUT}/E4_countsweep.png"; plt.savefig(p, dpi=300)
     import json; json.dump(summary, open(p.replace(".png", ".json"), "w"), indent=1)
     print("saved", p, "(+ .json)")

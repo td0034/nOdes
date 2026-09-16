@@ -15,6 +15,11 @@
    "mean_k": 18.29,
    "ari_consensus": 0.312
   },
+  "adaptive-gap floodfill (floor 220)": {
+   "size_match_pct": 0.0,
+   "mean_k": 18.54,
+   "ari_consensus": 0.294
+  },
   "floodfill @ best global thr (188)": {
    "size_match_pct": 1.4,
    "mean_k": 5.99,
