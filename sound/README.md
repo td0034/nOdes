@@ -18,7 +18,7 @@ PipeWire (JACK API)  →  chosen output sink
   1 = G, 2 = D …); the note is returned when the cluster leaves, so pitch never
   drifts. A cluster is **silent at rest**.
 - **Spin → a gated pad** (piano-ish) that swells while an orb spins and releases
-  when it slows — pad length tracks spin length.
+  when it slows. Pad length tracks spin length.
 - **Jump → one chime** on the cluster note (one of 6 random timbres).
 - All tunables live in **`sound_settings.csv`** (hot-reloaded on save).
 
@@ -33,7 +33,7 @@ Tuning reference: `../docs/SESSION_RUNBOOK.md` (audio section).
 | `desktop/` | full-server install: systemd **--user** units, audio-route + MIDI helpers, installer |
 
 > The older desktop synth (`orb_synth.scd`) and the `bridge/` poller were
-> retired 2026-06-17 — the Pi model above is now the single sound path. They
+> retired 2026-06-17. The Pi model above is now the single sound path. They
 > remain in git history if ever needed.
 
 ## Running on the full server (desktop)

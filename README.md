@@ -1,9 +1,9 @@
-# nOdes — a human-carried proximity swarm
+# nOdes: a human-carried proximity swarm
 
 nOdes is a swarm of handheld wireless "orbs" that sense **who is with whom** in a room
 by inter-node radio signal strength, cluster on it, and play that configuration back
 to the people holding them as collective light and sound. The orbs have no locomotion
-of their own: their configuration — and everything downstream of it — is supplied by
+of their own: their configuration (and everything downstream of it) is supplied by
 the people carrying them.
 
 This repository is a **curated replication kit**, not a mirror of the development
@@ -39,12 +39,12 @@ data/calibration-2026/   run data behind the calibration results, and the script
 ## The system in one paragraph
 
 Each orb is an ESP32-S3 with 12 APA102 LEDs, an LSM6DS accelerometer/gyro, an INA219
-battery monitor, a speaker and a MEMS microphone, in a sealed shell — no USB access
-once built, so **all updates are over the air**. Orbs broadcast to their peers over
+battery monitor, a speaker and a MEMS microphone, in a sealed shell. There is no USB
+access once built, so **all updates are over the air**. Orbs broadcast to their peers over
 ESP-NOW and log received signal strength, producing a proximity graph; an adaptive-gap
 single-linkage clusterer turns that into cluster membership. The **same clustering
 routine** runs in two regimes: **ad-hoc** (orbs only, peer-to-peer, no server, no access
-point — what ships to unattended installations) and **infrastructure mode** (an optional
+point, and what ships to unattended installations) and **infrastructure mode** (an optional
 Linux server sends a 50 Hz multicast frame carrying colour per slot, receives unicast
 telemetry from every orb, and drives synchronised light and sound). The two share one
 radio: an orb that has just received a multicast frame broadcasts its own neighbour
@@ -94,7 +94,7 @@ cd client
 #   #define WIFI_SSID / #define WIFI_PASS in main/hello_world_main.c
 source ../esp-idf/export.sh
 idf.py build
-ls -l build/espidf_orb.bin        # MUST be under 1 MB — see below
+ls -l build/espidf_orb.bin        # MUST be under 1 MB (see below)
 ```
 
 **First flash of a new orb** is over USB, before the shell is sealed
@@ -110,7 +110,7 @@ cd server && python3 -m http.server 8000     # orbs fetch http://10.0.0.8:8000/e
 actually deployed to the fleet, with `SHA256SUMS`. They were built with the authors' AP
 credentials compiled in and are provided as known-good reference images; build your own.
 
-### Safety-critical invariants — read before touching firmware
+### Safety-critical invariants: read before touching firmware
 
 - **OTA is the only update path and rollback is not enabled.** A bad OTA build bricks a
   sealed orb permanently. Bench-test on two or three orbs first.
@@ -142,7 +142,7 @@ cd server && mkdir -p build && cd build && cmake .. && make
 ./multicast_sender --rate 20       # fixed rate
 ```
 
-The server exports live state as JSON to `/tmp/orb_data` — slot↔serial map, proximity
+The server exports live state as JSON to `/tmp/orb_data`: slot↔serial map, proximity
 matrix, per-orb telemetry, network stats. Everything else reads that file:
 
 ```bash
@@ -154,8 +154,8 @@ python3 cluster_viz.py             # movement-clustering visualiser (MODE_CLUSTE
 Sound: `sound/` holds the SuperCollider synths and the conductor; `sound/desktop/`
 has the systemd units and PipeWire routing for a Linux workstation (`pw-jack`, 48 kHz/1024).
 
-Running a session end to end — start order, audio debugging, capture verification —
-is `docs/SESSION_RUNBOOK.md`; pre-flight is `tools/session_preflight.sh`.
+Running a session end to end (start order, audio debugging, capture verification)
+is `docs/SESSION_RUNBOOK.md`. Pre-flight is `tools/session_preflight.sh`.
 
 ---
 
@@ -189,7 +189,7 @@ Design rules for RSSI proximity clustering on identical hardware, each measured:
 - **Smooth with an RSSI decay constant ≥ 3 s.** At-rest instability is exactly zero
   for every τ ≥ 3 s at every debounce setting.
 - **Saturating the similarity widens the correct-threshold band** rather than harming
-  clustering — and destroys the gradient that metric ranging would need. For a swarm
+  clustering, and destroys the gradient that metric ranging would need. For a swarm
   whose useful percept is *who is with whom*, that is the right trade.
 - **Three known-position anchors give station-level presence and bearing at range,
   not position** (radius compressed ~4.4×). Plan on relational sensing.
@@ -204,9 +204,9 @@ Design rules for RSSI proximity clustering on identical hardware, each measured:
 
 ## Papers
 
-- *nOdes* — NIME 2026 (the instrument).
-- *Who Is With Whom: A Human-Carried Swarm That Senses Its Own Configuration and
-  Plays It Back* — Frontiers in Robotics and AI, HSI Research Topic (in revision):
+- *nOdes*, NIME 2026 (the instrument).
+- *Wi-Fi RSSI Proximity Sensing for Human-Hybrid Swarms in Group Experiences*,
+  Frontiers in Robotics and AI, HSI Research Topic (in revision):
   the sensing characterisation this data belongs to.
 - The Obstruction Manual (`docs/obstruction-manual/`) follows Merendino, Masu & Lepri,
   *The Obstruction Manual*, NIME 2026: it is deliberately incomplete.
@@ -229,5 +229,5 @@ Third-party components keep their own licences (ESP-IDF: Apache-2.0).
 
 ## Contact
 
-Tom Didiot-Cook, Department of Engineering Mathematics, University of Bristol —
+Tom Didiot-Cook, Department of Engineering Mathematics, University of Bristol.
 td0034@bristol.ac.uk.

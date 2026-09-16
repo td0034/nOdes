@@ -1,11 +1,11 @@
-# finale sound — the scale that assembles as the swarm declusters
+# finale sound: the scale that assembles as the swarm declusters
 
 *Status 2026-08-18: scale engine built + tested (state machine unit tests,
 synthetic end-to-end with MIDI + flash). Not yet heard with real orbs.*
 
 The musical mechanic of the finale study (`docs/finale/SCOPING.md` §2): each
 session draws a random **root**; the group starts as one root-huddle, and
-each orb that leaves earns the next scale degree in circle-of-fifths order —
+each orb that leaves earns the next scale degree in circle-of-fifths order,
 root, 5th, 2nd, 6th, 3rd, 7th, 4th (+0, 7, 2, 9, 4, 11, 5 semitones). Seven
 people on one note become the full diatonic major / relative-minor scale by
 moving apart. Degrees are sticky for the session; re-huddling keeps the scale
@@ -19,7 +19,7 @@ assembled.
 | `test_scale_state.py` | unit tests (`python3 sound/finale/test_scale_state.py`) |
 | `scale_conductor.py` | subclass of the festival `conductor_pi.Conductor`: same MIDI contract into `orb_synth_spatial.scd`, same voices, new note policy |
 | `render_events.py` | artefact step 1: replay a raw capture through the conductor OFFLINE (rtmidi stubbed, no /tmp writes) → events JSON with per-event spatial gains |
-| `nrt_voices.scd` | the live voices written out as `.scsyndef` for scsynth NRT (COPY of the live engine's defs — keep in sync) |
+| `nrt_voices.scd` | the live voices written out as `.scsyndef` for scsynth NRT (COPY of the live engine's defs; keep in sync) |
 | `render_artefact.py` | the whole artefact: events → python-built NRT score → 8-ch scsynth render → stereo downmix (left rig hard L, right hard R, back centred) → `orb_replay` video → mux |
 | `make_test_capture.py` | synthetic 45 s capture with huddle→disperse dynamics, for pipeline testing without orbs |
 
@@ -32,7 +32,7 @@ spin→pad, EMAs, tempo shaping), `sound_settings.csv` tunables.
 - **Per-orb notes.** Chime = `CHIME_BASE + root + degree(orb)`, pad =
   `PAD_BASE + root + degree(orb)`. Unassigned orbs sound the root.
 - **Stable per-orb timbre** (crc32(serial) % 6): a person's sound identity
-  never changes mid-session — legibility of individual action.
+  never changes mid-session: legibility of individual action.
 - **Chime → flash, in sync.** Chimed slots are batched once per tick into
   `/tmp/orb_flash_cmd`; `multicast_sender` (srv `flash` cmd) paints those
   orbs white for 8 frames (~160 ms) starting next frame. Separate file from
@@ -66,7 +66,7 @@ python3 sound/finale/render_artefact.py CAPTURE.raw.jsonl.gz \
 # audio only: --audio-only -o mix.wav      test fixture: make_test_capture.py
 ```
 
-Overhead reconstruction (`orb_replay`, wall-clock linear — the same clock as
+Overhead reconstruction (`orb_replay`, wall-clock linear, the same clock as
 the audio events, so they stay in sync) + the music re-rendered offline from
 telemetry through the same voices, mixed left rig hard L / right rig hard R /
 back rig centred. Needs `scsynth`, `sclang` (once), and `ffmpeg` (PATH,
@@ -77,13 +77,13 @@ separation during a left-side spin burst, aligned mp4.
 ## Open items
 
 - **Glow aesthetics on real orbs**: the floor (0.25) dims idle orbs below the
-  festival look — deliberate ("aware of their individual actions") but needs
+  festival look: deliberate ("aware of their individual actions") but needs
   eyes on the real fleet; tune `glow_floor` / `glow_hz` in sound_settings.csv.
 - **Flash↔chime skew**: both fire from the same tick, but audio leaves the
   jack in ~10–20 ms while the flash rides the next 50 Hz frame. Measure with
   `tools/orb_audio_tap.sh`; if audible, delay the chime by one frame.
 - **Re-merge sound design**: merged clusters currently just sound their
-  members' degrees together (which is the assembled chord — arguably right).
+  members' degrees together (which is the assembled chord, arguably right).
   Listen and decide.
 - **Block integration**: whether the scale resets per block or persists across
   the session's three blocks (SCREEN → CONDUCTOR → ENSEMBLE) is a study

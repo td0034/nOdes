@@ -5,7 +5,7 @@ peer sensing, the adaptive-gap clusterer (`compute_cluster_ids`, mirrored line f
 line from the server), LED, motion, battery and audio drivers, OTA. The INA219
 battery monitor is the one component split out (`components/ina219`).
 
-Build with ESP-IDF v5.4 — see the top-level README. Before building, set
+Build with ESP-IDF v5.4 (see the top-level README). Before building, set
 `WIFI_SSID` / `WIFI_PASS` to your own access point; the values here are placeholders.
 
 **Read the safety-critical invariants in the top-level README first.** Orbs are

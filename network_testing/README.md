@@ -9,10 +9,10 @@ plots in `plots/`. Capture/analysis tools live in the repo `tools/`
 1. **Hard capacity knee at ~12–13 orbs** (PROXIMITY mode). Per-orb miss <16% up
    to 12, jumps to 33% at 13, ~69% at 22. (`plots/sweep_curve.png`)
 2. **It's a servicing cap, not congestion.** Round-trip latency stays ~18 ms and
-   jitter flat (~9 ms p95) across the whole range — orbs that *are* serviced are
+   jitter flat (~9 ms p95) across the whole range. Orbs that *are* serviced are
    fine; the server just can't round-trip more than ~12 per 50 Hz frame.
 3. **Misses are NOT shared fairly.** At 20–22 orbs, per-orb miss spans 41–83%
-   (effective 8.5–30 Hz), correlated with RSSI — weak-signal orbs starve first
+   (effective 8.5–30 Hz), correlated with RSSI: weak-signal orbs starve first
    (CoV 0.17). Signal isn't the bottleneck at low count, but it decides *who*
    loses at saturation.
 4. **ESP-NOW competes for airtime in PROXIMITY only.** Firmware
@@ -27,23 +27,23 @@ plots in `plots/`. Capture/analysis tools live in the repo `tools/`
   the rate to 25 Hz should roughly double the knee to ~24. **That's the key test.**
 
 ## Better measures to add
-- **Per-orb effective update rate (Hz)** and its spread (CoV / Gini) — fairness,
+- **Per-orb effective update rate (Hz)** and its spread (CoV / Gini): fairness,
   not just the aggregate miss_ratio.
-- **Throughput C = served_orbs × rate** (round-trips/s) — the quantity that should
+- **Throughput C = served_orbs × rate** (round-trips/s): the quantity that should
   be conserved if it's airtime-bound. Plot C vs orb-count at each rate.
-- **Inter-update interval variance per orb** — directly measures "consistent
+- **Inter-update interval variance per orb**: directly measures "consistent
   update" (the adaptive-rate goal), beyond mean rate.
-- **Per-orb miss vs RSSI at saturation** — signal-fairness curve.
+- **Per-orb miss vs RSSI at saturation**: signal-fairness curve.
 
 ## Experiments
-- **E1 — rate sweep:** count-sweep at 50, 25 (and 12.5) Hz. Test knee × rate ≈ C.
+- **E1, rate sweep:** count-sweep at 50, 25 (and 12.5) Hz. Test knee × rate ≈ C.
   If C is constant → pure airtime budget → adaptive rate is clean. If C rises at
   lower rate → there's per-frame overhead beyond cadence.
-- **E2 — ESP-NOW isolation:** count-sweep COMMS vs PROXIMITY at fixed rate.
+- **E2, ESP-NOW isolation:** count-sweep COMMS vs PROXIMITY at fixed rate.
   knee_comms − knee_prox = ESP-NOW's airtime cost.
-- **E3 — fairness vs rate:** does lowering the rate flatten the per-orb miss
+- **E3, fairness vs rate:** does lowering the rate flatten the per-orb miss
   spread (CoV → 0)? Expect yes once below the knee.
-- **E4 — adaptive rate:** `period = clamp(20ms, 1e6/R_min, N / C)` recomputed on
+- **E4, adaptive rate:** `period = clamp(20ms, 1e6/R_min, N / C)` recomputed on
   active count N. Slows as orbs join so all stay serviced every frame at a
   consistent rate; floor R_min set by feel (you judge sluggishness). Caps max
   orbs at C / R_min.
@@ -52,7 +52,7 @@ plots in `plots/`. Capture/analysis tools live in the repo `tools/`
 Add a `--rate <hz>` flag (test rates without recompiling) and an `--adaptive
 [--rmin <hz>]` mode (dynamic period). Then E1–E4 are runnable.
 
-## Caveat — the spare orb
+## Caveat: the spare orb
 Capacity/knee experiments need the **full fleet** (awake + OFF charge so sleep
 sticks). One orb only validates plumbing: that `--rate`/`--adaptive` change the
 per-orb cadence as expected, and single-orb latency/ESP-NOW baseline. The real

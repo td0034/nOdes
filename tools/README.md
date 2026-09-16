@@ -6,7 +6,7 @@ deploy, operate, recover, or debug the system lives here.
 
 ## Current contents
 
-- `R500_200.7.10.2.339.bl7` — Ruckus R500 access-point firmware image.
+- `R500_200.7.10.2.339.bl7`: Ruckus R500 access-point firmware image.
   Flash the AP to this version if it's ever downgraded or you're building a
   new stack. Everything in `server/src/multicast_sender.cpp` assumes the
   OrbAP runs this build.
@@ -22,5 +22,5 @@ deploy, operate, recover, or debug the system lives here.
 
 ## What belongs in `visualiser/` instead
 
-- Anything whose output is a live or post-hoc visualisation — proximity graph,
+- Anything whose output is a live or post-hoc visualisation: proximity graph,
   cluster scatter, Grafana dashboards, InfluxDB bridge

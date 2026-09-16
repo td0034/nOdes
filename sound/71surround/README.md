@@ -1,4 +1,4 @@
-# nOdes 7.1 surround — spatialised swarm audio
+# nOdes 7.1 surround: spatialised swarm audio
 
 *Started 2026-07-01. Status: concept + working router prototype.*
 
@@ -12,7 +12,7 @@ and its sound sweeps across the 7.1 field with it.
 The key trick: **we already measure this.** The server publishes a full
 `proximity_matrix` (RSSI strength, 0–255, every orb ↔ every orb) in
 `/tmp/orb_data` at 50 Hz. Park an orb at each speaker and a handheld orb's row of
-that matrix *is* a pan vector — no cameras, no metric coordinates, no calibration
+that matrix *is* a pan vector: no cameras, no metric coordinates, no calibration
 of centimetres. Proximity to anchor → gain on that anchor's channel.
 
 ```
@@ -50,7 +50,7 @@ gain    *= master
 
 - `focus` controls how tightly the sound clings to the nearest speaker vs. bleeds
   across the field. Low = ambient wash, high = pin-point localisation.
-- **LFE (idx 3) is not panned** — bass is omnidirectional. It's driven by a
+- **LFE (idx 3) is not panned**: bass is omnidirectional. It's driven by a
   separate low-frequency send (per-source energy, or the collective "gravity"; see
   ROADMAP). The centre **FC** *is* anchorable if you place an orb there.
 - This needs **no coordinates** and degrades gracefully: if only some speakers
@@ -60,7 +60,7 @@ gain    *= master
 MDS-MAP, or measured by tape), the router can instead do classic
 distance-based amplitude panning over the speaker geometry in
 `speaker_layout.json`. More "correct" spatially, but only as good as the position
-estimate — RSSI-MDS is metre-scale and relative. Proximity panning sidesteps that
+estimate: RSSI-MDS is metre-scale and relative. Proximity panning sidesteps that
 by never leaving the RSSI domain.
 
 ## Files
@@ -70,7 +70,7 @@ by never leaving the RSSI domain.
 | `speaker_layout.json` | 7.1 geometry + which anchor orb serial sits at each channel |
 | `spatial_router.py` | reads `/tmp/orb_data`, proximity → 8-ch gains, emits OSC (`--print`/`--sim` for dry runs) |
 | `orb_spatial.scd` | SuperCollider: mono voices routed through per-source 8-ch gain matrix into the 7.1 output |
-| `ROADMAP.md` | extensions — height/3D, Doppler, calibration walk, collective woofer, etc. |
+| `ROADMAP.md` | extensions: height/3D, Doppler, calibration walk, collective woofer, etc. |
 
 ## Quick start
 
@@ -84,7 +84,7 @@ by never leaving the RSSI domain.
    `anchor_serial` in `speaker_layout.json` for that channel. (Do this with the
    `--print` router running so you can watch gains respond as you move a handheld
    orb between speakers.)
-3. **Dry-run the router** (no audio, no deps — just watch the gain vectors):
+3. **Dry-run the router** (no audio, no deps; just watch the gain vectors):
    ```bash
    python3 spatial_router.py --print            # live from /tmp/orb_data
    python3 spatial_router.py --sim --print      # fabricated orbiting source, no server needed
@@ -96,10 +96,10 @@ by never leaving the RSSI domain.
 
 - **RSSI is noisy and metre-scale.** Expect a soft "zone" pan, not a laser. `focus`
   and smoothing (EMA in the router) trade responsiveness for stability.
-- **Anchors must be well separated** — the same lesson as localisation tuning
+- **Anchors must be well separated**: the same lesson as localisation tuning
   (`docs`… project_proximity_tuning): co-located anchors give ambiguous gains.
 - **One card = one horizontal ring.** True 3D (orbs at different heights) needs a
-  height layer — a second card or Ambisonics. See ROADMAP.
-- **Orbs are sealed / OTA-only.** Anchors need no new firmware — they just sit there
+  height layer: a second card or Ambisonics. See ROADMAP.
+- **Orbs are sealed / OTA-only.** Anchors need no new firmware; they just sit there
   and report proximity like any orb. All spatial logic lives on the desktop, so
   iterate freely without touching the fleet.
