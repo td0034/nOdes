@@ -1,0 +1,39 @@
+{
+  "title": "nOdes: a human-carried proximity swarm",
+  "upload_type": "software",
+  "description": "<p>nOdes is a swarm of handheld wireless orbs that sense <em>who is with whom</em> in a room by inter-node Wi-Fi signal strength (RSSI over ESP-NOW), cluster on it, and play that configuration back to the people holding them as collective light and sound. The orbs have no locomotion of their own, so the swarm's configuration is supplied by the people carrying them.</p><p>This deposit is a curated replication kit, not a mirror of the development repository. It contains the ESP32-S3 firmware, the C++ central plane, the visualisers, the sound layer, every experiment driver, the capture and replay tooling, and the E1&ndash;E7 calibration data with the scripts that regenerate every published figure from it.</p><p>Code is released under the MIT licence; documentation, figures and calibration data under CC BY 4.0.</p>",
+  "creators": [
+    {
+      "name": "Didiot-Cook, Tom",
+      "affiliation": "Department of Engineering Mathematics, University of Bristol",
+      "orcid": "0009-0007-2299-9846"
+    },
+    {
+      "name": "Jones, Simon",
+      "affiliation": "Department of Engineering Mathematics, University of Bristol"
+    },
+    {
+      "name": "Hauert, Sabine",
+      "affiliation": "Department of Engineering Mathematics, University of Bristol"
+    }
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "human-swarm interaction",
+    "tangible swarm",
+    "RSSI proximity sensing",
+    "proximity clustering",
+    "ESP-NOW",
+    "multimodal feedback",
+    "self-characterising systems",
+    "deployable HSI"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/td0034/nOdes",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

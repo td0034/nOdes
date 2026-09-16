@@ -202,7 +202,7 @@ Design rules for RSSI proximity clustering on identical hardware, each measured:
 
 ---
 
-## Papers
+## Citation
 
 - *nOdes*, NIME 2026 (the instrument).
 - *Wi-Fi RSSI Proximity Sensing for Human-Hybrid Swarms in Group Experiences*,
