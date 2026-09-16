@@ -20,7 +20,7 @@ import argparse, json, os, sys, time
 
 ORB = "/tmp/orb_data"
 ROOM = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                    "..", "docs", "Frontiers HSI 2026", "E7_room.json")
+                    "..", "data", "calibration-2026", "E7_room.json")
 
 
 def gyro_mag(o):

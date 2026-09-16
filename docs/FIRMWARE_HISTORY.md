@@ -10,7 +10,7 @@ for sha in $(git log --all --format=%H -- client/main/hello_world_main.c); do
 done
 ```
 
-Going forward, new commits that touch `client/main/hello_world_main.c` get a `[fw vX.Y]` tag appended to the commit message by the `prepare-commit-msg` hook in `.githooks/` (enable with `git config core.hooksPath .githooks`).
+Going forward, new commits that touch `client/main/hello_world_main.c` get a `[fw vX.Y]` tag appended to the commit message by a `prepare-commit-msg` hook. The hook lives in the development repository and is not part of this kit.
 
 > **Deployed fleet firmware: v3.23 (top-PROX_N=10 RSSI report, E1 ablation), built/staged 2026-06-30** (`server/espidf_orb.bin` md5 `bd5364a5…`, 84-B uplink). The fleet was OTA'd on 2026-06-30 to the functionally-identical 3.18-numbered top-N build and is healthy (27/27, re-OTA-able); the **3.23 bin is a cosmetic renumber awaiting a 2-3-orb battery bench-test before the next fleet OTA**. The `collective` branch source is now **v3.23**.
 >

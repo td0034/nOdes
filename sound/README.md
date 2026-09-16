@@ -33,8 +33,8 @@ Tuning reference: `../docs/SESSION_RUNBOOK.md` (audio section).
 | `desktop/` | full-server install: systemd **--user** units, audio-route + MIDI helpers, installer |
 
 > The older desktop synth (`orb_synth.scd`) and the `bridge/` poller were
-> retired 2026-06-17. The Pi model above is now the single sound path. They
-> remain in git history if ever needed.
+> retired 2026-06-17. The Pi model above is now the single sound path. Neither
+> is included in this kit.
 
 ## Running on the full server (desktop)
 One-time install (systemd --user services + pw-jack wrappers):

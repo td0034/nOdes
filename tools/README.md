@@ -15,9 +15,8 @@ deploy, operate, recover, or debug the system lives here.
 
 - Setup scripts (AP configuration, DHCP reservation helpers, one-shot
   provisioners)
-- Session-recording / session-analysis CLIs (e.g. the study-time
-  `session_recorder.py` / `session_analyzer.py` in the CHI 2027 protocol
-  punchlist)
+- Session-recording / session-analysis CLIs (the study-time ones are not
+  included in this kit)
 - Binary blobs we need to keep on hand (AP firmware, bootloader images)
 
 ## What belongs in `visualiser/` instead

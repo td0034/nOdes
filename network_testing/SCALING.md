@@ -6,7 +6,7 @@ opposite directions as the fleet grows. Treat them as one system.
 ## The coupling
 - **Network (measured):** knee at 12-13 orbs @ 50 Hz; at 20+ miss ≈ 0.8 and per-orb
   rate collapses to a *ragged* 8-30 Hz (weak-RSSI orbs starve first; CoV 0.17).
-- **Sound (postmortem `docs/DEBUG_audio_cutout_2026-06-17.md`):** cutout scaled with
+- **Sound (postmortem, development repository):** cutout scaled with
   orbs × motion — orphaned gated-pad voices pegged the DSP. Fixed by fire-and-forget
   voices + node caps (now on `collective`, live on the PC).
 - **They feed each other:**

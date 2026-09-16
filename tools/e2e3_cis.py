@@ -19,9 +19,9 @@ import random
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-RAWDIR = os.path.join(HERE, "..", "docs", "Frontiers HSI 2026", "E1_runs", "raw")
-OUT = os.path.join(HERE, "..", "docs", "Frontiers HSI 2026", "E1_runs", "E2_E3_cis.json")
-GT = os.path.join(HERE, "..", "docs", "Frontiers HSI 2026", "E1_runs", "E2_ground_truth.json")
+RAWDIR = os.path.join(HERE, "..", "data", "calibration-2026", "E1_runs", "raw")
+OUT = os.path.join(HERE, "..", "data", "calibration-2026", "E1_runs", "E2_E3_cis.json")
+GT = os.path.join(HERE, "..", "data", "calibration-2026", "E1_runs", "E2_ground_truth.json")
 FRAME_DT = 0.6
 E2_TAU_S = 6.0
 

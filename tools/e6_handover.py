@@ -2,7 +2,7 @@
 """e6_handover.py — E6 analysis: what the fleet does when the server goes silent.
 
 Consumes the sniffer captures written by tools/e6_capture.py and reports the
-measures in docs/Frontiers HSI 2026/E6_HANDOVER_PROTOCOL.md section 4.
+measures in the E6 handover protocol (development repository), section 4.
 
     python3 tools/e6_handover.py analyse                 # all runs in E6_runs/raw
     python3 tools/e6_handover.py analyse --run e6_*.jsonl.gz
@@ -34,7 +34,7 @@ sys.path.insert(0, HERE)
 from sat_ari_truth import flood, ari                      # noqa: E402
 from mutual_knn_eval import adaptive_gap_thr              # noqa: E402
 
-RUNS = os.path.join(HERE, "..", "docs", "Frontiers HSI 2026", "E6_runs")
+RUNS = os.path.join(HERE, "..", "data", "calibration-2026", "E6_runs")
 LAYOUT = os.path.join(HERE, "..", "sound", "71surround", "speaker_layout.json")
 
 

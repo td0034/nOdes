@@ -3,7 +3,7 @@
 *Status 2026-08-18: scale engine built + tested (state machine unit tests,
 synthetic end-to-end with MIDI + flash). Not yet heard with real orbs.*
 
-The musical mechanic of the finale study (`docs/finale/SCOPING.md` §2): each
+The musical mechanic of the finale study (scoping notes in the development repository, §2): each
 session draws a random **root**; the group starts as one root-huddle, and
 each orb that leaves earns the next scale degree in circle-of-fifths order,
 root, 5th, 2nd, 6th, 3rd, 7th, 4th (+0, 7, 2, 9, 4, 11, 5 semitones). Seven

@@ -15,7 +15,7 @@ absolute-position estimators against the ground truth:
          mds_layout.py, roadmap Rank 2), snapped into the room frame by a
          similarity transform (Umeyama) fitted on the 4 known anchor positions
 
-Protocol + analysis plan: docs/'Frontiers HSI 2026'/E7_LOCALISATION_PROTOCOL.md
+Protocol + analysis plan: E7_LOCALISATION_PROTOCOL.md (development repository)
 
 Subcommands:
     init      write E7_room.json (room, anchor positions from speaker_layout,
@@ -44,7 +44,7 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-DOCS_E7 = REPO / "docs" / "Frontiers HSI 2026"
+DOCS_E7 = REPO / "data" / "calibration-2026"
 ROOM_DEFAULT = DOCS_E7 / "E7_room.json"
 RUNS_DIR = DOCS_E7 / "E7_runs"
 RAW_DIR = RUNS_DIR / "raw"

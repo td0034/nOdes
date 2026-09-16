@@ -1,8 +1,13 @@
 # Component versions
 
+> This file records the versioning scheme and the deployed component versions at
+> the time of release. Some paths below refer to the development repository
+> rather than to this kit; the released firmware binaries are under
+> `client/firmware-3.23/` and `client/firmware-stable/`.
+
 Four components are tracked. Firmware uses the runtime `ORBVERSION` constant
 (embedded in every orb's unicast packet); the rest carry an `@orb-version: X.Y`
-comment marker read by `.githooks/prepare-commit-msg`, which appends one
+comment marker read by a `prepare-commit-msg` hook, which appends one
 `[tag vX.Y]` per touched component to every commit message.
 
 | Tag    | Component              | Path                                  | Source of truth |
@@ -10,7 +15,7 @@ comment marker read by `.githooks/prepare-commit-msg`, which appends one
 | `fw`   | Orb firmware           | `client/main/hello_world_main.c:52`   | `#define ORBVERSION VERSION(M,m)` |
 | `srv`  | Multicast server + TUI | `server/src/multicast_sender.cpp`     | `@orb-version:` marker |
 | `pg`   | Proximity graph viz    | `visualiser/proximity_graph.py`            | `@orb-version:` marker |
-| `snd`  | SuperCollider synth    | `sound/orb_synth.scd`                 | `@orb-version:` marker |
+| `snd`  | SuperCollider synth    | `sound/orb_synth_pi.scd`              | `@orb-version:` marker |
 
 ## Current versions (2026-08-25)
 
@@ -36,7 +41,8 @@ comment marker read by `.githooks/prepare-commit-msg`, which appends one
 - **Bump major** (`1.x` → `2.0`) when a change breaks compatibility with other
   components — e.g. a new ESP-NOW frame layout, a new server protocol field,
   a new `/tmp/orb_data` schema.
-- **Component sets** (coordinated releases) live in `docs/sets/` — each file
+- **Component sets** (coordinated releases) are recorded in the development
+  repository — each file
   records which versions are tested together and flags any compatibility
   gotchas. See `docs/FIRMWARE_HISTORY.md` for the firmware-only timeline.
 
@@ -53,7 +59,7 @@ for sha in $(git log --all --format=%H); do
     pg=$(git show "$sha:visualiser/proximity_graph.py" 2>/dev/null \
          | grep -oE '@orb-version:[[:space:]]*[0-9]+\.[0-9]+' | head -1 \
          | sed 's/.*:[[:space:]]*//')
-    snd=$(git show "$sha:sound/orb_synth.scd" 2>/dev/null \
+    snd=$(git show "$sha:sound/orb_synth_pi.scd" 2>/dev/null \
           | grep -oE '@orb-version:[[:space:]]*[0-9]+\.[0-9]+' | head -1 \
           | sed 's/.*:[[:space:]]*//')
     printf '%s  fw=%s srv=%s pg=%s snd=%s  %s\n' "${sha:0:9}" \

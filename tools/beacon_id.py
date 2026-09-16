@@ -12,7 +12,7 @@ tool is running. Workflow for bringing a new beacon online:
     2. plug the new beacon orb into USB at its speaker
     3. the new serial prints highlighted within a few seconds
     4. paste it into anchor_serial in sound/71surround/speaker_layout.json
-       (and into docs/'Frontiers HSI 2026'/E7_room.json for the experiment)
+       (and into data/calibration-2026/E7_room.json for the experiment)
     5. verify: spatial_router.py --print — move a handheld orb toward the
        speaker and watch that channel's gain rise
 

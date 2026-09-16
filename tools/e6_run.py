@@ -16,7 +16,7 @@ than only against the gap it infers.
 import argparse, json, os, signal, subprocess, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RUNS = os.path.join(HERE, "..", "docs", "Frontiers HSI 2026", "E6_runs")
+RUNS = os.path.join(HERE, "..", "data", "calibration-2026", "E6_runs")
 
 
 def server_pid():

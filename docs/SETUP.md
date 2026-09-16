@@ -105,7 +105,7 @@ A window labelled "nOdes proximity graph" should appear, nodes glowing as each o
 
 ## 5. Sound
 
-Phase A of the bridge is live (see `docs/collective/SOUND_BRIDGE_PLAN.md`). End-to-end sequence:
+Phase A of the bridge is live. End-to-end sequence:
 
 - [ ] `sudo apt install pipewire-jack` if it isn't already — provides the `pw-jack` wrapper. Without this, SC spawns its own `jackdmp` on `hw:0` (HDMI on our machine) and audio disappears from the PipeWire sink mixer.
 - [ ] **One-time**: `./tools/install-sc-wrappers.sh` — drops wrappers at `~/.local/bin/{scide,sclang}` that auto-route through `pw-jack`, so plain `scide` (and the GNOME app launcher) just work. If you skip this step, substitute `pw-jack scide …` wherever this runbook says `scide`.
@@ -152,5 +152,4 @@ Matrix UI, presets, per-voice instrument selection, cluster-aware voice assignme
 
 - Component versions: `docs/VERSIONS.md`
 - Firmware-only timeline: `docs/FIRMWARE_HISTORY.md`
-- Active workstream (what's in flight): `docs/collective/STATUS.md`
 - System architecture: `README.md` top-level section

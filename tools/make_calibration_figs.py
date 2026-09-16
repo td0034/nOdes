@@ -2,7 +2,7 @@
 """Paper figures — one panel per claim, the title states the claim.
 
 Every figure regenerates from committed run data. Design rationale and the
-rejected alternatives: docs/Frontiers HSI 2026/FIGURE_BRAINSTORM_2026-09-10.md.
+rejected alternatives are recorded in the development repository.
 Palette derived from the Frontiers logo: each cube face's hue kept, lightness snapped
 into the 0.43-0.77 band in OKLab, chroma preserved where the gamut allows. Core order
 SKY, CORAL, TEAL, PURPLE passes every validator check with no warnings (worst adjacent

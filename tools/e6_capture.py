@@ -20,7 +20,7 @@ Frame: [ slot(1) | serial(3) | num_peers(1) | {slot,strength} x 6 (12) ]
 import argparse, gzip, json, os, sys, threading, time
 
 RUNS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        "..", "docs", "Frontiers HSI 2026", "E6_runs")
+                        "..", "data", "calibration-2026", "E6_runs")
 
 
 def parse_frame(hexstr):

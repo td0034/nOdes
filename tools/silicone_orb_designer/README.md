@@ -11,7 +11,7 @@ persist in the browser (localStorage) and "Copy settings" exports them.
 STL export (per half when split) works from the locally opened file.
 
 Preview geometry only (surface nets over an SDF); production solids are
-built natively in Fusion 360 by the scripts in `3D/goldbery/gyroid-orb/`
+built natively in Fusion 360 by scripts kept in the development repository
 (GoldbergOrbFusion / GoldbergOrbDialog / GoldbergOrbBatch), which share the
 same tiling maths.
 

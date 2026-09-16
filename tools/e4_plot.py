@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CAP = os.path.join(REPO, "network_testing", "captures")
-OUT = os.path.join(REPO, "docs", "Frontiers HSI 2026", "E1_runs")
+OUT = os.path.join(REPO, "data", "calibration-2026", "E1_runs")
 CEIL, FLOOR = 50.0, 10  # --rate ceiling, --armin floor
 
 def load(label):

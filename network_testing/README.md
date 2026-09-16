@@ -1,6 +1,6 @@
 # nOdes network testing
 
-Characterising orb-network capacity + plan for tuning. Captures in `captures/`,
+Characterising orb-network capacity + plan for tuning. Captures land in `captures/` when you run the drivers,
 plots in `plots/`. Capture/analysis tools live in the repo `tools/`
 (`net_capture.py`, `net_analyse.py`, `count_sweep.py`, `sweep_curve.py`).
 
@@ -61,7 +61,7 @@ E1–E3 sweeps are a fleet session.
 ## Rate-control implemented + validated (single orb, 2026-06-18)
 Server now takes `--rate HZ`, `--adaptive`, `--rmin HZ`, `--budget RT`
 (`multicast_sender.cpp`; TUI stat line shows live `Rate:` + `[adaptive]`).
-Single-orb validation (`captures/rate_validation.csv`, `plots/rate_validation.png`)
+Single-orb validation (written to `captures/rate_validation.csv` and `plots/rate_validation.png` by the driver)
 hit every target exactly:
 
 | config | expected | measured | per-orb interval |
