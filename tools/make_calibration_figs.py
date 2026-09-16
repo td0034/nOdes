@@ -249,7 +249,12 @@ def fig_sat_v2():
     ax.set_ylim(-0.22, 1.05); ax.set_xlim(145, 262)
     ax.set_yticks([0, .5, 1.0])
     ax.axhline(0, color=MUTED, lw=.8)
-    ax.set_xlabel("cluster threshold"); ax.set_ylabel("ARI vs physical truth")
+    ax.set_xlabel("cluster threshold"); ax.set_ylabel("agreement with true grouping (ARI)")
+    # Label what a LOW and a HIGH cut do wrong, so the hump reads without the caption.
+    ax.annotate("cut too low:\nseparate groups\nmerge into one", xy=(152, 0.06), xytext=(152, 0.30),
+                fontsize=7.2, color=MUTED, ha="left", va="bottom", linespacing=1.35)
+    ax.annotate("cut too high:\nreal groups\nsplit apart", xy=(258, 0.06), xytext=(258, 0.30),
+                fontsize=7.2, color=MUTED, ha="right", va="bottom", linespacing=1.35)
     ax.set_title("Saturation turns a bounded correct window into an open-ended one", loc="left")
     tidy(ax)
     save(fig, "sat_ari_truth.png")
