@@ -130,7 +130,7 @@ def fig_e2_v2():
     ax.text(200, 0.86, "deployed\ndefault", ha="center", va="top", fontsize=8, color=INK)
     ax.set_xlim(32, 256); ax.set_ylim(0, 1.4)
     ax.set_yticks([0, .25, .5, .75, 1.0])
-    ax.set_xlabel("cluster_min_thresh  (configured floor)")
+    ax.set_xlabel("cluster_min_thresh: floor on 8-bit link strength (0–255)")
     ax.set_ylabel("ARI vs physical truth")
     ax.set_title("The threshold floor only matters between 218 and 236", loc="left")
     tidy(ax)
@@ -178,8 +178,11 @@ def fig_e7_v2():
     ax.set_xticklabels([]); ax.set_yticklabels([])
     # Range rings competed with the data and their labels sat on top of it; the
     # claim is about direction kept and radius compressed, not absolute range.
-    ax.yaxis.grid(False)
-    ax.xaxis.grid(True, color=GRID, lw=.6, alpha=.55)
+    # No range rings, no angular spokes and no outer circle: the anchor triangle
+    # is the only spatial reference the reader needs, and the rest competed with
+    # the estimates.
+    ax.yaxis.grid(False); ax.xaxis.grid(False)
+    ax.spines["polar"].set_visible(False)
     for lab, pts, col in GROUPS:
         bold = lab.startswith("far")
         al, lw, ms_t, ms_e = (1.0, 2.4, 9, 7) if bold else (0.38, 1.2, 7, 5)
@@ -203,7 +206,7 @@ def fig_e7_v2():
             for (t1, r1), (t2, r2) in zip(A, A[1:] + A[:1]):
                 x1, y1, x2, y2 = r1 * math.cos(t1), r1 * math.sin(t1), r2 * math.cos(t2), r2 * math.sin(t2)
                 xs = _np.linspace(x1, x2, 30); ys = _np.linspace(y1, y2, 30)
-                ax.plot(_np.arctan2(ys, xs), _np.hypot(xs, ys), "-", color=INK, lw=0.8, alpha=0.35, zorder=1)
+                ax.plot(_np.arctan2(ys, xs), _np.hypot(xs, ys), ":", color=INK, lw=1.0, alpha=0.55, zorder=1)
     except Exception:
         pass
     ax.plot([], [], "o", mfc="white", mec=INK, mew=1.8, ms=8, label="true position")
@@ -211,7 +214,7 @@ def fig_e7_v2():
     ax.plot([], [], "s", color=INK, ms=8, label="anchor")
     ax.legend(loc="lower left", bbox_to_anchor=(-0.12, -0.12), frameon=False, fontsize=8)
     ax.set_title("Weighted-centroid estimates against true positions", loc="left", fontsize=11, pad=26)
-    ax.text(0.0, 1.045, "bold: far ring.  faded: near ring and between-anchor points.  outer edge 2.7 m",
+    ax.text(0.0, 1.045, "bold: far ring.  faded: near ring and between-anchor points.  anchor triangle 3.25 m a side",
             transform=ax.transAxes, fontsize=8, color=MUTED, ha="left")
     save(fig, "E7_polar.png")
 
@@ -251,7 +254,7 @@ def fig_sat_v2():
     ax.set_ylim(-0.22, 1.05); ax.set_xlim(145, 262)
     ax.set_yticks([0, .5, 1.0])
     ax.axhline(0, color=MUTED, lw=.8)
-    ax.set_xlabel("cluster threshold"); ax.set_ylabel("agreement with true grouping (ARI)")
+    ax.set_xlabel("cluster threshold (8-bit link strength, 0–255)"); ax.set_ylabel("agreement with true grouping (ARI)")
     # Label what a LOW and a HIGH cut do wrong, so the hump reads without the caption.
     ax.annotate("cut too low:\nseparate groups\nmerge into one", xy=(152, 0.06), xytext=(152, 0.30),
                 fontsize=7.2, color=MUTED, ha="left", va="bottom", linespacing=1.35)
