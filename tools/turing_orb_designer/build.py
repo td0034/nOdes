@@ -10,7 +10,9 @@ import pathlib
 here = pathlib.Path(__file__).parent
 core = (here / "turing_core.js").read_text().split(
     'if(typeof module!=="undefined")')[0]
-shell = (here / "turing_app_shell.html").read_text()
-assert "/*__CORE__*/" in shell
-(here / "turing_designer.html").write_text(shell.replace("/*__CORE__*/", core))
-print("built turing_designer.html")
+for shell_name, out_name in [("turing_app_shell.html", "turing_designer.html"),
+                             ("turing_evolver_shell.html", "turing_evolver.html")]:
+    shell = (here / shell_name).read_text()
+    assert "/*__CORE__*/" in shell
+    (here / out_name).write_text(shell.replace("/*__CORE__*/", core))
+    print("built", out_name)

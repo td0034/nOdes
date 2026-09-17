@@ -1,0 +1,348 @@
+<title>Turing Orb Evolver</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root{
+    --ink:#12161B; --deep:#0D1115; --panel:#191F26; --panel2:#1F2630;
+    --line:#2B343E; --text:#E4EAEF; --mute:#8D9AA6; --accent:#5BC8AF;
+    --like:#74C08F; --dis:#E0705C;
+    --ui:"Archivo",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--deep);color:var(--text);font-family:var(--ui);
+       font-size:14px;overflow:hidden;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;gap:14px;padding:10px 16px;
+       background:var(--ink);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  h1{margin:0;font-size:16px;font-weight:700}
+  h1 em{color:var(--accent);font-style:normal}
+  #gen{font-family:var(--mono);font-size:12px;color:var(--mute)}
+  .btn{padding:8px 14px;background:var(--panel2);color:var(--text);
+       border:1px solid var(--line);border-radius:7px;font-family:var(--ui);
+       font-size:13px;font-weight:600;cursor:pointer}
+  .btn:hover:not(:disabled){border-color:var(--accent)}
+  .btn:disabled{color:var(--mute);cursor:default}
+  .btn.primary{background:var(--accent);color:#0D1115;border-color:var(--accent)}
+  .btn.primary:disabled{background:var(--panel2);color:var(--mute);border-color:var(--line)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  label.ctl{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--mute)}
+  select,input[type=range]{accent-color:var(--accent)}
+  select{background:var(--panel);color:var(--text);border:1px solid var(--line);
+       border-radius:6px;padding:5px 7px;font-size:12px;font-family:var(--ui)}
+  #hint{margin-left:auto;font-size:12px;color:var(--mute)}
+  #stage{flex:1;position:relative;min-height:0}
+  #glcanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);
+       grid-template-rows:repeat(4,1fr);gap:6px;padding:6px}
+  .tile{position:relative;border:2px solid var(--line);border-radius:9px;
+       cursor:pointer;transition:border-color .12s}
+  .tile:hover{border-color:var(--mute)}
+  .tile.like{border-color:var(--like)}
+  .tile.dis{border-color:var(--dis);opacity:.55}
+  .tile .tag{position:absolute;top:6px;left:8px;font-family:var(--mono);
+       font-size:10.5px;color:var(--mute);pointer-events:none}
+  .tile .mark{position:absolute;top:4px;right:8px;font-size:15px;pointer-events:none}
+  .tile .info{position:absolute;bottom:5px;left:8px;right:30px;font-family:var(--mono);
+       font-size:9.5px;color:var(--mute);pointer-events:none;white-space:nowrap;
+       overflow:hidden;text-overflow:ellipsis}
+  .tile .edit{position:absolute;bottom:3px;right:5px;background:none;border:none;
+       color:var(--mute);font-size:13px;cursor:pointer;padding:2px 4px;border-radius:5px}
+  .tile .edit:hover{color:var(--accent);background:var(--panel2)}
+  .tile .spin{position:absolute;inset:0;display:flex;align-items:center;
+       justify-content:center;color:var(--mute);font-family:var(--mono);font-size:11px;
+       pointer-events:none}
+</style>
+
+<header>
+  <h1>Turing <em>Orb</em> Evolver</h1>
+  <span id="gen">gen 1</span>
+  <button class="btn primary" id="evolve" disabled>Evolve next generation</button>
+  <button class="btn" id="reroll">Reroll (random 16)</button>
+  <label class="ctl">Mutation
+    <input type="range" id="mut" min="0.05" max="0.5" step="0.05" value="0.18" style="width:90px">
+  </label>
+  <label class="ctl">Models
+    <select id="mix">
+      <option value="both" selected>GS + kilobot</option>
+      <option value="gs">Gray–Scott only</option>
+      <option value="linear">Kilobot only</option>
+    </select>
+  </label>
+  <span id="hint">click a tile: 👍 → 👎 → clear · rate all 16 to evolve · ✎ sends to the designer</span>
+</header>
+<div id="stage">
+  <canvas id="glcanvas"></canvas>
+  <div id="grid"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/*__CORE__*/
+</script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const GRID=16;
+const SKEY="turingEvolver.v1";
+const PRESETS=[[0.0545,0.062],[0.0367,0.0649],[0.046,0.063],[0.029,0.057],
+               [0.039,0.058],[0.03,0.062]];
+const RANGES={ // gene: [min,max]
+  F:[0.02,0.075],k:[0.045,0.07],Du:[0.08,0.25],Dv:[0.03,0.13],
+  A:[0.03,0.15],B:[-0.15,-0.03],C:[0.005,0.08],gu:[0.01,0.06],E:[0.05,0.2],
+  Fv:[0.05,0.2],gv:[0.02,0.1],R:[80,280],lDu:[0.2,1.2],lDv:[4,20],
+  simres:[22,42],thr:[0.15,0.65],
+};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clampR=(v,r)=>Math.min(r[1],Math.max(r[0],v));
+
+function randomGenome(){
+  const mix=$("mix").value;
+  const model=mix==="both"?(Math.random()<0.5?"gs":"linear"):mix;
+  const g={model,rngSeed:(Math.random()*1e9)|0,
+    simres:Math.round(rnd(...RANGES.simres)),invert:Math.random()<0.15};
+  if(model==="gs"){
+    const p=PRESETS[(Math.random()*PRESETS.length)|0];
+    g.F=clampR(p[0]+rnd(-0.006,0.006),RANGES.F);
+    g.k=clampR(p[1]+rnd(-0.003,0.003),RANGES.k);
+    g.Du=clampR(0.16+rnd(-0.05,0.05),RANGES.Du);
+    g.Dv=clampR(0.08+rnd(-0.025,0.025),RANGES.Dv);
+    g.thr=clampR(0.3+rnd(-0.1,0.15),RANGES.thr);
+  }else{
+    g.A=clampR(0.08+rnd(-0.03,0.03),RANGES.A);
+    g.B=clampR(-0.08+rnd(-0.03,0.03),RANGES.B);
+    g.C=clampR(0.03+rnd(-0.015,0.02),RANGES.C);
+    g.gu=clampR(0.03+rnd(-0.01,0.01),RANGES.gu);
+    g.E=clampR(0.1+rnd(-0.03,0.03),RANGES.E);
+    g.Fv=clampR(0.12+rnd(-0.04,0.04),RANGES.Fv);
+    g.gv=clampR(0.06+rnd(-0.02,0.02),RANGES.gv);
+    g.R=clampR(160+rnd(-50,50),RANGES.R);
+    g.lDu=clampR(0.5+rnd(-0.15,0.15),RANGES.lDu);
+    g.lDv=clampR(10+rnd(-3,3),RANGES.lDv);
+    g.thr=clampR(0.45+rnd(-0.15,0.15),RANGES.thr);
+  }
+  return g;
+}
+const GS_GENES=["F","k","Du","Dv"];
+const LIN_GENES=["A","B","C","gu","E","Fv","gv","R","lDu","lDv"];
+function breed(pa,pb,mut){
+  const base=Math.random()<0.5?pa:pb;
+  const child={model:base.model,invert:base.invert,
+    rngSeed:Math.random()<0.35?(Math.random()*1e9)|0:base.rngSeed};
+  const genes=base.model==="gs"?GS_GENES:LIN_GENES;
+  const other=(pa.model===pb.model)?(base===pa?pb:pa):base;
+  for(const gn of[...genes,"simres","thr"]){
+    let v=Math.random()<0.5?base[gn]:(other[gn]!==undefined?other[gn]:base[gn]);
+    if(Math.random()<0.6){
+      const r=RANGES[gn]||RANGES[gn.replace("l","")];
+      const span=r[1]-r[0];
+      v=clampR(v+(Math.random()*2-1)*mut*span*0.5,r);
+    }
+    child[gn]=gn==="simres"?Math.round(v):v;
+  }
+  if(Math.random()<0.08)child.invert=!child.invert;
+  return child;
+}
+
+function genomeQ(g){ // -> simulate() params
+  if(g.model==="gs")
+    return{model:"gs",res:g.simres,Du:g.Du,Dv:g.Dv,F:g.F,k:g.k,dt:1,
+      steps:3000,seeds:18,seedNoise:0.05,rngSeed:g.rngSeed};
+  return{model:"linear",res:g.simres,Du:g.lDu,Dv:g.lDv,dt:0.002,steps:8000,
+    A:g.A,B:g.B,C:g.C,gu:g.gu,E:g.E,Fv:g.Fv,gv:g.gv,synU:0.23,synV:0.5,R:g.R,
+    seeds:18,seedNoise:0.05,rngSeed:g.rngSeed,F:0,k:0};
+}
+const TILE_P={innerD:68,depth:6,invert:false,memMode:1,memT:1,memFillet:1.2,
+  edgeFillet:0.5,connD:0,connT:0,holeD:0,cbD:0,neck:0,connBand:0,connK:0,
+  rimP:0,pcbD:66,pcbT:1.6,rimT:1.5,rimF:0.8,barb:1,split:false,gap:0};
+
+// ---------- three.js: one renderer, 16 scissored scenes ----------
+const canvas=$("glcanvas");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const tiles=[];
+function makeTileScene(){
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0d1115);
+  scene.add(new THREE.HemisphereLight(0xcfd8e0,0x1b2026,0.8));
+  const key=new THREE.DirectionalLight(0xffe8cf,0.85);key.position.set(1.2,0.6,1.4);scene.add(key);
+  const cam=new THREE.PerspectiveCamera(36,1,1,2000);
+  return{scene,cam,mesh:null,theta:Math.random()*6.28};
+}
+function setTileMesh(t,data){
+  if(t.mesh){t.scene.remove(t.mesh);t.mesh.geometry.dispose();t.mesh.material.dispose();}
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(data.positions,3));
+  geo.setIndex(new THREE.BufferAttribute(data.indices,1));
+  geo.computeVertexNormals();
+  t.mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({
+    color:0xd8d4ca,roughness:0.55,metalness:0.06,side:THREE.DoubleSide}));
+  t.scene.add(t.mesh);
+}
+
+// ---------- state ----------
+let genomes=[],ratings=[],genNo=1,building=false;
+function saveState(){
+  try{localStorage.setItem(SKEY,JSON.stringify({genomes,ratings,genNo}));}catch(e){}
+}
+function loadState(){
+  try{
+    const o=JSON.parse(localStorage.getItem(SKEY));
+    if(o&&o.genomes&&o.genomes.length===GRID){
+      genomes=o.genomes;ratings=o.ratings||new Array(GRID).fill(0);genNo=o.genNo||1;
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+function genomeLabel(g){
+  return g.model==="gs"
+    ?`GS F${g.F.toFixed(3)} k${g.k.toFixed(3)} r${g.simres}${g.invert?" inv":""}`
+    :`KB A${g.A.toFixed(2)} C${g.C.toFixed(2)} R${g.R.toFixed(0)} r${g.simres}${g.invert?" inv":""}`;
+}
+
+// ---------- build queue ----------
+let buildSeq=0;
+function buildGeneration(){
+  building=true;buildSeq++;
+  const seq=buildSeq;
+  updateHeader();
+  const order=[...Array(GRID).keys()];
+  let done=0;
+  function next(){
+    if(seq!==buildSeq)return;                       // superseded
+    const i=order.shift();
+    if(i===undefined){building=false;updateHeader();return;}
+    const el=document.querySelectorAll(".tile")[i];
+    el.querySelector(".spin").textContent="…";
+    setTimeout(()=>{
+      if(seq!==buildSeq)return;
+      const g=genomes[i];
+      try{
+        const sim=simulate(genomeQ(g));
+        const T=fieldTexture(sim,256,128);
+        const P=Object.assign({},TILE_P,{thr:g.thr,invert:g.invert});
+        const M=buildModel(P,T);
+        const S=sampleField((x,y,z)=>M.fSolid(x,y,z),M.H,72);
+        const m=meshFromNodes(S,M.H,72);
+        setTileMesh(tiles[i],m);
+        el.querySelector(".spin").textContent="";
+        el.querySelector(".info").textContent=genomeLabel(g);
+      }catch(e){
+        el.querySelector(".spin").textContent="err";
+      }
+      done++;next();
+    },10);
+  }
+  next();
+}
+
+// ---------- grid DOM ----------
+const gridEl=$("grid");
+for(let i=0;i<GRID;i++){
+  const d=document.createElement("div");
+  d.className="tile";
+  d.innerHTML=`<span class="tag">#${i+1}</span><span class="mark"></span>
+    <span class="spin"></span><span class="info"></span>
+    <button class="edit" title="Send to the designer">✎</button>`;
+  d.addEventListener("click",e=>{
+    if(e.target.classList.contains("edit"))return;
+    ratings[i]=(ratings[i]+1)%3;                    // 0 none, 1 like, 2 dislike
+    paintTile(i);updateHeader();saveState();
+  });
+  d.querySelector(".edit").addEventListener("click",()=>sendToDesigner(i));
+  gridEl.appendChild(d);
+  tiles.push(makeTileScene());
+}
+function paintTile(i){
+  const el=gridEl.children[i];
+  el.classList.toggle("like",ratings[i]===1);
+  el.classList.toggle("dis",ratings[i]===2);
+  el.querySelector(".mark").textContent=ratings[i]===1?"👍":ratings[i]===2?"👎":"";
+}
+function updateHeader(){
+  $("gen").textContent=`gen ${genNo}`;
+  const rated=ratings.filter(r=>r>0).length,liked=ratings.filter(r=>r===1).length;
+  $("evolve").disabled=building||rated<GRID;
+  $("evolve").textContent=building?"Building…":
+    rated<GRID?`Evolve (rated ${rated}/16)`:
+    liked?`Evolve from ${liked} liked`:"Evolve (none liked → reroll)";
+}
+
+// ---------- actions ----------
+$("evolve").addEventListener("click",()=>{
+  const liked=genomes.filter((g,i)=>ratings[i]===1);
+  const mut=parseFloat($("mut").value);
+  genomes=liked.length
+    ?Array.from({length:GRID},()=>breed(
+        liked[(Math.random()*liked.length)|0],
+        liked[(Math.random()*liked.length)|0],mut))
+    :Array.from({length:GRID},randomGenome);
+  ratings=new Array(GRID).fill(0);
+  genNo++;
+  genomes.forEach((_,i)=>paintTile(i));
+  saveState();buildGeneration();
+});
+$("reroll").addEventListener("click",()=>{
+  genomes=Array.from({length:GRID},randomGenome);
+  ratings=new Array(GRID).fill(0);genNo=1;
+  genomes.forEach((_,i)=>paintTile(i));
+  saveState();buildGeneration();
+});
+
+function sendToDesigner(i){
+  const g=genomes[i];
+  let o={};
+  try{o=JSON.parse(localStorage.getItem("turingOrbSettings.v1"))||{};}catch(e){}
+  o.model=g.model;o.preset="custom";o.rngSeed=g.rngSeed;
+  o.simres=String(g.simres);o.thr=String(+g.thr.toFixed(3));o.invert=g.invert;
+  if(g.model==="gs"){
+    o.F=String(g.F);o.kk=String(g.k);o.Du=String(g.Du);o.Dv=String(g.Dv);
+    o.dt="1";o.steps="4000";
+  }else{
+    o.lA=String(g.A);o.lB=String(g.B);o.lC=String(g.C);o.lgu=String(g.gu);
+    o.lE=String(g.E);o.lF=String(g.Fv);o.lgv=String(g.gv);o.lR=String(g.R);
+    o.lDu=String(g.lDu);o.lDv=String(g.lDv);o.ldt="0.002";o.steps="8000";
+  }
+  try{
+    localStorage.setItem("turingOrbSettings.v1",JSON.stringify(o));
+    window.open("turing_designer.html","_blank");
+  }catch(e){}
+}
+
+// ---------- render loop ----------
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function tick(){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(canvas.width!==Math.floor(w*renderer.getPixelRatio()))renderer.setSize(w,h,false);
+  renderer.setScissorTest(true);
+  const stageR=canvas.getBoundingClientRect();
+  for(let i=0;i<GRID;i++){
+    const t=tiles[i];
+    if(!t.mesh)continue;
+    const r=gridEl.children[i].getBoundingClientRect();
+    const x=r.left-stageR.left,y=stageR.bottom-r.bottom;
+    renderer.setViewport(x,y,r.width,r.height);
+    renderer.setScissor(x,y,r.width,r.height);
+    if(!reduceMotion)t.theta+=0.004;
+    const d=170;
+    t.cam.aspect=r.width/r.height;t.cam.updateProjectionMatrix();
+    t.cam.position.set(d*Math.cos(t.theta)*0.82,d*Math.sin(t.theta)*0.82,d*0.57);
+    t.cam.up.set(0,0,1);t.cam.lookAt(0,0,0);
+    renderer.render(t.scene,t.cam);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ---------- boot ----------
+if(!loadState()){
+  genomes=Array.from({length:GRID},randomGenome);
+  ratings=new Array(GRID).fill(0);
+}
+genomes.forEach((_,i)=>paintTile(i));
+updateHeader();
+tick();
+buildGeneration();
+</script>
