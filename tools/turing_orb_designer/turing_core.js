@@ -100,47 +100,77 @@ function mulberry32(a){
   };
 }
 
+// Q.model: "gs" (Gray–Scott, Pearson) or "linear" (Miyazawa linear
+// activator–inhibitor as used on the Bristol kilobots, Slavkov et al. 2018:
+// syn_u = clamp(A·u + B·v + C, 0, synU), du/dt = R(syn_u − γu·u) + Du·Σ(u_j−u_i)
+// syn_v = clamp(E·u − F, 0, synV),      dv/dt = R(syn_v − γv·v) + Dv·Σ(v_j−v_i))
 function simulate(Q,progress){
   const{verts,neigh}=icosphere(Q.res);
   const n=verts.length;
-  const u=new Float32Array(n).fill(1),v=new Float32Array(n);
   const rng=mulberry32(Q.rngSeed|0||1);
+  const linear=Q.model==="linear";
+  const u=new Float32Array(n).fill(linear?1:1),v=new Float32Array(n);
+  if(linear){
+    for(let i=0;i<n;i++){u[i]=1+(rng()-0.5)*0.2;v[i]=(rng())*0.2;}
+  }
   // seed patches
   for(let s=0;s<Q.seeds;s++){
     const dir=vnorm([rng()*2-1,rng()*2-1,rng()*2-1]);
     const cosR=Math.cos(0.12);
     for(let i=0;i<n;i++)
-      if(vdot(verts[i],dir)>cosR){u[i]=0.50;v[i]=0.25;}
+      if(vdot(verts[i],dir)>cosR){
+        if(linear){u[i]=4;}else{u[i]=0.50;v[i]=0.25;}
+      }
   }
   if(Q.seedNoise>0)
     for(let i=0;i<n;i++){
-      u[i]=Math.min(1,Math.max(0,u[i]+(rng()-0.5)*Q.seedNoise));
-      v[i]=Math.min(1,Math.max(0,v[i]+(rng()-0.5)*Q.seedNoise*0.5));
+      u[i]=Math.max(0,u[i]+(rng()-0.5)*Q.seedNoise*(linear?4:1));
+      if(!linear)u[i]=Math.min(1,u[i]);
+      v[i]=Math.max(0,v[i]+(rng()-0.5)*Q.seedNoise*0.5);
+      if(!linear)v[i]=Math.min(1,v[i]);
     }
   const lu=new Float32Array(n),lv=new Float32Array(n);
   const{Du,Dv,F,k,dt}=Q;
+  const clamp=(x,lo,hi)=>x<lo?lo:x>hi?hi:x;
   for(let step=0;step<Q.steps;step++){
     for(let i=0;i<n;i++){
       const nb=neigh[i];
       let su=0,sv=0;
       for(let j=0;j<nb.length;j++){su+=u[nb[j]];sv+=v[nb[j]];}
-      lu[i]=su/nb.length-u[i];
-      lv[i]=sv/nb.length-v[i];
+      if(linear){                       // kilobot diffusion: sum of differences
+        lu[i]=su-nb.length*u[i];
+        lv[i]=sv-nb.length*v[i];
+      }else{                            // GS convention: mean − self
+        lu[i]=su/nb.length-u[i];
+        lv[i]=sv/nb.length-v[i];
+      }
     }
-    for(let i=0;i<n;i++){
-      const uvv=u[i]*v[i]*v[i];
-      u[i]+=dt*(Du*lu[i]-uvv+F*(1-u[i]));
-      v[i]+=dt*(Dv*lv[i]+uvv-(F+k)*v[i]);
+    if(linear){
+      const{A,B,C,gu,E,Fv,gv,synU,synV,R}=Q;
+      for(let i=0;i<n;i++){
+        const synu=clamp(A*u[i]+B*v[i]+C,0,synU);
+        const synv=clamp(E*u[i]-Fv,0,synV);
+        u[i]=Math.max(0,u[i]+dt*(R*(synu-gu*u[i])+Du*lu[i]));
+        v[i]=Math.max(0,v[i]+dt*(R*(synv-gv*v[i])+Dv*lv[i]));
+      }
+    }else{
+      for(let i=0;i<n;i++){
+        const uvv=u[i]*v[i]*v[i];
+        u[i]+=dt*(Du*lu[i]-uvv+F*(1-u[i]));
+        v[i]+=dt*(Dv*lv[i]+uvv-(F+k)*v[i]);
+      }
     }
     if(progress&&step%200===0)progress(step/Q.steps);
   }
-  return{verts,u,v,n};
+  // pattern channel: GS shows v, the kilobot LEDs show u
+  return{verts,u,v,pat:linear?u:v,n};
 }
 
 // resample the vertex field onto a wrap-around lat-lon texture (bilinear-
 // sampleable), value = v channel normalised to [0,1]
 function fieldTexture(sim,W,H){
-  const{verts,v,n}=sim;
+  const{verts,pat,n}=sim;
+  const v=pat;
   let vmax=1e-9;for(let i=0;i<n;i++)if(v[i]>vmax)vmax=v[i];
   // bucket verts by direction for nearest lookup
   const G=64,buckets=new Array(G*G*G);

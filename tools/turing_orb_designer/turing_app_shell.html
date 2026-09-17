@@ -98,6 +98,11 @@
 
     <div class="group">
       <h2>Reaction–diffusion</h2>
+      <div class="row" style="margin-bottom:4px"><label for="model">Model</label></div>
+      <select id="model">
+        <option value="gs" selected>Gray–Scott (Pearson)</option>
+        <option value="linear">Linear activator–inhibitor · BRL kilobots (Slavkov 2018 / Miyazawa)</option>
+      </select>
       <div class="row" style="margin-bottom:4px"><label for="preset">Pearson regime</label></div>
       <select id="preset">
         <option value="custom">Custom</option>
@@ -108,6 +113,7 @@
         <option value="holes">Holes · F .039 k .058</option>
         <option value="solitons">Solitons · F .03 k .062</option>
       </select>
+      <div id="gsRows">
       <div class="row"><label for="F">Feed rate F</label><output id="FO"></output></div>
       <input type="range" id="F" min="0.01" max="0.09" step="0.0005" value="0.0545">
       <div class="row"><label for="kk">Kill rate k</label><output id="kkO"></output></div>
@@ -118,6 +124,38 @@
       <input type="range" id="Dv" min="0.02" max="0.15" step="0.005" value="0.08">
       <div class="row"><label for="dt">Timestep dt</label><output id="dtO"></output></div>
       <input type="range" id="dt" min="0.2" max="1.5" step="0.05" value="1">
+      </div>
+      <div id="linRows" hidden>
+      <div class="row"><label for="lA">A (u self-activation)</label><output id="lAO"></output></div>
+      <input type="range" id="lA" min="0" max="0.2" step="0.005" value="0.08">
+      <div class="row"><label for="lB">B (v inhibition)</label><output id="lBO"></output></div>
+      <input type="range" id="lB" min="-0.2" max="0" step="0.005" value="-0.08">
+      <div class="row"><label for="lC">C (base synthesis)</label><output id="lCO"></output></div>
+      <input type="range" id="lC" min="0" max="0.1" step="0.005" value="0.03">
+      <div class="row"><label for="lgu">γu (u degradation)</label><output id="lguO"></output></div>
+      <input type="range" id="lgu" min="0.005" max="0.1" step="0.005" value="0.03">
+      <div class="row"><label for="lE">E (u → v drive)</label><output id="lEO"></output></div>
+      <input type="range" id="lE" min="0" max="0.3" step="0.005" value="0.1">
+      <div class="row"><label for="lF">F (v threshold)</label><output id="lFO"></output></div>
+      <input type="range" id="lF" min="0" max="0.3" step="0.005" value="0.12">
+      <div class="row"><label for="lgv">γv (v degradation)</label><output id="lgvO"></output></div>
+      <input type="range" id="lgv" min="0.005" max="0.15" step="0.005" value="0.06">
+      <div class="row"><label for="lsynU">synUmax</label><output id="lsynUO"></output></div>
+      <input type="range" id="lsynU" min="0.05" max="1" step="0.01" value="0.23">
+      <div class="row"><label for="lsynV">synVmax</label><output id="lsynVO"></output></div>
+      <input type="range" id="lsynV" min="0.05" max="1" step="0.01" value="0.5">
+      <div class="row"><label for="lR">R (reaction rate)</label><output id="lRO"></output></div>
+      <input type="range" id="lR" min="20" max="400" step="5" value="160">
+      <div class="row"><label for="lDu">Du</label><output id="lDuO"></output></div>
+      <input type="range" id="lDu" min="0.1" max="2" step="0.05" value="0.5">
+      <div class="row"><label for="lDv">Dv</label><output id="lDvO"></output></div>
+      <input type="range" id="lDv" min="2" max="30" step="0.5" value="10">
+      <div class="row"><label for="ldt">dt</label><output id="ldtO"></output></div>
+      <input type="range" id="ldt" min="0.0001" max="0.003" step="0.0001" value="0.001">
+      <p class="hint">Paper values (Slavkov et al. 2018): A .08, B −.08, C .03, γu .03,
+      E .1, F .12, γv .06, syn .23/.5, R 160, Du .5, Dv 10. Paper dt is 5e-5 —
+      type it in for exactness; 1e-3 converges to the same pattern far faster.</p>
+      </div>
       <div class="row"><label for="steps">Iterations</label><output id="stepsO"></output></div>
       <input type="range" id="steps" min="500" max="20000" step="250" value="4000">
       <div class="row"><label for="simres">Sim resolution</label><output id="simresO"></output></div>
@@ -247,15 +285,18 @@
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const sliders=["F","kk","Du","Dv","dt","steps","simres","seeds","seedNoise",
+const sliders=["F","kk","Du","Dv","dt",
+               "lA","lB","lC","lgu","lE","lF","lgv","lsynU","lsynV","lR","lDu","lDv","ldt",
+               "steps","simres","seeds","seedNoise",
                "thr","depth","innerD","memT","memFillet","edgeFillet",
                "connD","connT","holeD","cbD","neck","connK","rimP","pcbD","pcbT","rimT","rimF","barb",
                "gap","explode"];
-const SIM_IDS=new Set(["F","kk","Du","Dv","dt","steps","simres","seeds","seedNoise"]);
+const SIM_IDS=new Set(["F","kk","Du","Dv","dt","lA","lB","lC","lgu","lE","lF","lgv","lsynU","lsynV","lR","lDu","lDv","ldt","steps","simres","seeds","seedNoise"]);
 const PRESETS={coral:[0.0545,0.062],mitosis:[0.0367,0.0649],worms:[0.046,0.063],
                maze:[0.029,0.057],holes:[0.039,0.058],solitons:[0.03,0.062]};
 let rngSeed=7;
 const UNITS={F:"",kk:"",Du:"",Dv:"",dt:"",steps:"",simres:"",seeds:"",seedNoise:"",
+  lA:"",lB:"",lC:"",lgu:"",lE:"",lF:"",lgv:"",lsynU:"",lsynV:"",lR:"",lDu:"",lDv:"",ldt:"",
   thr:"",connK:"",innerD:"Ø mm",connD:"Ø mm",holeD:"Ø mm",cbD:"Ø mm",pcbD:"Ø mm"};
 let memMode=1;
 // swap each slider's readout for a typed number field, synced both ways
@@ -287,21 +328,30 @@ function params(){
   const g=id=>parseFloat($(id).value);
   return{depth:g("depth"),innerD:g("innerD"),thr:g("thr"),invert:$("invert").checked,
     memMode,memT:g("memT"),memFillet:g("memFillet"),edgeFillet:g("edgeFillet"),
-    connD:g("connD"),connT:g("connT"),connBand:parseInt($("connBand").value),connK:g("connK"),
+    connD:g("connD"),connT:g("connT"),holeD:g("holeD"),cbD:g("cbD"),neck:g("neck"),
+    connBand:parseInt($("connBand").value),connK:g("connK"),
     rimP:g("rimP"),pcbD:g("pcbD"),pcbT:g("pcbT"),rimT:g("rimT"),rimF:g("rimF"),barb:g("barb"),
     split:$("split").checked,gap:g("gap")};
 }
 function simParams(){
   const g=id=>parseFloat($(id).value);
-  return{res:Math.round(g("simres")),Du:g("Du"),Dv:g("Dv"),F:g("F"),k:g("kk"),
-    dt:g("dt"),steps:Math.round(g("steps")),seeds:Math.round(g("seeds")),
-    seedNoise:g("seedNoise"),rngSeed};
+  const model=$("model").value;
+  const Q={model,res:Math.round(g("simres")),steps:Math.round(g("steps")),
+    seeds:Math.round(g("seeds")),seedNoise:g("seedNoise"),rngSeed};
+  if(model==="linear"){
+    Object.assign(Q,{Du:g("lDu"),Dv:g("lDv"),dt:g("ldt"),A:g("lA"),B:g("lB"),
+      C:g("lC"),gu:g("lgu"),E:g("lE"),Fv:g("lF"),gv:g("lgv"),
+      synU:g("lsynU"),synV:g("lsynV"),R:g("lR"),F:0,k:0});
+  }else{
+    Object.assign(Q,{Du:g("Du"),Dv:g("Dv"),F:g("F"),k:g("kk"),dt:g("dt")});
+  }
+  return Q;
 }
 function labels(){
   for(const id of sliders){
     const o=$(id+"O");
     if(document.activeElement===o)continue;      // don't clobber while typing
-    o.value=String(+parseFloat($(id).value).toFixed(SIM_IDS.has(id)||id==="thr"?4:2));
+    o.value=String(+parseFloat($(id).value).toFixed(id==="ldt"?5:(SIM_IDS.has(id)||id==="thr"?4:2)));
   }
 }
 
@@ -424,7 +474,9 @@ function readouts(P,out,ms){
   const chips=[];
   const add=(k,v,warn)=>chips.push(`<span class="chip${warn?" warn":""}"><b>${k}</b>${v}</span>`);
   const Q=simParams();
-  add("pattern",`F ${Q.F} · k ${Q.k} · ${texCache.nVerts} pts · ${(texCache.simMs/1000).toFixed(1)} s sim`);
+  add("pattern",Q.model==="linear"
+    ?`kilobot A ${Q.A} C ${Q.C} R ${Q.R} · ${texCache.nVerts} pts · ${(texCache.simMs/1000).toFixed(1)} s sim`
+    :`F ${Q.F} · k ${Q.k} · ${texCache.nVerts} pts · ${(texCache.simMs/1000).toFixed(1)} s sim`);
   const cov=coverage(out.T,P.thr,P.invert);
   add("coverage",(100*cov).toFixed(0)+"% solid",cov<0.25||cov>0.85);
   add("OD",(2*M.Rout).toFixed(0)+" mm");
@@ -538,6 +590,12 @@ let timer=null;
 function schedule(){labels();clearTimeout(timer);timer=setTimeout(rebuild,380);}
 for(const id of sliders)$(id).addEventListener("input",schedule);
 for(const id of["connBand","res","preset"])$(id).addEventListener("change",schedule);
+function syncModelRows(){
+  const lin=$("model").value==="linear";
+  $("gsRows").hidden=lin;$("linRows").hidden=!lin;
+  $("preset").disabled=lin;
+}
+$("model").addEventListener("change",()=>{syncModelRows();persist();schedule();});
 $("split").addEventListener("change",schedule);
 $("invert").addEventListener("change",schedule);
 $("preset").addEventListener("change",()=>{
@@ -565,7 +623,7 @@ function snapshot(){
   for(const id of sliders)o[id]=$(id).value;
   for(const id of["connBand","res"])o[id]=$(id).value;
   for(const id of["split","invert","section","autorot"])o[id]=$(id).checked;
-  o.preset=$("preset").value;o.rngSeed=rngSeed;
+  o.preset=$("preset").value;o.model=$("model").value;o.rngSeed=rngSeed;
   return o;
 }
 function restore(){
@@ -576,6 +634,7 @@ function restore(){
   for(const id of["connBand","res"])if(id in o)$(id).value=o[id];
   for(const id of["split","invert","section"])if(id in o)$(id).checked=o[id];
   if(o.preset)$("preset").value=o.preset;
+  if(o.model)$("model").value=o.model;
   if(o.rngSeed)rngSeed=o.rngSeed;
   if("memMode" in o){
     memMode=parseInt(o.memMode)||0;
@@ -595,6 +654,7 @@ $("copySet").addEventListener("click",async()=>{
 
 makeNumFields();
 restore();
+syncModelRows();
 labels();
 tick();
 rebuild();
