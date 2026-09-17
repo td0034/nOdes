@@ -60,6 +60,7 @@
   <span id="gen">gen 1</span>
   <button class="btn primary" id="evolve" disabled>Evolve next generation</button>
   <button class="btn" id="reroll">Reroll (random 16)</button>
+  <button class="btn" id="hist">Copy liked history</button>
   <label class="ctl">Mutation
     <input type="range" id="mut" min="0.05" max="0.5" step="0.05" value="0.18" style="width:90px">
   </label>
@@ -182,15 +183,16 @@ function setTileMesh(t,data){
 }
 
 // ---------- state ----------
-let genomes=[],ratings=[],genNo=1,building=false;
+let genomes=[],ratings=[],genNo=1,building=false,likedLog=[];
 function saveState(){
-  try{localStorage.setItem(SKEY,JSON.stringify({genomes,ratings,genNo}));}catch(e){}
+  try{localStorage.setItem(SKEY,JSON.stringify({genomes,ratings,genNo,likedLog}));}catch(e){}
 }
 function loadState(){
   try{
     const o=JSON.parse(localStorage.getItem(SKEY));
     if(o&&o.genomes&&o.genomes.length===GRID){
       genomes=o.genomes;ratings=o.ratings||new Array(GRID).fill(0);genNo=o.genNo||1;
+      likedLog=o.likedLog||[];
       return true;
     }
   }catch(e){}
@@ -274,6 +276,7 @@ function updateHeader(){
 // ---------- actions ----------
 $("evolve").addEventListener("click",()=>{
   const liked=genomes.filter((g,i)=>ratings[i]===1);
+  for(const g of liked)likedLog.push(Object.assign({gen:genNo},g));
   const mut=parseFloat($("mut").value);
   genomes=liked.length
     ?Array.from({length:GRID},()=>breed(
@@ -284,6 +287,12 @@ $("evolve").addEventListener("click",()=>{
   genNo++;
   genomes.forEach((_,i)=>paintTile(i));
   saveState();buildGeneration();
+});
+$("hist").addEventListener("click",async()=>{
+  const txt=JSON.stringify(likedLog,null,1);
+  try{await navigator.clipboard.writeText(txt);
+    $("hint").textContent=`copied ${likedLog.length} liked genomes to the clipboard`;}
+  catch(e){prompt("Liked genomes:",txt);}
 });
 $("reroll").addEventListener("click",()=>{
   genomes=Array.from({length:GRID},randomGenome);
@@ -298,9 +307,10 @@ function sendToDesigner(i){
   try{o=JSON.parse(localStorage.getItem("turingOrbSettings.v1"))||{};}catch(e){}
   o.model=g.model;o.preset="custom";o.rngSeed=g.rngSeed;
   o.simres=String(g.simres);o.thr=String(+g.thr.toFixed(3));o.invert=g.invert;
+  o.seeds="18";o.seedNoise="0.05";      // match the thumbnail sim exactly
   if(g.model==="gs"){
     o.F=String(g.F);o.kk=String(g.k);o.Du=String(g.Du);o.Dv=String(g.Dv);
-    o.dt="1";o.steps="4000";
+    o.dt="1";o.steps="3000";
   }else{
     o.lA=String(g.A);o.lB=String(g.B);o.lC=String(g.C);o.lgu=String(g.gu);
     o.lE=String(g.E);o.lF=String(g.Fv);o.lgv=String(g.gv);o.lR=String(g.R);
