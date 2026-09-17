@@ -1,0 +1,601 @@
+<title>Turing Orb Designer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root{
+    --ink:#12161B; --deep:#0D1115; --panel:#191F26; --panel2:#1F2630;
+    --line:#2B343E; --text:#E4EAEF; --mute:#8D9AA6; --accent:#5BC8AF;
+    --good:#74C08F; --warn:#E0705C;
+    --ui:"Archivo",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--deep);color:var(--text);font-family:var(--ui);
+       font-size:14px;overflow:hidden}
+  #app{display:flex;height:100vh}
+
+  /* ---- control rail ---- */
+  #rail{width:304px;flex:0 0 304px;background:var(--ink);border-right:1px solid var(--line);
+        overflow-y:auto;padding:0 0 24px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  #rail header{padding:18px 18px 14px;border-bottom:1px solid var(--line);
+        position:sticky;top:0;background:var(--ink);z-index:2}
+  #rail h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.01em}
+  #rail h1 em{color:var(--accent);font-style:normal}
+  #rail header p{margin:4px 0 0;color:var(--mute);font-size:12px}
+  .group{border-bottom:1px solid var(--line);padding:14px 18px 16px}
+  .group>h2{margin:0 0 10px;font-size:11px;font-weight:600;color:var(--mute);
+        text-transform:uppercase;letter-spacing:.09em}
+  .row{display:flex;align-items:center;gap:10px;margin:9px 0}
+  .row label{flex:1;color:var(--text);font-size:13px}
+  .row output{font-family:var(--mono);font-size:12px;color:var(--accent);
+        min-width:62px;text-align:right;font-variant-numeric:tabular-nums}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;
+        background:transparent;margin:0 0 2px;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;
+        background:var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+        border-radius:50%;background:var(--text);margin-top:-5.5px;border:none}
+  input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+  input[type=range]:disabled::-webkit-slider-thumb{background:var(--line)}
+  input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(--line)}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+        background:var(--text);border:none}
+  .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:7px;
+        overflow:hidden}
+  .seg button{flex:1;padding:7px 4px;background:none;border:none;color:var(--mute);
+        font-family:var(--ui);font-size:12px;font-weight:500;cursor:pointer}
+  .seg button[aria-pressed=true]{background:var(--panel2);color:var(--text);
+        box-shadow:inset 0 -2px 0 var(--accent)}
+  .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .check{display:flex;align-items:center;gap:9px;margin:9px 0;font-size:13px;cursor:pointer}
+  .check input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+  select{background:var(--panel);color:var(--text);border:1px solid var(--line);
+        border-radius:6px;padding:6px 8px;font-family:var(--ui);font-size:12.5px;width:100%}
+  .btn{display:block;width:100%;padding:9px 10px;margin-top:10px;background:var(--panel2);
+        color:var(--text);border:1px solid var(--line);border-radius:7px;
+        font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
+  .btn:hover{border-color:var(--accent)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .hint{color:var(--mute);font-size:11.5px;margin:6px 0 0;line-height:1.45}
+  .row input.num{width:66px;background:var(--panel);border:1px solid var(--line);
+        border-radius:5px;color:var(--accent);font-family:var(--mono);font-size:12px;
+        text-align:right;padding:3px 6px;font-variant-numeric:tabular-nums;
+        -moz-appearance:textfield}
+  .row input.num::-webkit-outer-spin-button,.row input.num::-webkit-inner-spin-button{
+        -webkit-appearance:none;margin:0}
+  .row input.num:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .row input.num:disabled{color:var(--mute)}
+  .row .unit{color:var(--mute);font-size:10.5px;min-width:22px}
+
+  /* ---- viewport ---- */
+  #view{flex:1;position:relative;min-width:0}
+  #canvas{display:block;width:100%;height:100%}
+  #status{position:absolute;top:14px;right:16px;font-family:var(--mono);font-size:12px;
+        color:var(--mute);background:rgba(18,22,27,.82);border:1px solid var(--line);
+        border-radius:7px;padding:6px 11px;transition:color .2s}
+  #status.busy{color:var(--accent)}
+  #readouts{position:absolute;left:14px;right:14px;bottom:12px;display:flex;flex-wrap:wrap;
+        gap:7px;pointer-events:none}
+  .chip{font-family:var(--mono);font-size:11.5px;color:var(--text);background:rgba(18,22,27,.85);
+        border:1px solid var(--line);border-radius:6px;padding:5px 9px;
+        font-variant-numeric:tabular-nums}
+  .chip b{font-weight:600;color:var(--mute);margin-right:5px}
+  .chip.warn{color:var(--warn);border-color:var(--warn)}
+  @media (max-width:760px){
+    #app{flex-direction:column}
+    #rail{width:100%;flex:0 0 44%;border-right:none;border-bottom:1px solid var(--line)}
+  }
+</style>
+
+<div id="app">
+  <div id="rail">
+    <header>
+      <h1>Turing <em>Orb</em> Designer</h1>
+      <p>Gray–Scott reaction–diffusion shell</p>
+    </header>
+
+    <div class="group">
+      <h2>Reaction–diffusion</h2>
+      <div class="row" style="margin-bottom:4px"><label for="preset">Pearson regime</label></div>
+      <select id="preset">
+        <option value="custom">Custom</option>
+        <option value="coral" selected>Coral · F .0545 k .062</option>
+        <option value="mitosis">Mitosis · F .0367 k .0649</option>
+        <option value="worms">Worms · F .046 k .063</option>
+        <option value="maze">Maze · F .029 k .057</option>
+        <option value="holes">Holes · F .039 k .058</option>
+        <option value="solitons">Solitons · F .03 k .062</option>
+      </select>
+      <div class="row"><label for="F">Feed rate F</label><output id="FO"></output></div>
+      <input type="range" id="F" min="0.01" max="0.09" step="0.0005" value="0.0545">
+      <div class="row"><label for="kk">Kill rate k</label><output id="kkO"></output></div>
+      <input type="range" id="kk" min="0.04" max="0.075" step="0.0005" value="0.062">
+      <div class="row"><label for="Du">Diffusion Du</label><output id="DuO"></output></div>
+      <input type="range" id="Du" min="0.05" max="0.3" step="0.005" value="0.16">
+      <div class="row"><label for="Dv">Diffusion Dv</label><output id="DvO"></output></div>
+      <input type="range" id="Dv" min="0.02" max="0.15" step="0.005" value="0.08">
+      <div class="row"><label for="dt">Timestep dt</label><output id="dtO"></output></div>
+      <input type="range" id="dt" min="0.2" max="1.5" step="0.05" value="1">
+      <div class="row"><label for="steps">Iterations</label><output id="stepsO"></output></div>
+      <input type="range" id="steps" min="500" max="20000" step="250" value="4000">
+      <div class="row"><label for="simres">Sim resolution</label><output id="simresO"></output></div>
+      <input type="range" id="simres" min="24" max="96" step="4" value="48">
+      <div class="row"><label for="seeds">Seed patches</label><output id="seedsO"></output></div>
+      <input type="range" id="seeds" min="1" max="60" step="1" value="20">
+      <div class="row"><label for="seedNoise">Seed noise</label><output id="seedNoiseO"></output></div>
+      <input type="range" id="seedNoise" min="0" max="0.3" step="0.01" value="0.05">
+      <button class="btn" id="reseed">Reseed (new random start)</button>
+      <p class="hint">Pattern scale on the orb = sim resolution (fine ↑) vs the regime’s
+      intrinsic wavelength. Higher iterations = fully settled pattern.</p>
+    </div>
+
+    <div class="group">
+      <h2>Shell</h2>
+      <div class="row"><label for="thr">Wall threshold</label><output id="thrO"></output></div>
+      <input type="range" id="thr" min="0.05" max="0.95" step="0.01" value="0.3">
+      <label class="check"><input type="checkbox" id="invert">Invert (pattern = holes)</label>
+      <div class="row"><label for="depth">Radial depth</label><output id="depthO"></output></div>
+      <input type="range" id="depth" min="3" max="10" step="0.5" value="6">
+      <div class="row"><label for="innerD">Inner diameter</label><output id="innerDO"></output></div>
+      <input type="range" id="innerD" min="50" max="80" step="1" value="68">
+    </div>
+
+    <div class="group">
+      <h2>Membrane</h2>
+      <div class="seg" id="memMode" role="group" aria-label="Membrane position">
+        <button data-v="0">None</button><button data-v="1" aria-pressed="true">Internal</button><button data-v="2">External</button>
+      </div>
+      <div class="row"><label for="memT">Thickness</label><output id="memTO"></output></div>
+      <input type="range" id="memT" min="0.6" max="2" step="0.1" value="1">
+      <div class="row"><label for="memFillet">Membrane fillet</label><output id="memFilletO"></output></div>
+      <input type="range" id="memFillet" min="0" max="6" step="0.1" value="1.2">
+      <p class="hint">The fillet blends the membrane into every rib wall — the “silicone pooled in the cells” look.</p>
+    </div>
+
+    <div class="group">
+      <h2>Edge fillets</h2>
+      <div class="row"><label for="edgeFillet">Outer edges</label><output id="edgeFilletO"></output></div>
+      <input type="range" id="edgeFillet" min="0" max="2" step="0.1" value="0.6">
+    </div>
+
+    <div class="group">
+      <h2>Connector</h2>
+      <div class="row"><label for="connD">Boss diameter (0 = none)</label><output id="connDO"></output></div>
+      <input type="range" id="connD" min="0" max="16" step="0.5" value="12">
+      <div class="row"><label for="connT">Boss depth</label><output id="connTO"></output></div>
+      <input type="range" id="connT" min="4" max="12" step="0.5" value="8">
+      <div class="row"><label for="holeD">Hole Ø (through)</label><output id="holeDO"></output></div>
+      <input type="range" id="holeD" min="6" max="9" step="0.1" value="8">
+      <div class="row"><label for="cbD">Counterbore Ø (entry)</label><output id="cbDO"></output></div>
+      <input type="range" id="cbD" min="9" max="12" step="0.1" value="10.3">
+      <div class="row"><label for="neck">Neck (outer face → shoulder)</label><output id="neckO"></output></div>
+      <input type="range" id="neck" min="2" max="6" step="0.1" value="2">
+      <p class="hint">Connector goes in from the inside: Ø10 flange seats on the shoulder
+      (can’t pull out), resin packs the entry bore (can’t push in).</p>
+      <div class="row" style="margin-bottom:4px"><label for="connBand">Position (3-fold axis)</label></div>
+      <select id="connBand">
+        <option value="0" selected>Bottom ring · polar 142.6°</option>
+        <option value="1">Lower equator · polar 100.8°</option>
+        <option value="2">Upper equator · polar 79.2°</option>
+        <option value="3">Top ring · polar 37.4°</option>
+      </select>
+      <div class="row"><label for="connK">Which of the 5</label><output id="connKO"></output></div>
+      <input type="range" id="connK" min="0" max="4" step="1" value="0">
+    </div>
+
+    <div class="group">
+      <h2>PCB rim</h2>
+      <div class="row"><label for="rimP">Protrude depth</label><output id="rimPO"></output></div>
+      <input type="range" id="rimP" min="0" max="5" step="0.25" value="2">
+      <div class="row"><label for="pcbD">PCB diameter</label><output id="pcbDO"></output></div>
+      <input type="range" id="pcbD" min="58" max="70" step="0.5" value="68.5">
+      <div class="row"><label for="pcbT">PCB thickness</label><output id="pcbTO"></output></div>
+      <input type="range" id="pcbT" min="0.8" max="4" step="0.1" value="3">
+      <div class="row"><label for="rimT">Rim thickness</label><output id="rimTO"></output></div>
+      <input type="range" id="rimT" min="0.8" max="3" step="0.1" value="1.5">
+      <div class="row"><label for="rimF">Rim–membrane fillet</label><output id="rimFO"></output></div>
+      <input type="range" id="rimF" min="0" max="1.5" step="0.1" value="0.8">
+      <div class="row"><label for="barb">Barb depth</label><output id="barbO"></output></div>
+      <input type="range" id="barb" min="0.5" max="2.5" step="0.05" value="1">
+      <p class="hint">Harpoon clip: each half keeps a full support ring on its side of the
+      board and a short ramped barb on the other — the PCB snaps past the barbs and locks
+      when the halves close. Barbs show in split view. Protrude 0 = no rim.</p>
+    </div>
+
+    <div class="group">
+      <h2>Equator split</h2>
+      <label class="check"><input type="checkbox" id="split" checked>Split into two halves</label>
+      <div class="row"><label for="gap">Clearance gap</label><output id="gapO"></output></div>
+      <input type="range" id="gap" min="0" max="0.6" step="0.05" value="0.15">
+      <div class="row"><label for="explode">Explode view</label><output id="explodeO"></output></div>
+      <input type="range" id="explode" min="0" max="30" step="1" value="24">
+    </div>
+
+    <div class="group">
+      <h2>View</h2>
+      <div class="row" style="margin-bottom:4px"><label for="res">Preview resolution</label></div>
+      <select id="res">
+        <option value="96">Fast · 96³</option>
+        <option value="128">Standard · 128³</option>
+        <option value="160">Fine · 160³</option>
+        <option value="200" selected>Ultra · 200³ (slow)</option>
+      </select>
+      <label class="check"><input type="checkbox" id="section">Section view (cut at X)</label>
+      <label class="check"><input type="checkbox" id="autorot">Auto-rotate</label>
+      <button class="btn" id="stl">Export STL (per half when split)</button>
+      <button class="btn" id="copySet">Copy settings</button>
+      <p class="hint" id="stlHint" hidden>Browsers can’t save files from this hosted page — open the local copy
+      (<span style="font-family:var(--mono)">gyroid-orb/silicone_designer.html</span>) and export from there.</p>
+      <p class="hint">Preview geometry only — the Fusion scripts build the real
+      solid. Drag to orbit, scroll to zoom.</p>
+    </div>
+  </div>
+
+  <div id="view">
+    <canvas id="canvas"></canvas>
+    <div id="status">ready</div>
+    <div id="readouts"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/*__CORE__*/
+</script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const sliders=["F","kk","Du","Dv","dt","steps","simres","seeds","seedNoise",
+               "thr","depth","innerD","memT","memFillet","edgeFillet",
+               "connD","connT","holeD","cbD","neck","connK","rimP","pcbD","pcbT","rimT","rimF","barb",
+               "gap","explode"];
+const SIM_IDS=new Set(["F","kk","Du","Dv","dt","steps","simres","seeds","seedNoise"]);
+const PRESETS={coral:[0.0545,0.062],mitosis:[0.0367,0.0649],worms:[0.046,0.063],
+               maze:[0.029,0.057],holes:[0.039,0.058],solitons:[0.03,0.062]};
+let rngSeed=7;
+const UNITS={F:"",kk:"",Du:"",Dv:"",dt:"",steps:"",simres:"",seeds:"",seedNoise:"",
+  thr:"",connK:"",innerD:"Ø mm",connD:"Ø mm",holeD:"Ø mm",cbD:"Ø mm",pcbD:"Ø mm"};
+let memMode=1;
+// swap each slider's readout for a typed number field, synced both ways
+function makeNumFields(){
+  for(const id of sliders){
+    const o=$(id+"O"),r=$(id);
+    const inp=document.createElement("input");
+    inp.type="number";inp.className="num";inp.id=id+"O";
+    inp.min=r.min;inp.max=r.max;inp.step=r.step;
+    inp.setAttribute("aria-label",id+" value");
+    o.replaceWith(inp);
+    const unit=document.createElement("span");
+    unit.className="unit";
+    unit.textContent=(id in UNITS)?UNITS[id]:"mm";
+    inp.after(unit);
+    inp.addEventListener("change",()=>{
+      let v=parseFloat(inp.value);
+      if(isNaN(v)){labels();return;}
+      v=Math.min(parseFloat(r.max),Math.max(parseFloat(r.min),v));
+      r.value=v;
+      labels();persist();
+      if(id==="explode")applyExplode();else schedule();
+    });
+  }
+}
+
+
+function params(){
+  const g=id=>parseFloat($(id).value);
+  return{depth:g("depth"),innerD:g("innerD"),thr:g("thr"),invert:$("invert").checked,
+    memMode,memT:g("memT"),memFillet:g("memFillet"),edgeFillet:g("edgeFillet"),
+    connD:g("connD"),connT:g("connT"),connBand:parseInt($("connBand").value),connK:g("connK"),
+    rimP:g("rimP"),pcbD:g("pcbD"),pcbT:g("pcbT"),rimT:g("rimT"),rimF:g("rimF"),barb:g("barb"),
+    split:$("split").checked,gap:g("gap")};
+}
+function simParams(){
+  const g=id=>parseFloat($(id).value);
+  return{res:Math.round(g("simres")),Du:g("Du"),Dv:g("Dv"),F:g("F"),k:g("kk"),
+    dt:g("dt"),steps:Math.round(g("steps")),seeds:Math.round(g("seeds")),
+    seedNoise:g("seedNoise"),rngSeed};
+}
+function labels(){
+  for(const id of sliders){
+    const o=$(id+"O");
+    if(document.activeElement===o)continue;      // don't clobber while typing
+    o.value=String(+parseFloat($(id).value).toFixed(SIM_IDS.has(id)||id==="thr"?4:2));
+  }
+}
+
+// ---------- three.js scene ----------
+const canvas=$("canvas");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.localClippingEnabled=true;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0d1115);
+const camera=new THREE.PerspectiveCamera(38,1,1,2000);
+let camTheta=0.6,camPhi=1.15,camDist=185;
+function placeCam(){
+  camera.position.set(camDist*Math.sin(camPhi)*Math.cos(camTheta),
+                      camDist*Math.sin(camPhi)*Math.sin(camTheta),
+                      camDist*Math.cos(camPhi));
+  camera.up.set(0,0,1);
+  camera.lookAt(0,0,0);
+}
+scene.add(new THREE.HemisphereLight(0xcfd8e0,0x1b2026,0.75));
+const key=new THREE.DirectionalLight(0xffe8cf,0.9);key.position.set(1.2,0.6,1.4);scene.add(key);
+const rim=new THREE.DirectionalLight(0x9fb6c9,0.45);rim.position.set(-1.4,-0.8,-0.6);scene.add(rim);
+
+const clipPlane=new THREE.Plane(new THREE.Vector3(-1,0,0),0);
+function makeMat(color){
+  return new THREE.MeshStandardMaterial({color,roughness:0.55,metalness:0.06,
+    side:THREE.DoubleSide,clippingPlanes:$("section").checked?[clipPlane]:[]});
+}
+let meshes=[];
+function clearMeshes(){
+  for(const m of meshes){scene.remove(m);m.geometry.dispose();m.material.dispose();}
+  meshes=[];
+}
+function addMesh(data,color,zoff){
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(data.positions,3));
+  geo.setIndex(new THREE.BufferAttribute(data.indices,1));
+  geo.computeVertexNormals();
+  const m=new THREE.Mesh(geo,makeMat(color));
+  m.position.z=zoff||0;
+  m.userData.zbase=zoff||0;
+  scene.add(m);meshes.push(m);
+  return m;
+}
+
+// ---------- build pipeline ----------
+let lastBuild={P:null,meshData:null};
+let building=false,pending=false;
+function setStatus(t,busy){$("status").textContent=t;$("status").classList.toggle("busy",!!busy);}
+
+function rebuild(){
+  if(building){pending=true;return;}
+  building=true;
+  const P=params();
+  setStatus("building…",true);
+  requestAnimationFrame(()=>setTimeout(()=>{
+    const t0=performance.now();
+    let out;
+    try{out=buildAll(P);}catch(e){setStatus("error: "+e.message,false);building=false;return;}
+    clearMeshes();
+    if(out.top){
+      addMesh(out.top,0xd8d4ca,0);
+      addMesh(out.bottom,0xb9beb9,0);
+    }else{
+      addMesh(out.whole,0xd8d4ca,0);
+    }
+    applyExplode();
+    const ms=performance.now()-t0;
+    readouts(P,out,ms);
+    setStatus((ms/1000).toFixed(1)+" s @ "+$("res").value+"³",false);
+    building=false;
+    if(pending){pending=false;rebuild();}
+  },25));
+}
+
+let texCache={key:null,T:null,simMs:0,nVerts:0};
+function ensureTexture(){
+  const Q=simParams();
+  const key=JSON.stringify(Q);
+  if(texCache.key===key)return texCache;
+  const t0=performance.now();
+  const sim=simulate(Q);
+  texCache={key,T:fieldTexture(sim,512,256),
+            simMs:performance.now()-t0,nVerts:sim.n};
+  return texCache;
+}
+function buildAll(P){
+  const{T}=ensureTexture();
+  const M=buildModel(P,T);
+  const N=parseInt($("res").value);
+  const S=sampleField((x,y,z)=>M.fSolid(x,y,z),M.H,N);
+  const rimOn=P.rimP>0;
+  if(!P.split){
+    let nodes=S;
+    if(rimOn){
+      const rk=Math.max(P.rimF,0.3);
+      const R0=sampleField((x,y,z)=>M.fRim(x,y,z,0),M.H,N);
+      nodes=new Float32Array(S.length);
+      for(let i=0;i<S.length;i++)nodes[i]=smin(S[i],R0[i],rk);
+    }
+    const whole=meshFromNodes(nodes,M.H,N);
+    return{whole,M,T,volume:whole.volume};
+  }
+  const Cut=sampleField((x,y,z)=>M.fCut(x,y,z),M.H,N);
+  const RT=rimOn?sampleField((x,y,z)=>M.fRim(x,y,z,1),M.H,N):null;
+  const RB=rimOn?sampleField((x,y,z)=>M.fRim(x,y,z,-1),M.H,N):null;
+  const g2=P.gap/2,rk=Math.max(P.rimF,0.3);
+  const Tn=new Float32Array(S.length),B=new Float32Array(S.length);
+  for(let i=0;i<S.length;i++){
+    const st=rimOn?smin(S[i],RT[i],rk):S[i];
+    const sb=rimOn?smin(S[i],RB[i],rk):S[i];
+    Tn[i]=Math.max(st,Cut[i]+g2);
+    B[i]=Math.max(sb,-Cut[i]+g2);
+  }
+  const top=meshFromNodes(Tn,M.H,N),bottom=meshFromNodes(B,M.H,N);
+  return{top,bottom,M,T,volume:top.volume+bottom.volume};
+}
+function readouts(P,out,ms){
+  const M=out.M;
+  const chips=[];
+  const add=(k,v,warn)=>chips.push(`<span class="chip${warn?" warn":""}"><b>${k}</b>${v}</span>`);
+  const Q=simParams();
+  add("pattern",`F ${Q.F} · k ${Q.k} · ${texCache.nVerts} pts · ${(texCache.simMs/1000).toFixed(1)} s sim`);
+  const cov=coverage(out.T,P.thr,P.invert);
+  add("coverage",(100*cov).toFixed(0)+"% solid",cov<0.25||cov>0.85);
+  add("OD",(2*M.Rout).toFixed(0)+" mm");
+  const vol=out.volume/1000;
+  add("volume",vol.toFixed(1)+" cm³ · "+(vol*1.01).toFixed(0)+" g PA12");
+  const w=P.thr/out.T.gmed*M.rMid;
+  add("≈wall scale",w.toFixed(1)+" mm",w<1);
+  if(P.rimP>0){
+    const grip=P.pcbD/2-(P.innerD/2-P.rimP);
+    add("ring grip",grip.toFixed(2)+" mm",grip<0.5);
+    add("barb grip",(P.pcbD/2-(P.innerD/2-P.barb)).toFixed(2)+" mm");
+  }
+  if(P.connD>0){
+    const wall=(P.connD-P.cbD)/2;
+    add("conn",`Ø${P.holeD}↕ · bore Ø${P.cbD} · wall ${wall.toFixed(1)} mm`,wall<1||P.cbD<=P.holeD);
+  }
+  const nt=out.whole?out.whole.nTris:out.top.nTris+out.bottom.nTris;
+  add("mesh",(nt/1000).toFixed(0)+"k tris");
+  $("readouts").innerHTML=chips.join("");
+}
+
+function applyExplode(){
+  const e=parseFloat($("explode").value);
+  if(meshes.length===2){
+    meshes[0].position.z=e/2;
+    meshes[1].position.z=-e/2;
+  }
+}
+
+// ---------- interaction ----------
+let dragging=false,px=0,py=0;
+canvas.addEventListener("pointerdown",e=>{dragging=true;px=e.clientX;py=e.clientY;
+  canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener("pointermove",e=>{
+  if(!dragging)return;
+  camTheta-=(e.clientX-px)*0.008;
+  camPhi=Math.min(Math.PI-0.05,Math.max(0.05,camPhi-(e.clientY-py)*0.008));
+  px=e.clientX;py=e.clientY;
+});
+canvas.addEventListener("pointerup",()=>dragging=false);
+canvas.addEventListener("wheel",e=>{e.preventDefault();
+  camDist=Math.min(500,Math.max(70,camDist*(1+e.deltaY*0.001)));},{passive:false});
+
+function resize(){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(canvas.width!==w*renderer.getPixelRatio()){
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+}
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(reduceMotion)$("autorot").checked=false;
+function tick(){
+  resize();
+  if($("autorot").checked&&!dragging)camTheta+=0.0022;
+  placeCam();
+  renderer.render(scene,camera);
+  requestAnimationFrame(tick);
+}
+
+// ---------- STL export (preview only) ----------
+function stlBuffer(m){
+  const nt=m.geometry.index.count/3;
+  const buf=new ArrayBuffer(84+nt*50),dv=new DataView(buf);
+  dv.setUint32(80,nt,true);
+  let off=84;
+  {
+    const pos=m.geometry.attributes.position.array,idx=m.geometry.index.array;
+    for(let i=0;i<idx.length;i+=3){
+      const a=idx[i]*3,b=idx[i+1]*3,c=idx[i+2]*3;
+      const ux=pos[b]-pos[a],uy=pos[b+1]-pos[a+1],uz=pos[b+2]-pos[a+2];
+      const vx=pos[c]-pos[a],vy=pos[c+1]-pos[a+1],vz=pos[c+2]-pos[a+2];
+      let nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;
+      const nl=Math.hypot(nx,ny,nz)||1;nx/=nl;ny/=nl;nz/=nl;
+      dv.setFloat32(off,nx,true);dv.setFloat32(off+4,ny,true);dv.setFloat32(off+8,nz,true);
+      for(const j of[a,b,c]){
+        off+=12;
+        dv.setFloat32(off,pos[j],true);
+        dv.setFloat32(off+4,pos[j+1],true);
+        dv.setFloat32(off+8,pos[j+2],true);
+      }
+      off+=14;dv.setUint16(off-2,0,true);
+    }
+  }
+  return buf;
+}
+function exportSTL(){
+  if(!meshes.length)return;
+  let hosted=false;
+  try{hosted=!!(window.claude&&window.claude.use);}catch(e){}
+  if(hosted){
+    $("stlHint").hidden=false;
+    setStatus("STL export needs the local copy",false);
+    return;
+  }
+  const P=params(),Q=simParams();
+  const base=`turing_orb_F${Q.F}_k${Q.k}_thr${P.thr}_d${P.depth}`;
+  const names=meshes.length===2?[base+"_top.stl",base+"_bottom.stl"]:[base+"_preview.stl"];
+  meshes.forEach((m,i)=>{
+    setTimeout(()=>{
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(new Blob([stlBuffer(m)],{type:"model/stl"}));
+      a.download=names[i];a.click();
+    },i*400);
+  });
+  setStatus("exported "+names.join(" + "),false);
+}
+
+// ---------- wiring ----------
+let timer=null;
+function schedule(){labels();clearTimeout(timer);timer=setTimeout(rebuild,380);}
+for(const id of sliders)$(id).addEventListener("input",schedule);
+for(const id of["connBand","res","preset"])$(id).addEventListener("change",schedule);
+$("split").addEventListener("change",schedule);
+$("invert").addEventListener("change",schedule);
+$("preset").addEventListener("change",()=>{
+  const p=PRESETS[$("preset").value];
+  if(p){$("F").value=p[0];$("kk").value=p[1];labels();persist();}
+});
+for(const id of["F","kk"])$(id).addEventListener("input",()=>{$("preset").value="custom";});
+$("reseed").addEventListener("click",()=>{rngSeed=(Math.random()*1e9)|0;texCache.key=null;persist();schedule();});
+$("section").addEventListener("change",()=>{
+  for(const m of meshes)m.material.clippingPlanes=$("section").checked?[clipPlane]:[];
+});
+$("explode").addEventListener("input",()=>{labels();applyExplode();});
+$("memMode").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  memMode=parseInt(b.dataset.v);
+  for(const x of $("memMode").children)x.setAttribute("aria-pressed",x===b);
+  schedule();
+});
+$("stl").addEventListener("click",exportSTL);
+
+// ---------- settings persistence ----------
+const SKEY="turingOrbSettings.v1";
+function snapshot(){
+  const o={memMode};
+  for(const id of sliders)o[id]=$(id).value;
+  for(const id of["connBand","res"])o[id]=$(id).value;
+  for(const id of["split","invert","section","autorot"])o[id]=$(id).checked;
+  o.preset=$("preset").value;o.rngSeed=rngSeed;
+  return o;
+}
+function restore(){
+  let o=null;
+  try{o=JSON.parse(localStorage.getItem(SKEY));}catch(e){}
+  if(!o)return;
+  for(const id of sliders)if(id in o)$(id).value=o[id];
+  for(const id of["connBand","res"])if(id in o)$(id).value=o[id];
+  for(const id of["split","invert","section"])if(id in o)$(id).checked=o[id];
+  if(o.preset)$("preset").value=o.preset;
+  if(o.rngSeed)rngSeed=o.rngSeed;
+  if("memMode" in o){
+    memMode=parseInt(o.memMode)||0;
+    [...$("memMode").children].forEach(b=>b.setAttribute("aria-pressed",parseInt(b.dataset.v)===memMode));
+  }
+}
+function persist(){
+  try{localStorage.setItem(SKEY,JSON.stringify(snapshot()));}catch(e){}
+}
+document.getElementById("rail").addEventListener("input",persist);
+document.getElementById("rail").addEventListener("click",persist);
+$("copySet").addEventListener("click",async()=>{
+  const txt=JSON.stringify(snapshot());
+  try{await navigator.clipboard.writeText(txt);setStatus("settings copied to clipboard",false);}
+  catch(e){prompt("Copy the settings:",txt);}
+});
+
+makeNumFields();
+restore();
+labels();
+tick();
+rebuild();
+</script>
